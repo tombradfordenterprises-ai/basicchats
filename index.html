@@ -12,7 +12,11 @@
 
   <div class="top-bar">
     <input id="search" placeholder="Search chats..." />
-    <button onclick="showCreate()">+ Create</button>
+        <button onclick=function showCreate() {
+  document.getElementById("chatList").classList.add("hidden");
+  document.getElementById("create").classList.remove("hidden");
+}
+>Create</button>
   </div>
 
   <div id="chatList"></div>
