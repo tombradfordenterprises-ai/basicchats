@@ -12,21 +12,19 @@
 
   <div class="top-bar">
     <input id="search" placeholder="Search chats..." />
-        <button onclick=function showCreate() {
-  document.getElementById("chatList").classList.add("hidden");
-  document.getElementById("create").classList.remove("hidden");
-}
->Create</button>
+    <button onclick="showCreate()">+ Create</button>
   </div>
 
   <div id="chatList"></div>
 
+  <!-- CREATE CHAT -->
   <div id="create" class="hidden">
     <input id="chatName" placeholder="Chat name" />
     <textarea id="chatRules" placeholder="Rules"></textarea>
     <button onclick="createChat()">Create</button>
   </div>
 
+  <!-- CHAT ROOM -->
   <div id="chatRoom" class="hidden">
     <h2 id="roomTitle"></h2>
     <p id="roomRules"></p>
@@ -46,4 +44,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
