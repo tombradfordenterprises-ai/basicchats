@@ -12,16 +12,16 @@
 
   <div class="top-bar">
     <input id="search" placeholder="Search chats..." />
-    <button onclick="showCreate()">+ Create</button>
+    <button id="createBtn">+ Create</button>
   </div>
 
   <div id="chatList"></div>
 
-  <!-- CREATE CHAT -->
+  <!-- CREATE CHAT FORM -->
   <div id="create" class="hidden">
     <input id="chatName" placeholder="Chat name" />
     <textarea id="chatRules" placeholder="Rules"></textarea>
-    <button onclick="createChat()">Create</button>
+    <button id="createChatBtn">Create</button>
   </div>
 
   <!-- CHAT ROOM -->
@@ -33,10 +33,10 @@
 
     <div class="message-bar">
       <input id="messageInput" />
-      <button onclick="sendMessage()">Send</button>
+      <button id="sendMsgBtn">Send</button>
     </div>
 
-    <button onclick="goHome()">Back</button>
+    <button id="backBtn">Back</button>
   </div>
 </div>
 
