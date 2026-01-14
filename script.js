@@ -86,14 +86,17 @@ function createChat() {
     rules
   };
 
+  // Emit the new chat to the backend
   socket.emit("createChat", chat);
 
-  // Clear inputs
+  // Clear input fields
   chatNameInput.value = "";
   chatRulesInput.value = "";
 
-  goHome();
+  // Automatically join the newly created chat
+  joinChat(chat);
 }
+
 
 function joinChat(chat) {
   currentChat = chat;
