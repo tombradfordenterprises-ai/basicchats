@@ -1,50 +1,61 @@
-// 🔌 Connect to backend
-// IMPORTANT: replace with your Render URL
+// ----------------------
+// CONNECT TO SOCKET.IO
+// ----------------------
+// Replace with your Render URL
 const socket = io("https://chat-backend-9rd5.onrender.com");
 
-// App state
+// ----------------------
+// ELEMENTS
+// ----------------------
+const chatListEl = document.getElementById("chatList");
+const messagesEl = document.getElementById("messages");
+const chatNameInput = document.getElementById("chatName");
+const chatRulesInput = document.getElementById("chatRules");
+const messageInput = document.getElementById("messageInput");
+
+const createBtn = document.getElementById("createBtn");
+const createChatBtn = document.getElementById("createChatBtn");
+const sendMsgBtn = document.getElementById("sendMsgBtn");
+const backBtn = document.getElementById("backBtn");
+
 let chats = [];
 let currentChat = null;
 
-// Elements
-const chatListEl = document.getElementById("chatList");
-const messagesEl = document.getElementById("messages");
-
-// ==========================
+// ----------------------
 // SOCKET EVENTS
-// ==========================
-
-// Receive full chat list
+// ----------------------
 socket.on("chatList", (data) => {
   chats = data;
   renderChats();
 });
 
-// Receive new message
-socket.on("newMessage", (message) => {
+socket.on("newMessage", (msg) => {
   if (!currentChat) return;
 
   const div = document.createElement("div");
-  div.className = "message";
-  div.textContent = message;
+  div.textContent = msg;
   messagesEl.appendChild(div);
-
   messagesEl.scrollTop = messagesEl.scrollHeight;
 });
 
-// ==========================
-// UI FUNCTIONS
-// ==========================
+// ----------------------
+// EVENT LISTENERS
+// ----------------------
+createBtn.addEventListener("click", showCreate);
+createChatBtn.addEventListener("click", createChat);
+sendMsgBtn.addEventListener("click", sendMessage);
+backBtn.addEventListener("click", goHome);
 
+// ----------------------
+// FUNCTIONS
+// ----------------------
 function renderChats() {
   chatListEl.innerHTML = "";
-
   chats.forEach((chat) => {
     const div = document.createElement("div");
     div.className = "chat-item";
     div.textContent = chat.name;
-
-    div.onclick = () => joinChat(chat);
+    div.addEventListener("click", () => joinChat(chat));
     chatListEl.appendChild(div);
   });
 }
@@ -60,27 +71,26 @@ function goHome() {
   document.getElementById("chatList").classList.remove("hidden");
 }
 
-// ==========================
-// CHAT LOGIC
-// ==========================
-
 function createChat() {
-  const name = document.getElementById("chatName").value.trim();
-  const rules = document.getElementById("chatRules").value.trim();
+  const name = chatNameInput.value.trim();
+  const rules = chatRulesInput.value.trim();
 
   if (!name) {
     alert("Chat name is required");
     return;
   }
 
-  socket.emit("createChat", {
+  const chat = {
     id: Date.now().toString(),
     name,
     rules
-  });
+  };
 
-  document.getElementById("chatName").value = "";
-  document.getElementById("chatRules").value = "";
+  socket.emit("createChat", chat);
+
+  // Clear inputs
+  chatNameInput.value = "";
+  chatRulesInput.value = "";
 
   goHome();
 }
@@ -102,9 +112,7 @@ function joinChat(chat) {
 }
 
 function sendMessage() {
-  const input = document.getElementById("messageInput");
-  const text = input.value.trim();
-
+  const text = messageInput.value.trim();
   if (!text || !currentChat) return;
 
   socket.emit("sendMessage", {
@@ -112,5 +120,5 @@ function sendMessage() {
     message: text
   });
 
-  input.value = "";
+  messageInput.value = "";
 }
