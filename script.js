@@ -1,6 +1,6 @@
 // 🔌 Connect to backend
 // IMPORTANT: replace with your Render URL
-const socket = io("https://YOUR-BACKEND.onrender.com");
+const socket = io("https://chat-backend-9rd5.onrender.com");
 
 // App state
 let chats = [];
