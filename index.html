@@ -10,21 +10,23 @@
 <div class="app-container">
   <h1>Chat Hub</h1>
 
+  <!-- Top Bar -->
   <div class="top-bar">
     <input id="search" placeholder="Search chats..." />
     <button id="createBtn">+ Create</button>
   </div>
 
+  <!-- Chat List -->
   <div id="chatList"></div>
 
-  <!-- CREATE CHAT FORM -->
+  <!-- Create Chat Form -->
   <div id="create" class="hidden">
     <input id="chatName" placeholder="Chat name" />
     <textarea id="chatRules" placeholder="Rules"></textarea>
     <button id="createChatBtn">Create</button>
   </div>
 
-  <!-- CHAT ROOM -->
+  <!-- Chat Room -->
   <div id="chatRoom" class="hidden">
     <h2 id="roomTitle"></h2>
     <p id="roomRules"></p>
@@ -40,7 +42,4 @@
   </div>
 </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+<script src="/socket.io/sock
