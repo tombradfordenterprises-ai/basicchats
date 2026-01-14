@@ -1,80 +1,116 @@
-const socket = io(https://chat-backend-9rd5.onrender.com);
+// 🔌 Connect to backend
+// IMPORTANT: replace with your Render URL
+const socket = io("https://YOUR-BACKEND.onrender.com");
 
+// App state
 let chats = [];
 let currentChat = null;
 
-const chatList = document.getElementById("chatList");
+// Elements
+const chatListEl = document.getElementById("chatList");
+const messagesEl = document.getElementById("messages");
 
-socket.on("chatList", data => {
+// ==========================
+// SOCKET EVENTS
+// ==========================
+
+// Receive full chat list
+socket.on("chatList", (data) => {
   chats = data;
   renderChats();
 });
 
-socket.on("newMessage", msg => {
+// Receive new message
+socket.on("newMessage", (message) => {
+  if (!currentChat) return;
+
   const div = document.createElement("div");
-  div.textContent = msg;
-  document.getElementById("messages").appendChild(div);
+  div.className = "message";
+  div.textContent = message;
+  messagesEl.appendChild(div);
+
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 });
 
+// ==========================
+// UI FUNCTIONS
+// ==========================
+
 function renderChats() {
-  chatList.innerHTML = "";
-  chats.forEach(chat => {
+  chatListEl.innerHTML = "";
+
+  chats.forEach((chat) => {
     const div = document.createElement("div");
     div.className = "chat-item";
     div.textContent = chat.name;
+
     div.onclick = () => joinChat(chat);
-    chatList.appendChild(div);
+    chatListEl.appendChild(div);
   });
 }
 
 function showCreate() {
-  document.getElementById("create").classList.toggle("hidden");
+  document.getElementById("chatList").classList.add("hidden");
+  document.getElementById("create").classList.remove("hidden");
 }
 
-function createChat() {
-  const name = chatName.value;
-  const rules = chatRules.value;
+function goHome() {
+  document.getElementById("create").classList.add("hidden");
+  document.getElementById("chatRoom").classList.add("hidden");
+  document.getElementById("chatList").classList.remove("hidden");
+}
 
-  if (!name) return;
+// ==========================
+// CHAT LOGIC
+// ==========================
+
+function createChat() {
+  const name = document.getElementById("chatName").value.trim();
+  const rules = document.getElementById("chatRules").value.trim();
+
+  if (!name) {
+    alert("Chat name is required");
+    return;
+  }
 
   socket.emit("createChat", {
     id: Date.now().toString(),
     name,
     rules
   });
+
+  document.getElementById("chatName").value = "";
+  document.getElementById("chatRules").value = "";
+
+  goHome();
 }
 
 function joinChat(chat) {
   currentChat = chat;
+
   socket.emit("joinChat", chat.id);
 
   document.getElementById("roomTitle").textContent = chat.name;
-  document.getElementById("roomRules").textContent = chat.rules || "";
-  document.getElementById("messages").innerHTML = "";
+  document.getElementById("roomRules").textContent =
+    chat.rules || "No rules provided.";
 
-  show("chatRoom");
+  messagesEl.innerHTML = "";
+
+  document.getElementById("chatList").classList.add("hidden");
+  document.getElementById("create").classList.add("hidden");
+  document.getElementById("chatRoom").classList.remove("hidden");
 }
 
 function sendMessage() {
   const input = document.getElementById("messageInput");
-  const msg = input.value.trim();
-  if (!msg) return;
+  const text = input.value.trim();
+
+  if (!text || !currentChat) return;
 
   socket.emit("sendMessage", {
     chatId: currentChat.id,
-    message: msg
+    message: text
   });
 
   input.value = "";
-}
-
-function goHome() {
-  show();
-}
-
-function show(id) {
-  ["chatRoom", "create"].forEach(x =>
-    document.getElementById(x).classList.add("hidden")
-  );
-  if (id) document.getElementById(id).classList.remove("hidden");
 }
