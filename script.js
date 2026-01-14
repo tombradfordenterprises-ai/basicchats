@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io(https://chat-backend-9rd5.onrender.com);
 
 let chats = [];
 let currentChat = null;
