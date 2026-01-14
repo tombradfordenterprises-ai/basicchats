@@ -2,7 +2,7 @@
 // CONNECT TO SOCKET.IO
 // ----------------------
 // Replace with your Render URL
-const socket = io("https://chat-backend-9rd5.onrender.com");
+const socket = io("https://chat-backend-yjzb.onrender.com");
 
 // ----------------------
 // ELEMENTS
