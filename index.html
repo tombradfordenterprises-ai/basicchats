@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -248,6 +249,38 @@
 
 
     /* =========================
+       DRAWING MESSAGE
+       ========================= */
+
+    .drawing-message {
+      margin-bottom: 12px;
+
+      padding: 10px;
+
+      background: #374151;
+
+      border-radius: 8px;
+
+      overflow: hidden;
+    }
+
+
+    .drawing-image {
+      display: block;
+
+      width: 100%;
+
+      max-width: 400px;
+
+      height: auto;
+
+      background: white;
+
+      border-radius: 6px;
+    }
+
+
+    /* =========================
        MESSAGE INPUT
        ========================= */
 
@@ -336,6 +369,20 @@
 
 
     /* =========================
+       DRAW BUTTON
+       ========================= */
+
+    #drawButton {
+      background: #374151;
+    }
+
+
+    #drawButton:hover {
+      background: #4b5563;
+    }
+
+
+    /* =========================
        LOGIN SCREEN
        ========================= */
 
@@ -410,6 +457,164 @@
       line-height: 18px;
 
       text-align: center;
+    }
+
+
+    /* =========================
+       DRAWING OVERLAY
+       ========================= */
+
+    #drawingOverlay {
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 100;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 16px;
+
+      background: rgba(0, 0, 0, 0.65);
+    }
+
+
+    /* =========================
+       DRAWING BOX
+       ========================= */
+
+    #drawingBox {
+      width: min(92vw, 500px);
+
+      background: #1f2937;
+
+      border-radius: 12px;
+
+      padding: 12px;
+
+      box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.5);
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 10px;
+    }
+
+
+    /* =========================
+       DRAWING HEADER
+       ========================= */
+
+    #drawingHeader {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      font-size: 18px;
+
+      font-weight: bold;
+    }
+
+
+    #closeDrawingButton {
+      width: 40px;
+
+      min-width: 40px;
+
+      height: 40px;
+
+      min-height: 40px;
+
+      padding: 8px;
+
+      background: #374151;
+
+      font-size: 18px;
+    }
+
+
+    #closeDrawingButton:hover {
+      background: #4b5563;
+    }
+
+
+    /* =========================
+       DRAWING CANVAS
+       ========================= */
+
+    #drawingCanvas {
+      display: block;
+
+      width: 100%;
+
+      height: 300px;
+
+      background: white;
+
+      border-radius: 8px;
+
+      cursor: crosshair;
+
+      touch-action: none;
+
+      user-select: none;
+
+      -webkit-user-select: none;
+    }
+
+
+    /* =========================
+       DRAWING CONTROLS
+       ========================= */
+
+    #drawingControls {
+      display: flex;
+
+      gap: 8px;
+    }
+
+
+    #drawingControls button {
+      flex: 1;
+
+      min-height: 44px;
+
+      padding: 10px;
+
+      font-size: 13px;
+    }
+
+
+    #clearDrawingButton {
+      background: #374151;
+    }
+
+
+    #clearDrawingButton:hover {
+      background: #4b5563;
+    }
+
+
+    #cancelDrawingButton {
+      background: #6b7280;
+    }
+
+
+    #cancelDrawingButton:hover {
+      background: #4b5563;
+    }
+
+
+    #sendDrawingButton {
+      background: #2563eb;
     }
 
 
@@ -524,11 +729,16 @@
 
 
       .input-area button {
-        min-width: 68px;
+        min-width: 60px;
 
-        padding: 11px 12px;
+        padding: 11px 9px;
 
-        font-size: 14px;
+        font-size: 13px;
+      }
+
+
+      #drawButton {
+        min-width: 65px;
       }
 
 
@@ -543,6 +753,39 @@
         font-size: 22px;
 
         margin-bottom: 18px;
+      }
+
+
+      /* Drawing popup */
+
+      #drawingOverlay {
+        padding: 10px;
+      }
+
+
+      #drawingBox {
+        width: 100%;
+
+        padding: 10px;
+
+        border-radius: 10px;
+      }
+
+
+      #drawingCanvas {
+        height: 260px;
+      }
+
+
+      #drawingControls {
+        gap: 6px;
+      }
+
+
+      #drawingControls button {
+        padding: 9px 6px;
+
+        font-size: 12px;
       }
 
     }
@@ -587,11 +830,18 @@
 
 
       .input-area button {
+        min-width: 55px;
+
+        padding-left: 7px;
+
+        padding-right: 7px;
+
+        font-size: 12px;
+      }
+
+
+      #drawButton {
         min-width: 60px;
-
-        padding-left: 8px;
-
-        padding-right: 8px;
       }
 
     }
@@ -648,266 +898,12 @@
         padding: 18px;
       }
 
+
+      #drawingCanvas {
+        height: 180px;
+      }
+
     }
-    /* =========================
-   DRAWING BUTTON
-   ========================= */
-
-#drawButton {
-  background: #374151;
-}
-
-#drawButton:hover {
-  background: #4b5563;
-}
-
-
-/* =========================
-   DRAWING OVERLAY
-   ========================= */
-
-#drawingOverlay {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 100;
-
-  display: none;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 16px;
-
-  background: rgba(0, 0, 0, 0.65);
-}
-
-
-/* =========================
-   DRAWING BOX
-   ========================= */
-
-#drawingBox {
-  width: min(92vw, 500px);
-
-  background: #1f2937;
-
-  border-radius: 12px;
-
-  padding: 12px;
-
-  box-shadow:
-    0 15px 40px rgba(0, 0, 0, 0.5);
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 10px;
-}
-
-
-/* =========================
-   DRAWING HEADER
-   ========================= */
-
-#drawingHeader {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  font-size: 18px;
-
-  font-weight: bold;
-}
-
-
-#closeDrawingButton {
-  min-width: 40px;
-
-  min-height: 40px;
-
-  padding: 8px;
-
-  background: #374151;
-
-  font-size: 18px;
-}
-
-
-#closeDrawingButton:hover {
-  background: #4b5563;
-}
-
-
-/* =========================
-   CANVAS
-   ========================= */
-
-#drawingCanvas {
-  display: block;
-
-  width: 100%;
-
-  height: 300px;
-
-  background: white;
-
-  border-radius: 8px;
-
-  cursor: crosshair;
-
-  touch-action: none;
-}
-
-
-/* =========================
-   DRAWING CONTROLS
-   ========================= */
-
-#drawingControls {
-  display: flex;
-
-  gap: 8px;
-}
-
-
-#drawingControls button {
-  flex: 1;
-
-  min-height: 44px;
-
-  padding: 10px;
-
-  font-size: 13px;
-}
-
-
-#drawingControls button:first-child {
-  background: #374151;
-}
-
-
-#drawingControls button:first-child:hover {
-  background: #4b5563;
-}
-
-
-#drawingControls button:nth-child(2) {
-  background: #6b7280;
-}
-
-
-#drawingControls button:nth-child(2):hover {
-  background: #4b5563;
-}
-
-
-#sendDrawingButton {
-  background: #2563eb;
-}
-
-
-/* =========================
-   DRAWING IN CHAT
-   ========================= */
-
-.drawing-message {
-  margin-bottom: 12px;
-
-  padding: 10px;
-
-  background: #374151;
-
-  border-radius: 8px;
-}
-
-
-.drawing-message .name {
-  margin-bottom: 8px;
-}
-
-
-.drawing-image {
-  display: block;
-
-  width: 100%;
-
-  max-width: 400px;
-
-  height: auto;
-
-  background: white;
-
-  border-radius: 6px;
-}
-
-
-/* =========================
-   SMALL PHONES
-   ========================= */
-
-@media (max-width: 480px) {
-
-  #drawingOverlay {
-    padding: 10px;
-  }
-
-
-  #drawingBox {
-    width: 100%;
-
-    padding: 10px;
-
-    border-radius: 10px;
-  }
-
-
-  #drawingCanvas {
-    height: 260px;
-  }
-
-
-  #drawingControls {
-    gap: 6px;
-  }
-
-
-  #drawingControls button {
-    padding: 9px 6px;
-
-    font-size: 12px;
-  }
-
-
-  #drawButton {
-    min-width: 65px;
-
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-}
-
-
-/* =========================
-   LANDSCAPE PHONES
-   ========================= */
-
-@media (
-  max-height: 500px
-) and (
-  orientation: landscape
-) {
-
-  #drawingCanvas {
-    height: 180px;
-  }
-
-}
 
   </style>
 
@@ -946,7 +942,10 @@
     >
 
 
-    <button onclick="joinChat()">
+    <button
+      onclick="joinChat()"
+      type="button"
+    >
       Join Chat
     </button>
 
@@ -966,11 +965,16 @@
 
     <header>
 
-
       <div class="header-left">
 
         <div class="chat-title">
-          💬 <span id="chatName">Chat</span>
+
+          💬
+
+          <span id="chatName">
+            Chat
+          </span>
+
         </div>
 
       </div>
@@ -986,6 +990,7 @@
         <button
           id="homeButton"
           onclick="goHome()"
+          type="button"
         >
           🏠 Home
         </button>
@@ -1008,40 +1013,33 @@
          MESSAGE INPUT
          ========================= -->
 
-  <div class="input-area">
+    <div class="input-area">
 
-  <input
-    id="messageInput"
-    type="text"
-    placeholder="Type a message..."
-    maxlength="1000"
-    autocomplete="off"
-    enterkeyhint="send"
-    onkeydown="handleKey(event)"
-  >
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Type a message..."
+        maxlength="1000"
+        autocomplete="off"
+        enterkeyhint="send"
+        onkeydown="handleKey(event)"
+      >
 
-  <button
-    id="drawButton"
-    onclick="openDrawing()"
-    disabled
-  >
-    ✏️ Draw
-  </button>
 
-  <button
-    id="sendButton"
-    onclick="sendMessage()"
-    disabled
-  >
-    Send
-  </button>
-
-</div>
+      <button
+        id="drawButton"
+        onclick="openDrawing()"
+        type="button"
+        disabled
+      >
+        ✏️ Draw
+      </button>
 
 
       <button
         id="sendButton"
         onclick="sendMessage()"
+        type="button"
         disabled
       >
         Send
@@ -1051,70 +1049,99 @@
 
   </div>
 
-<!-- =========================
-     DRAWING POPUP
-     ========================= -->
-
-<div id="drawingOverlay">
-
-  <div id="drawingBox">
-
-    <div id="drawingHeader">
-      <span>✏️ Draw</span>
-
-      <button
-        id="closeDrawingButton"
-        onclick="closeDrawing()"
-        type="button"
-      >
-        ✕
-      </button>
-    </div>
 
 
-    <canvas id="drawingCanvas"></canvas>
+  <!-- =========================
+       DRAWING POPUP
+       ========================= -->
+
+  <div id="drawingOverlay">
+
+    <div id="drawingBox">
 
 
-    <div id="drawingControls">
+      <div id="drawingHeader">
 
-      <button
-        type="button"
-        onclick="clearDrawing()"
-      >
-        Clear
-      </button>
+        <span>
+          ✏️ Draw
+        </span>
 
-      <button
-        type="button"
-        onclick="closeDrawing()"
-      >
-        Cancel
-      </button>
 
-      <button
-        type="button"
-        id="sendDrawingButton"
-        onclick="sendDrawing()"
-      >
-        Send Drawing
-      </button>
+        <button
+          id="closeDrawingButton"
+          onclick="closeDrawing()"
+          type="button"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+
+      <canvas
+        id="drawingCanvas"
+      ></canvas>
+
+
+
+      <div id="drawingControls">
+
+        <button
+          id="clearDrawingButton"
+          onclick="clearDrawing()"
+          type="button"
+        >
+          Clear
+        </button>
+
+
+        <button
+          id="cancelDrawingButton"
+          onclick="closeDrawing()"
+          type="button"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          id="sendDrawingButton"
+          onclick="sendDrawing()"
+          type="button"
+        >
+          Send Drawing
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
-</div>
+
 
   <script>
+
+    /* =========================
+       GLOBAL VARIABLES
+       ========================= */
 
     let username = "";
 
     let socket = null;
 
+    let drawingCanvas = null;
 
-    // =========================
-    // JOIN CHAT
-    // =========================
+    let drawingContext = null;
+
+    let drawing = false;
+
+
+
+    /* =========================
+       JOIN CHAT
+       ========================= */
 
     function joinChat() {
 
@@ -1133,9 +1160,10 @@
 
 
       const status =
-        document.getElementById(
-          "connectionStatus"
-        );
+        document
+          .getElementById(
+            "connectionStatus"
+          );
 
 
       if (!username) {
@@ -1148,6 +1176,7 @@
           .focus();
 
         return;
+
       }
 
 
@@ -1161,6 +1190,7 @@
           .focus();
 
         return;
+
       }
 
 
@@ -1178,10 +1208,21 @@
         .disabled = true;
 
 
-      socket = new WebSocket(
-        "wss://basicchats.onrender.com"
-      );
 
+      /*
+       * Connect to your WebSocket server.
+       */
+
+      socket =
+        new WebSocket(
+          "wss://basicchats.onrender.com"
+        );
+
+
+
+      /* =========================
+         SOCKET OPEN
+         ========================= */
 
       socket.onopen = () => {
 
@@ -1190,9 +1231,11 @@
 
             type: "join",
 
-            username: username,
+            username:
+              username,
 
-            chatName: chatName
+            chatName:
+              chatName
 
           })
         );
@@ -1200,9 +1243,10 @@
       };
 
 
-      // =========================
-      // SERVER MESSAGE
-      // =========================
+
+      /* =========================
+         SERVER MESSAGE
+         ========================= */
 
       socket.onmessage = (event) => {
 
@@ -1212,7 +1256,9 @@
         try {
 
           data =
-            JSON.parse(event.data);
+            JSON.parse(
+              event.data
+            );
 
         } catch (error) {
 
@@ -1222,51 +1268,90 @@
           );
 
           return;
+
         }
 
 
-        // =========================
-        // JOIN ERROR
-        // =========================
 
-        if (data.type === "joinError") {
+        /* =========================
+           JOIN ERROR
+           ========================= */
+
+        if (
+          data.type ===
+          "joinError"
+        ) {
 
           status.textContent =
             data.message;
 
 
           document
-            .getElementById("username")
+            .getElementById(
+              "username"
+            )
             .disabled = false;
 
 
           document
-            .getElementById("chatNameInput")
+            .getElementById(
+              "chatNameInput"
+            )
             .disabled = false;
+
+
+          if (
+            socket &&
+            socket.readyState ===
+              WebSocket.OPEN
+          ) {
+
+            socket.close();
+
+          }
 
 
           return;
+
         }
 
 
-        // =========================
-        // SUCCESSFULLY JOINED
-        // =========================
 
-        if (data.type === "joined") {
+        /* =========================
+           SUCCESSFULLY JOINED
+           ========================= */
+
+        if (
+          data.type ===
+          "joined"
+        ) {
 
           document
-            .getElementById("login")
-            .style.display = "none";
+            .getElementById(
+              "login"
+            )
+            .style.display =
+              "none";
 
 
           document
-            .getElementById("sendButton")
+            .getElementById(
+              "sendButton"
+            )
             .disabled = false;
 
 
           document
-            .getElementById("chatName")
+            .getElementById(
+              "drawButton"
+            )
+            .disabled = false;
+
+
+          document
+            .getElementById(
+              "chatName"
+            )
             .textContent =
               data.chatName;
 
@@ -1283,19 +1368,26 @@
 
 
           document
-            .getElementById("messageInput")
+            .getElementById(
+              "messageInput"
+            )
             .focus();
 
 
           return;
+
         }
 
 
-        // =========================
-        // USER COUNT
-        // =========================
 
-        if (data.type === "userCount") {
+        /* =========================
+           USER COUNT
+           ========================= */
+
+        if (
+          data.type ===
+          "userCount"
+        ) {
 
           updateUserCount(
             data.userCount,
@@ -1303,28 +1395,38 @@
           );
 
           return;
+
         }
 
 
-        // =========================
-        // SYSTEM MESSAGE
-        // =========================
 
-        if (data.type === "system") {
+        /* =========================
+           SYSTEM MESSAGE
+           ========================= */
+
+        if (
+          data.type ===
+          "system"
+        ) {
 
           addSystemMessage(
             data.message
           );
 
           return;
+
         }
 
 
-        // =========================
-        // CHAT MESSAGE
-        // =========================
 
-        if (data.type === "message") {
+        /* =========================
+           CHAT MESSAGE
+           ========================= */
+
+        if (
+          data.type ===
+          "message"
+        ) {
 
           addMessage(
             data.username,
@@ -1332,14 +1434,36 @@
           );
 
           return;
+
+        }
+
+
+
+        /* =========================
+           DRAWING MESSAGE
+           ========================= */
+
+        if (
+          data.type ===
+          "drawing"
+        ) {
+
+          addDrawing(
+            data.username,
+            data.image
+          );
+
+          return;
+
         }
 
       };
 
 
-      // =========================
-      // CONNECTION ERROR
-      // =========================
+
+      /* =========================
+         CONNECTION ERROR
+         ========================= */
 
       socket.onerror = () => {
 
@@ -1348,32 +1472,64 @@
 
 
         document
-          .getElementById("username")
+          .getElementById(
+            "username"
+          )
           .disabled = false;
 
 
         document
-          .getElementById("chatNameInput")
+          .getElementById(
+            "chatNameInput"
+          )
           .disabled = false;
+
+
+        document
+          .getElementById(
+            "sendButton"
+          )
+          .disabled = true;
+
+
+        document
+          .getElementById(
+            "drawButton"
+          )
+          .disabled = true;
 
       };
 
 
-      // =========================
-      // DISCONNECTED
-      // =========================
+
+      /* =========================
+         DISCONNECTED
+         ========================= */
 
       socket.onclose = () => {
 
         document
-          .getElementById("sendButton")
+          .getElementById(
+            "sendButton"
+          )
+          .disabled = true;
+
+
+        document
+          .getElementById(
+            "drawButton"
+          )
           .disabled = true;
 
 
         if (
           document
-            .getElementById("login")
-            .style.display === "none"
+            .getElementById(
+              "login"
+            )
+            .style
+            .display ===
+          "none"
         ) {
 
           addSystemMessage(
@@ -1387,108 +1543,184 @@
     }
 
 
-    // =========================
-    // HOME BUTTON
-    // =========================
+
+    /* =========================
+       HOME BUTTON
+       ========================= */
 
     function goHome() {
 
-      // Close the current WebSocket.
+      /*
+       * Prevent the old socket's
+       * onclose handler from adding
+       * a "Disconnected" message.
+       */
 
-      if (
-        socket &&
-        socket.readyState ===
-          WebSocket.OPEN
-      ) {
+      if (socket) {
 
-        socket.close();
+        socket.onclose = null;
+
+
+        if (
+          socket.readyState ===
+            WebSocket.OPEN ||
+          socket.readyState ===
+            WebSocket.CONNECTING
+        ) {
+
+          socket.close();
+
+        }
 
       }
 
 
       socket = null;
 
+      username = "";
 
-      // Clear the messages.
+
+
+      /* Clear messages */
 
       document
-        .getElementById("messages")
+        .getElementById(
+          "messages"
+        )
         .innerHTML = "";
 
 
-      // Reset chat name.
+
+      /* Reset chat name */
 
       document
-        .getElementById("chatName")
-        .textContent = "Chat";
+        .getElementById(
+          "chatName"
+        )
+        .textContent =
+          "Chat";
 
 
-      // Reset user count.
 
-      document
-        .getElementById("userCount")
-        .textContent = "0 / 5";
-
-
-      // Clear the message input.
+      /* Reset user count */
 
       document
-        .getElementById("messageInput")
+        .getElementById(
+          "userCount"
+        )
+        .textContent =
+          "0 / 5";
+
+
+
+      /* Clear message */
+
+      document
+        .getElementById(
+          "messageInput"
+        )
         .value = "";
 
 
-      // Disable Send.
+
+      /* Disable buttons */
 
       document
-        .getElementById("sendButton")
+        .getElementById(
+          "sendButton"
+        )
         .disabled = true;
 
 
-      // Re-enable login inputs.
+      document
+        .getElementById(
+          "drawButton"
+        )
+        .disabled = true;
+
+
+
+      /* Reset login fields */
 
       document
-        .getElementById("username")
+        .getElementById(
+          "username"
+        )
         .disabled = false;
 
 
       document
-        .getElementById("chatNameInput")
+        .getElementById(
+          "chatNameInput"
+        )
         .disabled = false;
 
 
-      // Clear connection status.
+      document
+        .getElementById(
+          "username"
+        )
+        .value = "";
+
 
       document
-        .getElementById("connectionStatus")
+        .getElementById(
+          "chatNameInput"
+        )
+        .value = "";
+
+
+
+      /* Clear connection status */
+
+      document
+        .getElementById(
+          "connectionStatus"
+        )
         .textContent = "";
 
 
-      // Show the login page.
+
+      /* Close drawing window */
+
+      closeDrawing();
+
+
+
+      /* Show login */
 
       document
-        .getElementById("login")
-        .style.display = "block";
+        .getElementById(
+          "login"
+        )
+        .style.display =
+          "block";
 
 
-      // Put the cursor back in the name field.
+
+      /* Focus name */
 
       document
-        .getElementById("username")
+        .getElementById(
+          "username"
+        )
         .focus();
 
     }
 
 
-    // =========================
-    // SEND MESSAGE
-    // =========================
+
+    /* =========================
+       SEND MESSAGE
+       ========================= */
 
     function sendMessage() {
 
       const input =
-        document.getElementById(
-          "messageInput"
-        );
+        document
+          .getElementById(
+            "messageInput"
+          );
 
 
       const text =
@@ -1503,23 +1735,30 @@
       ) {
 
         return;
+
       }
 
+
+
+      /*
+       * Send the message to the
+       * server.
+       *
+       * The server should broadcast
+       * it back to everyone in the
+       * same chat.
+       */
 
       socket.send(
         JSON.stringify({
 
-          type: "message",
+          type:
+            "message",
 
-          text: text
+          text:
+            text
 
         })
-      );
-
-
-      addMessage(
-        "You",
-        text
       );
 
 
@@ -1530,13 +1769,17 @@
     }
 
 
-    // =========================
-    // ENTER TO SEND
-    // =========================
+
+    /* =========================
+       ENTER TO SEND
+       ========================= */
 
     function handleKey(event) {
 
-      if (event.key === "Enter") {
+      if (
+        event.key ===
+        "Enter"
+      ) {
 
         event.preventDefault();
 
@@ -1547,9 +1790,10 @@
     }
 
 
-    // =========================
-    // USER COUNT
-    // =========================
+
+    /* =========================
+       USER COUNT
+       ========================= */
 
     function updateUserCount(
       count,
@@ -1557,16 +1801,19 @@
     ) {
 
       document
-        .getElementById("userCount")
+        .getElementById(
+          "userCount"
+        )
         .textContent =
           `${count} / ${max}`;
 
     }
 
 
-    // =========================
-    // DISPLAY MESSAGE
-    // =========================
+
+    /* =========================
+       DISPLAY MESSAGE
+       ========================= */
 
     function addMessage(
       name,
@@ -1574,30 +1821,41 @@
     ) {
 
       const messages =
-        document.getElementById(
-          "messages"
-        );
+        document
+          .getElementById(
+            "messages"
+          );
 
 
       const div =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       div.className =
         "message";
 
 
       const nameElement =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       nameElement.className =
         "name";
+
 
       nameElement.textContent =
         name;
 
 
       const textElement =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       textElement.textContent =
         text;
@@ -1613,7 +1871,9 @@
       );
 
 
-      messages.appendChild(div);
+      messages.appendChild(
+        div
+      );
 
 
       messages.scrollTop =
@@ -1622,31 +1882,39 @@
     }
 
 
-    // =========================
-    // SYSTEM MESSAGE
-    // =========================
+
+    /* =========================
+       SYSTEM MESSAGE
+       ========================= */
 
     function addSystemMessage(
       text
     ) {
 
       const messages =
-        document.getElementById(
-          "messages"
-        );
+        document
+          .getElementById(
+            "messages"
+          );
 
 
       const div =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       div.className =
         "system-message";
+
 
       div.textContent =
         text;
 
 
-      messages.appendChild(div);
+      messages.appendChild(
+        div
+      );
 
 
       messages.scrollTop =
@@ -1654,8 +1922,635 @@
 
     }
 
+
+
+    /* =========================
+       OPEN DRAWING
+       ========================= */
+
+    function openDrawing() {
+
+      const overlay =
+        document
+          .getElementById(
+            "drawingOverlay"
+          );
+
+
+      drawingCanvas =
+        document
+          .getElementById(
+            "drawingCanvas"
+          );
+
+
+      overlay.style.display =
+        "flex";
+
+
+      /*
+       * Wait one frame so the
+       * canvas has its correct
+       * visible dimensions.
+       */
+
+      requestAnimationFrame(
+        () => {
+
+          setupDrawingCanvas();
+
+        }
+      );
+
+    }
+
+
+
+    /* =========================
+       CLOSE DRAWING
+       ========================= */
+
+    function closeDrawing() {
+
+      document
+        .getElementById(
+          "drawingOverlay"
+        )
+        .style.display =
+          "none";
+
+
+      drawing = false;
+
+    }
+
+
+
+    /* =========================
+       SETUP CANVAS
+       ========================= */
+
+    function setupDrawingCanvas() {
+
+      if (!drawingCanvas) {
+
+        drawingCanvas =
+          document
+            .getElementById(
+              "drawingCanvas"
+            );
+
+      }
+
+
+      const rect =
+        drawingCanvas
+          .getBoundingClientRect();
+
+
+      const devicePixelRatio =
+        window.devicePixelRatio ||
+        1;
+
+
+      drawingCanvas.width =
+        Math.max(
+          1,
+          Math.floor(
+            rect.width *
+            devicePixelRatio
+          )
+        );
+
+
+      drawingCanvas.height =
+        Math.max(
+          1,
+          Math.floor(
+            rect.height *
+            devicePixelRatio
+          )
+        );
+
+
+      drawingContext =
+        drawingCanvas.getContext(
+          "2d"
+        );
+
+
+      drawingContext.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+      );
+
+
+      /*
+       * White background.
+       */
+
+      drawingContext.fillStyle =
+        "#ffffff";
+
+
+      drawingContext.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+
+      /*
+       * Black pen.
+       */
+
+      drawingContext.strokeStyle =
+        "#000000";
+
+
+      drawingContext.fillStyle =
+        "#000000";
+
+
+      drawingContext.lineWidth =
+        3;
+
+
+      drawingContext.lineCap =
+        "round";
+
+
+      drawingContext.lineJoin =
+        "round";
+
+    }
+
+
+
+    /* =========================
+       GET POINTER POSITION
+       ========================= */
+
+    function getDrawingPosition(
+      event
+    ) {
+
+      const rect =
+        drawingCanvas
+          .getBoundingClientRect();
+
+
+      return {
+
+        x:
+          event.clientX -
+          rect.left,
+
+        y:
+          event.clientY -
+          rect.top
+
+      };
+
+    }
+
+
+
+    /* =========================
+       START DRAWING
+       ========================= */
+
+    function startDrawing(
+      event
+    ) {
+
+      if (
+        document
+          .getElementById(
+            "drawingOverlay"
+          )
+          .style
+          .display !==
+        "flex"
+      ) {
+
+        return;
+
+      }
+
+
+      event.preventDefault();
+
+
+      drawing = true;
+
+
+      if (
+        drawingCanvas
+          .setPointerCapture
+      ) {
+
+        try {
+
+          drawingCanvas
+            .setPointerCapture(
+              event.pointerId
+            );
+
+        } catch (error) {
+
+          /*
+           * Some browsers may not
+           * support pointer capture.
+           */
+
+        }
+
+      }
+
+
+      const position =
+        getDrawingPosition(
+          event
+        );
+
+
+      drawingContext.beginPath();
+
+
+      drawingContext.moveTo(
+        position.x,
+        position.y
+      );
+
+    }
+
+
+
+    /* =========================
+       DRAW
+       ========================= */
+
+    function draw(
+      event
+    ) {
+
+      if (!drawing) {
+
+        return;
+
+      }
+
+
+      event.preventDefault();
+
+
+      const position =
+        getDrawingPosition(
+          event
+        );
+
+
+      drawingContext.lineTo(
+        position.x,
+        position.y
+      );
+
+
+      drawingContext.stroke();
+
+    }
+
+
+
+    /* =========================
+       STOP DRAWING
+       ========================= */
+
+    function stopDrawing(
+      event
+    ) {
+
+      if (event) {
+
+        event.preventDefault();
+
+      }
+
+
+      drawing = false;
+
+
+      if (drawingContext) {
+
+        drawingContext.closePath();
+
+      }
+
+    }
+
+
+
+    /* =========================
+       CLEAR DRAWING
+       ========================= */
+
+    function clearDrawing() {
+
+      if (
+        !drawingCanvas ||
+        !drawingContext
+      ) {
+
+        return;
+
+      }
+
+
+      const rect =
+        drawingCanvas
+          .getBoundingClientRect();
+
+
+      drawingContext.setTransform(
+        window.devicePixelRatio ||
+          1,
+        0,
+        0,
+        window.devicePixelRatio ||
+          1,
+        0,
+        0
+      );
+
+
+      drawingContext.fillStyle =
+        "#ffffff";
+
+
+      drawingContext.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+
+      drawingContext.strokeStyle =
+        "#000000";
+
+
+      drawingContext.fillStyle =
+        "#000000";
+
+
+      drawingContext.lineWidth =
+        3;
+
+
+      drawingContext.lineCap =
+        "round";
+
+
+      drawingContext.lineJoin =
+        "round";
+
+    }
+
+
+
+    /* =========================
+       SEND DRAWING
+       ========================= */
+
+    function sendDrawing() {
+
+      if (
+        !socket ||
+        socket.readyState !==
+          WebSocket.OPEN
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        !drawingCanvas
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+       * Convert canvas into a
+       * PNG image.
+       */
+
+      const image =
+        drawingCanvas.toDataURL(
+          "image/png"
+        );
+
+
+      /*
+       * Send it through the
+       * WebSocket.
+       */
+
+      socket.send(
+        JSON.stringify({
+
+          type:
+            "drawing",
+
+          image:
+            image
+
+        })
+      );
+
+
+      closeDrawing();
+
+    }
+
+
+
+    /* =========================
+       DISPLAY DRAWING
+       ========================= */
+
+    function addDrawing(
+      name,
+      image
+    ) {
+
+      const messages =
+        document
+          .getElementById(
+            "messages"
+          );
+
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "drawing-message";
+
+
+      const nameElement =
+        document.createElement(
+          "div"
+        );
+
+
+      nameElement.className =
+        "name";
+
+
+      nameElement.textContent =
+        name;
+
+
+      const imageElement =
+        document.createElement(
+          "img"
+        );
+
+
+      imageElement.className =
+        "drawing-image";
+
+
+      imageElement.src =
+        image;
+
+
+      imageElement.alt =
+        `${name}'s drawing`;
+
+
+      div.appendChild(
+        nameElement
+      );
+
+
+      div.appendChild(
+        imageElement
+      );
+
+
+      messages.appendChild(
+        div
+      );
+
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    }
+
+
+
+    /* =========================
+       CANVAS POINTER EVENTS
+       ========================= */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+
+        drawingCanvas =
+          document
+            .getElementById(
+              "drawingCanvas"
+            );
+
+
+        drawingCanvas.addEventListener(
+          "pointerdown",
+          startDrawing
+        );
+
+
+        drawingCanvas.addEventListener(
+          "pointermove",
+          draw
+        );
+
+
+        drawingCanvas.addEventListener(
+          "pointerup",
+          stopDrawing
+        );
+
+
+        drawingCanvas.addEventListener(
+          "pointercancel",
+          stopDrawing
+        );
+
+
+        drawingCanvas.addEventListener(
+          "pointerleave",
+          stopDrawing
+        );
+
+      }
+    );
+
+
+
+    /* =========================
+       ESCAPE CLOSES DRAWING
+       ========================= */
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.key ===
+          "Escape"
+        ) {
+
+          const overlay =
+            document
+              .getElementById(
+                "drawingOverlay"
+              );
+
+
+          if (
+            overlay.style.display ===
+            "flex"
+          ) {
+
+            closeDrawing();
+
+          }
+
+        }
+
+      }
+    );
+
   </script>
 
 </body>
 
 </html>
+```
