@@ -1,26 +1,15 @@
-
-```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
-  <title>Chat Room</title>
-
+  <title>Basic Chat</title>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
-
 
     html,
     body {
@@ -28,958 +17,606 @@
       padding: 0;
       width: 100%;
       min-height: 100%;
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-      background: #f2f2f2;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f4f7;
       color: #222;
     }
 
-
-    body {
-      overflow-x: hidden;
-    }
-
-
     button,
     input {
-      font-family: inherit;
+      font: inherit;
     }
-
 
     button {
       cursor: pointer;
     }
 
 
-    /* ======================================================
-       HOME SCREEN
-       ====================================================== */
+    /* ========================================================
+       HOME PAGE
+       ======================================================== */
 
-    #homeScreen {
-
+    #homePage {
       min-height: 100vh;
-
       display: flex;
-
       justify-content: center;
-
       align-items: center;
-
       padding: 20px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #667eea,
-          #764ba2
-        );
-
     }
 
-
-    .homeBox {
-
+    .homeCard {
       width: 100%;
-
-      max-width: 430px;
-
+      max-width: 450px;
       background: white;
-
-      padding: 35px 25px;
-
       border-radius: 18px;
-
-      box-shadow:
-        0 10px 35px
-        rgba(0, 0, 0, 0.2);
-
+      padding: 35px 25px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
       text-align: center;
-
     }
 
-
-    .homeBox h1 {
-
+    .homeCard h1 {
       margin: 0 0 10px;
-
       font-size: 32px;
-
     }
 
-
-    .homeBox p {
-
+    .homeCard p {
+      margin: 0 0 25px;
       color: #666;
-
-      margin:
-        0 0 25px;
-
     }
-
 
     #roomInput {
-
       width: 100%;
-
-      padding: 14px;
-
-      border:
-        1px solid #ccc;
-
+      padding: 15px;
+      border: 1px solid #ccc;
       border-radius: 10px;
-
-      font-size: 16px;
-
+      font-size: 17px;
       margin-bottom: 12px;
-
       outline: none;
-
     }
-
 
     #roomInput:focus {
-
-      border-color:
-        #667eea;
-
+      border-color: #333;
     }
-
 
     #joinButton {
-
       width: 100%;
-
-      padding: 14px;
-
+      padding: 15px;
       border: none;
-
       border-radius: 10px;
-
-      background:
-        #667eea;
-
+      background: #222;
       color: white;
-
-      font-size: 17px;
-
       font-weight: bold;
-
+      font-size: 17px;
     }
-
 
     #joinButton:hover {
-
-      background:
-        #5568d9;
-
+      background: #000;
     }
-
 
     #homeError {
-
-      color:
-        #d93025;
-
-      margin-top: 12px;
-
+      color: #c62828;
+      margin-top: 15px;
       min-height: 20px;
-
       font-size: 14px;
-
     }
 
 
-    /* ======================================================
+    /* ========================================================
        APP
-       ====================================================== */
+       ======================================================== */
 
-    #app {
-
+    #appPage {
       display: none;
-
       min-height: 100vh;
-
       flex-direction: column;
-
     }
 
 
-    /* ======================================================
+    /* ========================================================
        TOP BAR
-       ====================================================== */
+       ======================================================== */
 
-    #topBar {
-
+    .topBar {
       background: #222;
-
       color: white;
-
-      padding:
-        10px 15px;
-
+      padding: 10px 15px;
       display: flex;
-
       align-items: center;
-
-      justify-content:
-        space-between;
-
+      justify-content: space-between;
       gap: 10px;
-
+      flex-wrap: wrap;
     }
 
+    .roomInfo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
 
-    #roomTitle {
-
-      font-size: 18px;
-
+    .roomNameDisplay {
       font-weight: bold;
-
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-
 
     #userCount {
-
+      background: #444;
+      padding: 5px 9px;
+      border-radius: 20px;
       font-size: 13px;
-
-      color: #ccc;
-
-      margin-top: 2px;
-
+      white-space: nowrap;
     }
 
+    #checkerRole {
+      background: #444;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
     #homeButton {
-
       border: none;
-
-      background: #444;
-
-      color: white;
-
-      padding:
-        9px 14px;
-
+      background: white;
+      color: #222;
+      padding: 8px 13px;
       border-radius: 8px;
-
-      font-size: 14px;
-
+      font-weight: bold;
     }
-
 
     #homeButton:hover {
-
-      background: #555;
-
+      background: #ddd;
     }
 
 
-    /* ======================================================
+    /* ========================================================
        TABS
-       ====================================================== */
+       ======================================================== */
 
-    #tabs {
-
+    .tabs {
       display: flex;
-
       background: white;
-
-      border-bottom:
-        1px solid #ddd;
-
+      border-bottom: 1px solid #ddd;
     }
-
 
     .tabButton {
-
       flex: 1;
-
-      padding:
-        13px 10px;
-
       border: none;
-
       background: white;
-
-      font-size: 15px;
-
+      padding: 14px 10px;
       font-weight: bold;
-
       color: #666;
-
+      border-bottom: 3px solid transparent;
     }
-
 
     .tabButton.active {
-
-      color: #667eea;
-
-      border-bottom:
-        3px solid #667eea;
-
+      color: #222;
+      border-bottom-color: #222;
     }
 
 
-    /* ======================================================
-       PAGES
-       ====================================================== */
+    /* ========================================================
+       CONTENT
+       ======================================================== */
 
-    .page {
-
-      display: none;
-
+    .content {
       flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px;
+    }
 
+    .tabContent {
+      display: none;
+      width: 100%;
+    }
+
+    .tabContent.active {
+      display: block;
     }
 
 
-    .page.active {
-
-      display: flex;
-
-    }
-
-
-    /* ======================================================
+    /* ========================================================
        CHAT
-       ====================================================== */
+       ======================================================== */
 
-    #chatPage {
-
+    .chatContainer {
+      height: calc(100vh - 130px);
+      min-height: 450px;
+      display: flex;
       flex-direction: column;
-
-      min-height:
-        calc(100vh - 105px);
-
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
-
 
     #messages {
-
       flex: 1;
-
       overflow-y: auto;
-
       padding: 15px;
-
-      background: #f5f5f5;
-
     }
-
 
     .message {
-
       margin-bottom: 10px;
-
-      max-width: 85%;
-
-      padding:
-        10px 13px;
-
-      background: white;
-
-      border-radius: 12px;
-
-      box-shadow:
-        0 1px 3px
-        rgba(0, 0, 0, 0.08);
-
-      word-wrap: break-word;
-
-    }
-
-
-    .message.system {
-
-      background:
-        #e8e8e8;
-
-      color: #666;
-
-      font-style: italic;
-
-      margin-left: auto;
-
-      margin-right: auto;
-
-      text-align: center;
-
-      font-size: 13px;
-
-      max-width: 90%;
-
-    }
-
-
-    #chatInputArea {
-
-      display: flex;
-
-      gap: 8px;
-
-      padding: 10px;
-
-      background: white;
-
-      border-top:
-        1px solid #ddd;
-
-    }
-
-
-    #messageInput {
-
-      flex: 1;
-
-      min-width: 0;
-
-      padding: 12px;
-
-      border:
-        1px solid #ccc;
-
+      padding: 10px 13px;
       border-radius: 10px;
+      background: #f0f0f0;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
 
-      font-size: 16px;
+    .systemMessage {
+      background: #fff4d6;
+      color: #795600;
+      font-size: 14px;
+      text-align: center;
+    }
 
+    .chatInputArea {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      background: #fafafa;
+    }
+
+    #chatInput {
+      flex: 1;
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 9px;
       outline: none;
-
     }
-
-
-    #messageInput:focus {
-
-      border-color:
-        #667eea;
-
-    }
-
 
     #sendButton {
-
       border: none;
-
-      background:
-        #667eea;
-
+      background: #222;
       color: white;
-
-      padding:
-        0 18px;
-
-      border-radius: 10px;
-
+      border-radius: 9px;
+      padding: 0 18px;
       font-weight: bold;
-
     }
 
 
-    /* ======================================================
+    /* ========================================================
        DRAWING
-       ====================================================== */
+       ======================================================== */
 
-    #drawingPage {
-
-      flex-direction: column;
-
-      background: #eee;
-
-      padding: 10px;
-
-    }
-
-
-    #drawingControls {
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-      flex-wrap: wrap;
-
+    .drawingContainer {
       background: white;
-
-      padding: 10px;
-
-      border-radius: 10px;
-
-      margin-bottom: 10px;
-
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
 
+    .drawingToolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .toolbarLabel {
+      font-weight: bold;
+      margin-right: 3px;
+    }
 
     .colorButton {
-
-      width: 34px;
-
-      height: 34px;
-
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-
-      border:
-        2px solid #ccc;
-
+      border: 3px solid transparent;
+      padding: 0;
     }
-
 
     .colorButton.selected {
-
-      border:
-        3px solid #000;
-
+      border-color: #222;
+      transform: scale(1.1);
     }
 
+    .colorBlack {
+      background: #000;
+    }
 
-    #clearCanvas {
+    .colorRed {
+      background: #e53935;
+    }
 
-      padding:
-        8px 12px;
+    .colorBlue {
+      background: #1e88e5;
+    }
 
-      border: none;
+    .colorGreen {
+      background: #43a047;
+    }
 
-      border-radius: 7px;
+    .colorYellow {
+      background: #fdd835;
+    }
 
-      background: #333;
+    .colorPurple {
+      background: #8e24aa;
+    }
 
-      color: white;
+    .colorOrange {
+      background: #fb8c00;
+    }
 
+    #clearDrawingButton {
       margin-left: auto;
-
+      border: none;
+      background: #e53935;
+      color: white;
+      padding: 9px 13px;
+      border-radius: 8px;
+      font-weight: bold;
     }
 
+    #canvasWrapper {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: white;
+    }
 
     #drawingCanvas {
-
       display: block;
-
-      background: white;
-
       width: 100%;
-
-      max-width: 1200px;
-
       height: auto;
-
-      margin: 0 auto;
-
-      border-radius: 10px;
-
-      touch-action: none;
-
-      box-shadow:
-        0 1px 5px
-        rgba(0, 0, 0, 0.15);
-
-    }
-
-
-    /* ======================================================
-       CHECKERS
-       ====================================================== */
-
-    #checkersPage {
-
-      flex-direction: column;
-
-      align-items: center;
-
-      padding: 15px;
-
-      background:
-        #e9e9e9;
-
-      min-height:
-        calc(100vh - 105px);
-
-      overflow-y: auto;
-
-    }
-
-
-    #checkersHeader {
-
-      width: 100%;
-
-      max-width: 650px;
-
       background: white;
+      touch-action: none;
+    }
 
-      padding: 15px;
 
+    /* ========================================================
+       CHECKERS
+       ======================================================== */
+
+    .checkersContainer {
+      background: white;
       border-radius: 12px;
-
-      margin-bottom: 15px;
-
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
       text-align: center;
-
-      box-shadow:
-        0 2px 8px
-        rgba(0, 0, 0, 0.08);
-
     }
 
-
-    #checkersHeader h2 {
-
-      margin:
-        0 0 8px;
-
-    }
-
-
-    #gameStatus {
-
+    #checkersStatus {
       font-weight: bold;
-
-      font-size: 17px;
-
+      margin-bottom: 15px;
+      min-height: 24px;
     }
-
-
-    #gameInfo {
-
-      margin-top: 8px;
-
-      color: #666;
-
-      font-size: 14px;
-
-    }
-
-
-    #checkersBoard {
-
-      width:
-        min(90vw, 600px);
-
-      height:
-        min(90vw, 600px);
-
-      display: grid;
-
-      grid-template-columns:
-        repeat(8, 1fr);
-
-      grid-template-rows:
-        repeat(8, 1fr);
-
-      border:
-        5px solid #222;
-
-      border-radius: 5px;
-
-      overflow: hidden;
-
-      box-shadow:
-        0 5px 20px
-        rgba(0, 0, 0, 0.2);
-
-      user-select: none;
-
-      -webkit-user-select: none;
-
-    }
-
-
-    .square {
-
-      position: relative;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-    }
-
-
-    .lightSquare {
-
-      background:
-        #f0d9b5;
-
-    }
-
-
-    .darkSquare {
-
-      background:
-        #b58863;
-
-    }
-
-
-    .square.selected {
-
-      box-shadow:
-        inset
-        0 0 0 5px
-        #ffd700;
-
-    }
-
-
-    .square.validMove {
-
-      cursor: pointer;
-
-    }
-
-
-    .square.validMove::after {
-
-      content: "";
-
-      position: absolute;
-
-      width: 25%;
-
-      height: 25%;
-
-      background:
-        rgba(0, 255, 0, 0.65);
-
-      border-radius: 50%;
-
-    }
-
-
-    .piece {
-
-      width: 75%;
-
-      height: 75%;
-
-      border-radius: 50%;
-
-      position: relative;
-
-      z-index: 2;
-
-      box-shadow:
-        inset
-        0 3px 4px
-        rgba(255, 255, 255, 0.25),
-
-        inset
-        0 -5px 7px
-        rgba(0, 0, 0, 0.35),
-
-        0 2px 4px
-        rgba(0, 0, 0, 0.4);
-
-    }
-
-
-    .redPiece {
-
-      background:
-        #d62828;
-
-      border:
-        3px solid #9d1515;
-
-    }
-
-
-    .blackPiece {
-
-      background:
-        #222;
-
-      border:
-        3px solid #000;
-
-    }
-
-
-    .piece.king::after {
-
-      content: "K";
-
-      position: absolute;
-
-      left: 50%;
-
-      top: 50%;
-
-      transform:
-        translate(-50%, -50%);
-
-      color:
-        #ffd700;
-
-      font-weight: bold;
-
-      font-size:
-        clamp(14px, 4vw, 30px);
-
-    }
-
-
-    #checkersControls {
-
-      display: flex;
-
-      gap: 10px;
-
-      margin-top: 15px;
-
-      margin-bottom: 20px;
-
-    }
-
 
     #newGameButton {
-
       border: none;
-
-      padding:
-        11px 18px;
-
-      border-radius: 9px;
-
-      background:
-        #667eea;
-
+      background: #222;
       color: white;
-
+      padding: 10px 18px;
+      border-radius: 8px;
       font-weight: bold;
+      margin-bottom: 15px;
+    }
 
-      font-size: 15px;
+    #checkersBoard {
+      width: min(90vw, 600px);
+      height: min(90vw, 600px);
+      max-width: 600px;
+      max-height: 600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      border: 4px solid #222;
+    }
 
+    .checkerSquare {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightSquare {
+      background: #f0d9b5;
+    }
+
+    .darkSquare {
+      background: #b58863;
+    }
+
+    .checkerPiece {
+      width: 72%;
+      height: 72%;
+      border-radius: 50%;
+      border: 3px solid rgba(0, 0, 0, 0.25);
+      box-shadow:
+        0 3px 5px rgba(0, 0, 0, 0.25),
+        inset 0 2px 3px rgba(255, 255, 255, 0.25);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .redPiece {
+      background: #d32f2f;
+    }
+
+    .blackPiece {
+      background: #222;
+    }
+
+    .kingPiece::after {
+      content: "K";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: clamp(12px, 3vw, 25px);
+      font-weight: bold;
+    }
+
+    .selectedChecker {
+      outline: 4px solid #2196f3;
+      outline-offset: -4px;
+    }
+
+    .possibleMove {
+      box-shadow: inset 0 0 0 5px rgba(33, 150, 243, 0.75);
+      cursor: pointer;
+    }
+
+    .captureMove {
+      box-shadow: inset 0 0 0 5px rgba(255, 193, 7, 0.9);
     }
 
 
-    #newGameButton:hover {
+    /* ========================================================
+       ERROR / CONNECTION STATUS
+       ======================================================== */
 
-      background:
-        #5568d9;
+    #connectionStatus {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 8px 13px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: none;
+      z-index: 1000;
+    }
 
+    #connectionStatus.error {
+      background: #c62828;
+    }
+
+    #connectionStatus.success {
+      background: #2e7d32;
     }
 
 
-    /* ======================================================
+    /* ========================================================
        MOBILE
-       ====================================================== */
+       ======================================================== */
 
     @media (max-width: 600px) {
 
-      #topBar {
-
-        padding:
-          9px 10px;
-
+      .homeCard {
+        padding: 28px 18px;
       }
 
-
-      #roomTitle {
-
-        font-size: 16px;
-
+      .homeCard h1 {
+        font-size: 27px;
       }
 
+      .topBar {
+        padding: 8px 10px;
+      }
+
+      .roomInfo {
+        flex: 1;
+        flex-wrap: wrap;
+      }
+
+      .roomNameDisplay {
+        max-width: 130px;
+      }
 
       #homeButton {
-
-        padding:
-          8px 10px;
-
+        padding: 8px 10px;
       }
 
-
-      .tabButton {
-
-        font-size: 13px;
-
-        padding:
-          11px 5px;
-
-      }
-
-
-      #chatPage {
-
-        min-height:
-          calc(100vh - 98px);
-
-      }
-
-
-      #drawingPage {
-
-        padding: 7px;
-
-      }
-
-
-      #checkersPage {
-
+      .content {
         padding: 8px;
-
       }
 
-
-      #checkersBoard {
-
-        width: 96vw;
-
-        height: 96vw;
-
+      .chatContainer {
+        height: calc(100vh - 115px);
+        min-height: 350px;
+        border-radius: 8px;
       }
 
-
-      #checkersHeader {
-
-        padding: 12px;
-
-        margin-bottom: 10px;
-
+      .chatInputArea {
+        padding: 8px;
       }
 
-
-      #gameInfo {
-
-        font-size: 13px;
-
+      #chatInput {
+        padding: 11px;
       }
 
+      #sendButton {
+        padding: 0 14px;
+      }
+
+      .drawingContainer,
+      .checkersContainer {
+        padding: 8px;
+      }
+
+      .drawingToolbar {
+        gap: 7px;
+      }
 
       .colorButton {
-
-        width: 30px;
-
-        height: 30px;
-
+        width: 29px;
+        height: 29px;
       }
 
+      #clearDrawingButton {
+        margin-left: 0;
+      }
+
+      #checkersBoard {
+        width: min(96vw, 600px);
+        height: min(96vw, 600px);
+        border-width: 3px;
+      }
     }
 
+
+    @media (max-width: 400px) {
+
+      .tabButton {
+        padding: 12px 5px;
+        font-size: 13px;
+      }
+
+      #userCount,
+      #checkerRole {
+        font-size: 11px;
+        padding: 4px 7px;
+      }
+
+      .roomNameDisplay {
+        max-width: 100px;
+      }
+    }
   </style>
-
 </head>
-
 
 <body>
 
 
-  <!-- ====================================================
-       HOME SCREEN
-       ==================================================== -->
+  <!-- ======================================================
+       HOME PAGE
+       ====================================================== -->
 
-  <div id="homeScreen">
+  <div id="homePage">
 
-    <div class="homeBox">
+    <div class="homeCard">
 
-      <h1>Chat Room</h1>
+      <h1>Basic Chat</h1>
 
       <p>
-        Enter a room name to join or create a room.
+        Enter a room name to create or join a chat room.
       </p>
 
       <input
@@ -1001,31 +638,34 @@
   </div>
 
 
-  <!-- ====================================================
-       MAIN APP
-       ==================================================== -->
+  <!-- ======================================================
+       APP PAGE
+       ====================================================== -->
 
-  <div id="app">
+  <div id="appPage">
 
 
-    <!-- ==================================================
+    <!-- ====================================================
          TOP BAR
-         ================================================== -->
+         ==================================================== -->
 
-    <div id="topBar">
+    <div class="topBar">
 
-      <div>
+      <div class="roomInfo">
 
-        <div id="roomTitle">
-          Room
+        <div class="roomNameDisplay">
+          Room: <span id="roomNameDisplay">---</span>
         </div>
 
         <div id="userCount">
-          Connecting...
+          0 / 5 users
+        </div>
+
+        <div id="checkerRole">
+          Spectator
         </div>
 
       </div>
-
 
       <button id="homeButton">
         Home
@@ -1034,31 +674,29 @@
     </div>
 
 
-    <!-- ==================================================
+    <!-- ====================================================
          TABS
-         ================================================== -->
+         ==================================================== -->
 
-    <div id="tabs">
+    <div class="tabs">
 
       <button
         class="tabButton active"
-        data-page="chatPage"
+        data-tab="chatTab"
       >
         Chat
       </button>
 
-
       <button
         class="tabButton"
-        data-page="drawingPage"
+        data-tab="drawingTab"
       >
         Drawing
       </button>
 
-
       <button
         class="tabButton"
-        data-page="checkersPage"
+        data-tab="checkersTab"
       >
         Checkers
       </button>
@@ -1066,507 +704,318 @@
     </div>
 
 
-    <!-- ==================================================
-         CHAT PAGE
-         ================================================== -->
+    <!-- ====================================================
+         CONTENT
+         ==================================================== -->
 
-    <div
-      id="chatPage"
-      class="page active"
-    >
-
-      <div id="messages"></div>
+    <div class="content">
 
 
-      <div id="chatInputArea">
+      <!-- ==================================================
+           CHAT TAB
+           ================================================== -->
 
-        <input
-          id="messageInput"
-          type="text"
-          maxlength="1000"
-          placeholder="Type a message..."
-          autocomplete="off"
-        >
+      <div
+        id="chatTab"
+        class="tabContent active"
+      >
 
+        <div class="chatContainer">
 
-        <button id="sendButton">
-          Send
-        </button>
+          <div id="messages"></div>
 
-      </div>
+          <div class="chatInputArea">
 
-    </div>
+            <input
+              id="chatInput"
+              type="text"
+              maxlength="1000"
+              placeholder="Type a message..."
+              autocomplete="off"
+            >
 
+            <button id="sendButton">
+              Send
+            </button>
 
-    <!-- ==================================================
-         DRAWING PAGE
-         ================================================== -->
+          </div>
 
-    <div
-      id="drawingPage"
-      class="page"
-    >
-
-
-      <div id="drawingControls">
-
-
-        <button
-          class="colorButton selected"
-          data-color="#000000"
-          style="background:#000000"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#ff0000"
-          style="background:#ff0000"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#0000ff"
-          style="background:#0000ff"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#00aa00"
-          style="background:#00aa00"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#ffff00"
-          style="background:#ffff00"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#ff00ff"
-          style="background:#ff00ff"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#00ffff"
-          style="background:#00ffff"
-        ></button>
-
-
-        <button
-          class="colorButton"
-          data-color="#ffffff"
-          style="background:#ffffff"
-        ></button>
-
-
-        <button id="clearCanvas">
-          Clear
-        </button>
-
-
-      </div>
-
-
-      <canvas
-        id="drawingCanvas"
-        width="1200"
-        height="800"
-      ></canvas>
-
-
-    </div>
-
-
-    <!-- ==================================================
-         CHECKERS PAGE
-         ================================================== -->
-
-    <div
-      id="checkersPage"
-      class="page"
-    >
-
-
-      <div id="checkersHeader">
-
-        <h2>
-          Checkers
-        </h2>
-
-
-        <div id="gameStatus">
-          Connecting...
-        </div>
-
-
-        <div id="gameInfo">
-          Connecting to the game...
         </div>
 
       </div>
 
 
-      <div id="checkersBoard"></div>
+      <!-- ==================================================
+           DRAWING TAB
+           ================================================== -->
+
+      <div
+        id="drawingTab"
+        class="tabContent"
+      >
+
+        <div class="drawingContainer">
+
+          <div class="drawingToolbar">
+
+            <span class="toolbarLabel">
+              Color:
+            </span>
+
+            <button
+              class="colorButton colorBlack selected"
+              data-color="#000000"
+              title="Black"
+            ></button>
+
+            <button
+              class="colorButton colorRed"
+              data-color="#e53935"
+              title="Red"
+            ></button>
+
+            <button
+              class="colorButton colorBlue"
+              data-color="#1e88e5"
+              title="Blue"
+            ></button>
+
+            <button
+              class="colorButton colorGreen"
+              data-color="#43a047"
+              title="Green"
+            ></button>
+
+            <button
+              class="colorButton colorYellow"
+              data-color="#fdd835"
+              title="Yellow"
+            ></button>
+
+            <button
+              class="colorButton colorPurple"
+              data-color="#8e24aa"
+              title="Purple"
+            ></button>
+
+            <button
+              class="colorButton colorOrange"
+              data-color="#fb8c00"
+              title="Orange"
+            ></button>
+
+            <button id="clearDrawingButton">
+              Clear
+            </button>
+
+          </div>
 
 
-      <div id="checkersControls">
+          <div id="canvasWrapper">
 
-        <button id="newGameButton">
-          New Game
-        </button>
+            <canvas
+              id="drawingCanvas"
+              width="1200"
+              height="800"
+            ></canvas>
+
+          </div>
+
+        </div>
 
       </div>
 
 
-    </div>
+      <!-- ==================================================
+           CHECKERS TAB
+           ================================================== -->
 
+      <div
+        id="checkersTab"
+        class="tabContent"
+      >
+
+        <div class="checkersContainer">
+
+          <div id="checkersStatus">
+            Waiting for game...
+          </div>
+
+          <button id="newGameButton">
+            New Game
+          </button>
+
+          <div id="checkersBoard"></div>
+
+        </div>
+
+      </div>
+
+    </div>
 
   </div>
 
 
+  <!-- ======================================================
+       CONNECTION STATUS
+       ====================================================== -->
+
+  <div id="connectionStatus"></div>
+
+
   <script>
 
-
     // ========================================================
-    // DOM ELEMENTS
+    // ELEMENTS
     // ========================================================
 
-    const homeScreen =
-      document.getElementById(
-        "homeScreen"
-      );
+    const homePage =
+      document.getElementById("homePage");
 
-
-    const app =
-      document.getElementById(
-        "app"
-      );
-
+    const appPage =
+      document.getElementById("appPage");
 
     const roomInput =
-      document.getElementById(
-        "roomInput"
-      );
-
+      document.getElementById("roomInput");
 
     const joinButton =
-      document.getElementById(
-        "joinButton"
-      );
-
+      document.getElementById("joinButton");
 
     const homeError =
-      document.getElementById(
-        "homeError"
-      );
-
+      document.getElementById("homeError");
 
     const homeButton =
-      document.getElementById(
-        "homeButton"
-      );
+      document.getElementById("homeButton");
 
-
-    const roomTitle =
-      document.getElementById(
-        "roomTitle"
-      );
-
+    const roomNameDisplay =
+      document.getElementById("roomNameDisplay");
 
     const userCount =
-      document.getElementById(
-        "userCount"
-      );
+      document.getElementById("userCount");
 
+    const checkerRole =
+      document.getElementById("checkerRole");
 
     const messages =
-      document.getElementById(
-        "messages"
-      );
+      document.getElementById("messages");
 
-
-    const messageInput =
-      document.getElementById(
-        "messageInput"
-      );
-
+    const chatInput =
+      document.getElementById("chatInput");
 
     const sendButton =
-      document.getElementById(
-        "sendButton"
-      );
+      document.getElementById("sendButton");
 
+    const connectionStatus =
+      document.getElementById("connectionStatus");
 
-    const gameStatus =
-      document.getElementById(
-        "gameStatus"
-      );
+    const checkersStatus =
+      document.getElementById("checkersStatus");
 
-
-    const gameInfo =
-      document.getElementById(
-        "gameInfo"
-      );
-
+    const newGameButton =
+      document.getElementById("newGameButton");
 
     const checkersBoard =
-      document.getElementById(
-        "checkersBoard"
-      );
+      document.getElementById("checkersBoard");
+
+    const canvas =
+      document.getElementById("drawingCanvas");
+
+    const ctx =
+      canvas.getContext("2d");
 
 
     // ========================================================
-    // CONNECTION STATE
+    // STATE
     // ========================================================
 
     let socket = null;
 
     let currentRoom = "";
 
-    let joined = false;
-
-
-    // ========================================================
-    // CHECKERS CLIENT STATE
-    // ========================================================
-
     let checkerColor = null;
 
-    let board = [];
+    let checkersState = {
+      board: [],
+      turn: "red",
+      gameOver: false,
+      winner: null
+    };
 
-    let currentTurn = "red";
+    let selectedChecker = null;
 
-    let gameOver = false;
+    let drawing = false;
 
-    let winner = null;
+    let lastX = 0;
 
-    let selectedSquare = null;
+    let lastY = 0;
+
+    let currentColor = "#000000";
 
 
     // ========================================================
-    // TAB SYSTEM
+    // CONNECTION STATUS
     // ========================================================
 
-    const tabButtons =
-      document.querySelectorAll(
-        ".tabButton"
+    function showStatus(message, type = "") {
+
+      connectionStatus.textContent =
+        message;
+
+      connectionStatus.className =
+        type;
+
+      connectionStatus.style.display =
+        "block";
+
+      clearTimeout(
+        showStatus.timeout
       );
 
+      showStatus.timeout =
+        setTimeout(() => {
 
-    const pages =
-      document.querySelectorAll(
-        ".page"
-      );
+          connectionStatus.style.display =
+            "none";
 
-
-    tabButtons.forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const pageId =
-            button.dataset.page;
-
-
-          tabButtons.forEach(btn => {
-
-            btn.classList.remove(
-              "active"
-            );
-
-          });
-
-
-          pages.forEach(page => {
-
-            page.classList.remove(
-              "active"
-            );
-
-          });
-
-
-          button.classList.add(
-            "active"
-          );
-
-
-          document
-            .getElementById(pageId)
-            .classList.add(
-              "active"
-            );
-
-        }
-      );
-
-    });
-
-
-    // ========================================================
-    // JOIN ROOM
-    // ========================================================
-
-    function joinRoom() {
-
-      const room =
-        roomInput.value.trim();
-
-
-      if (!room) {
-
-        homeError.textContent =
-          "Please enter a room name.";
-
-        return;
-
-      }
-
-
-      homeError.textContent = "";
-
-
-      currentRoom = room;
-
-
-      roomTitle.textContent =
-        "Room: " + currentRoom;
-
-
-      homeScreen.style.display =
-        "none";
-
-
-      app.style.display =
-        "flex";
-
-
-      connectWebSocket();
-
+        }, 3000);
     }
 
 
-    joinButton.addEventListener(
-      "click",
-      joinRoom
-    );
-
-
-    roomInput.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          joinRoom();
-
-        }
-
-      }
-    );
-
-
     // ========================================================
-    // HOME BUTTON
+    // WEBSOCKET URL
     // ========================================================
 
-    homeButton.addEventListener(
-      "click",
-      () => {
-
-        joined = false;
-
-
-        if (socket) {
-
-          try {
-
-            socket.close();
-
-          } catch (error) {}
-
-          socket = null;
-
-        }
-
-
-        currentRoom = "";
-
-        checkerColor = null;
-
-        selectedSquare = null;
-
-
-        app.style.display =
-          "none";
-
-
-        homeScreen.style.display =
-          "flex";
-
-
-        roomInput.value = "";
-
-        messages.innerHTML = "";
-
-
-        userCount.textContent =
-          "Disconnected";
-
-
-        gameStatus.textContent =
-          "Not connected";
-
-
-        gameInfo.textContent =
-          "Enter a room to play.";
-
-      }
-    );
-
-
-    // ========================================================
-    // WEBSOCKET CONNECTION
-    // ========================================================
-
-    function connectWebSocket() {
-
-      if (socket) {
-
-        try {
-          socket.close();
-        } catch (error) {}
-
-      }
-
+    function getWebSocketURL() {
 
       const protocol =
-        window.location.protocol ===
-        "https:"
+        window.location.protocol === "https:"
           ? "wss:"
           : "ws:";
 
-
-      const wsUrl =
+      return (
         protocol +
         "//" +
-        window.location.host;
+        window.location.host
+      );
+    }
 
+
+    // ========================================================
+    // CONNECT
+    // ========================================================
+
+    function connectToServer(roomName) {
+
+      if (
+        socket &&
+        socket.readyState === WebSocket.OPEN
+      ) {
+        socket.close();
+      }
 
       socket =
         new WebSocket(
-          wsUrl
+          getWebSocketURL()
         );
 
 
@@ -1574,18 +1023,17 @@
         "open",
         () => {
 
-          userCount.textContent =
-            "Connected";
+          showStatus(
+            "Connected",
+            "success"
+          );
 
-
-          sendSocketData({
-
-            type: "join",
-
-            room:
-              currentRoom
-
-          });
+          socket.send(
+            JSON.stringify({
+              type: "join",
+              room: roomName
+            })
+          );
 
         }
       );
@@ -1595,8 +1043,27 @@
         "message",
         event => {
 
-          handleSocketMessage(
-            event.data
+          let data;
+
+          try {
+
+            data =
+              JSON.parse(
+                event.data
+              );
+
+          } catch (error) {
+
+            console.error(
+              "Invalid server message:",
+              error
+            );
+
+            return;
+          }
+
+          handleServerMessage(
+            data
           );
 
         }
@@ -1607,15 +1074,10 @@
         "close",
         () => {
 
-          joined = false;
-
-
-          userCount.textContent =
-            "Disconnected";
-
-
-          gameStatus.textContent =
-            "Disconnected";
+          showStatus(
+            "Disconnected from server",
+            "error"
+          );
 
         }
       );
@@ -1623,93 +1085,92 @@
 
       socket.addEventListener(
         "error",
-        () => {
+        error => {
 
-          userCount.textContent =
-            "Connection error";
+          console.error(
+            "WebSocket error:",
+            error
+          );
+
+          showStatus(
+            "Connection error",
+            "error"
+          );
 
         }
       );
-
     }
 
 
     // ========================================================
-    // SEND SOCKET DATA
+    // SEND
     // ========================================================
 
-    function sendSocketData(data) {
+    function send(data) {
 
       if (
-        socket &&
-        socket.readyState ===
-        WebSocket.OPEN
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
       ) {
 
-        socket.send(
-          JSON.stringify(data)
+        showStatus(
+          "Not connected",
+          "error"
         );
 
+        return false;
       }
 
+      socket.send(
+        JSON.stringify(data)
+      );
+
+      return true;
     }
 
 
     // ========================================================
-    // HANDLE SOCKET MESSAGE
+    // SERVER MESSAGE HANDLER
     // ========================================================
 
-    function handleSocketMessage(
-      rawData
-    ) {
-
-      let data;
-
-
-      try {
-
-        data =
-          JSON.parse(
-            rawData
-          );
-
-      } catch (error) {
-
-        return;
-
-      }
-
+    function handleServerMessage(data) {
 
       // ======================================================
       // JOINED
       // ======================================================
 
       if (
-        data.type === "joined"
+        data.type ===
+        "joined"
       ) {
-
-        joined = true;
-
 
         currentRoom =
           data.room;
 
+        checkerColor =
+          data.checkerColor;
 
-        roomTitle.textContent =
-          "Room: " +
+        roomNameDisplay.textContent =
           currentRoom;
 
+        updateCheckerRole();
 
-        checkerColor =
-          data.checkerColor ||
-          null;
+        if (
+          typeof data.userCount ===
+          "number"
+        ) {
 
+          updateUserCount(
+            data.userCount
+          );
 
-        updateCheckerInfo();
+        }
 
+        addSystemMessage(
+          "You joined the room."
+        );
 
         return;
-
       }
 
 
@@ -1727,63 +1188,6 @@
         );
 
         return;
-
-      }
-
-
-      // ======================================================
-      // ROOM FULL
-      // ======================================================
-
-      if (
-        data.type ===
-        "roomFull"
-      ) {
-
-        app.style.display =
-          "none";
-
-
-        homeScreen.style.display =
-          "flex";
-
-
-        homeError.textContent =
-          data.message ||
-          "Room is full.";
-
-
-        if (socket) {
-
-          try {
-            socket.close();
-          } catch (error) {}
-
-          socket = null;
-
-        }
-
-
-        return;
-
-      }
-
-
-      // ======================================================
-      // SYSTEM MESSAGE
-      // ======================================================
-
-      if (
-        data.type ===
-        "system"
-      ) {
-
-        addSystemMessage(
-          data.message
-        );
-
-        return;
-
       }
 
 
@@ -1796,12 +1200,28 @@
         "chat"
       ) {
 
-        addMessage(
+        addChatMessage(
           data.message
         );
 
         return;
+      }
 
+
+      // ======================================================
+      // SYSTEM
+      // ======================================================
+
+      if (
+        data.type ===
+        "system"
+      ) {
+
+        addSystemMessage(
+          data.message
+        );
+
+        return;
       }
 
 
@@ -1815,11 +1235,73 @@
       ) {
 
         addSystemMessage(
+          "Error: " +
           data.message
         );
 
-        return;
+        showStatus(
+          data.message,
+          "error"
+        );
 
+        return;
+      }
+
+
+      // ======================================================
+      // ROOM FULL
+      // ======================================================
+
+      if (
+        data.type ===
+        "roomFull"
+      ) {
+
+        homeError.textContent =
+          data.message ||
+          "This room is full.";
+
+        if (socket) {
+          socket.close();
+        }
+
+        return;
+      }
+
+
+      // ======================================================
+      // DRAWING
+      // ======================================================
+
+      if (
+        data.type ===
+        "drawing"
+      ) {
+
+        drawRemoteLine(
+          data.x1,
+          data.y1,
+          data.x2,
+          data.y2,
+          data.color
+        );
+
+        return;
+      }
+
+
+      // ======================================================
+      // DRAWING CLEAR
+      // ======================================================
+
+      if (
+        data.type ===
+        "drawingClear"
+      ) {
+
+        clearCanvas();
+
+        return;
       }
 
 
@@ -1832,12 +1314,21 @@
         "checkersState"
       ) {
 
-        applyCheckersState(
-          data.state
-        );
+        if (data.state) {
+
+          checkersState =
+            data.state;
+
+          selectedChecker =
+            null;
+
+          renderCheckersBoard();
+
+          updateCheckersStatus();
+
+        }
 
         return;
-
       }
 
 
@@ -1850,33 +1341,63 @@
         "checkersMove"
       ) {
 
-        applyServerMove(
+        applyRemoteCheckersMove(
           data
         );
 
         return;
-
       }
-
     }
 
 
     // ========================================================
-    // USER COUNT DISPLAY
+    // USER COUNT
     // ========================================================
 
-    function updateUserCount(
-      count
-    ) {
+    function updateUserCount(count) {
 
       userCount.textContent =
         count +
-        (
-          count === 1
-            ? " user"
-            : " users"
-        );
+        " / 5 users";
+    }
 
+
+    // ========================================================
+    // CHECKER ROLE
+    // ========================================================
+
+    function updateCheckerRole() {
+
+      if (
+        checkerColor ===
+        "red"
+      ) {
+
+        checkerRole.textContent =
+          "You: Red";
+
+        checkerRole.style.background =
+          "#c62828";
+
+      } else if (
+        checkerColor ===
+        "black"
+      ) {
+
+        checkerRole.textContent =
+          "You: Black";
+
+        checkerRole.style.background =
+          "#111";
+
+      } else {
+
+        checkerRole.textContent =
+          "Spectator";
+
+        checkerRole.style.background =
+          "#444";
+      }
     }
 
 
@@ -1884,90 +1405,76 @@
     // CHAT
     // ========================================================
 
-    function addMessage(
-      text
-    ) {
+    function addChatMessage(message) {
 
       const div =
         document.createElement(
           "div"
         );
-
 
       div.className =
         "message";
 
-
       div.textContent =
-        text;
-
+        message;
 
       messages.appendChild(
         div
       );
 
-
-      messages.scrollTop =
-        messages.scrollHeight;
-
+      scrollMessagesToBottom();
     }
 
 
-    function addSystemMessage(
-      text
-    ) {
+    function addSystemMessage(message) {
 
       const div =
         document.createElement(
           "div"
         );
 
-
       div.className =
-        "message system";
-
+        "message systemMessage";
 
       div.textContent =
-        text;
-
+        message;
 
       messages.appendChild(
         div
       );
 
+      scrollMessagesToBottom();
+    }
+
+
+    function scrollMessagesToBottom() {
 
       messages.scrollTop =
         messages.scrollHeight;
-
     }
 
 
     function sendChatMessage() {
 
-      const text =
-        messageInput.value.trim();
+      const message =
+        chatInput.value.trim();
 
-
-      if (!text) {
+      if (!message) {
         return;
       }
 
+      if (
+        send({
+          type: "chat",
+          message
+        })
+      ) {
 
-      sendSocketData({
+        chatInput.value =
+          "";
 
-        type: "chat",
-
-        message:
-          text
-
-      });
-
-
-      messageInput.value = "";
-
-
-      messageInput.focus();
-
+        chatInput.focus();
+      }
     }
 
 
@@ -1977,253 +1484,115 @@
     );
 
 
-    messageInput.addEventListener(
+    chatInput.addEventListener(
       "keydown",
       event => {
 
         if (
-          event.key === "Enter"
+          event.key ===
+          "Enter"
         ) {
 
           event.preventDefault();
 
           sendChatMessage();
-
         }
-
       }
     );
+
+
+    // ========================================================
+    // TABS
+    // ========================================================
+
+    const tabButtons =
+      document.querySelectorAll(
+        ".tabButton"
+      );
+
+    const tabContents =
+      document.querySelectorAll(
+        ".tabContent"
+      );
+
+
+    tabButtons.forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const target =
+            button.dataset.tab;
+
+
+          tabButtons.forEach(
+            otherButton => {
+
+              otherButton.classList.remove(
+                "active"
+              );
+
+            }
+          );
+
+
+          tabContents.forEach(
+            content => {
+
+              content.classList.remove(
+                "active"
+              );
+
+            }
+          );
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          document
+            .getElementById(target)
+            .classList.add(
+              "active"
+            );
+
+        }
+      );
+
+    });
 
 
     // ========================================================
     // DRAWING
     // ========================================================
 
-    const canvas =
-      document.getElementById(
-        "drawingCanvas"
-      );
-
-
-    const ctx =
-      canvas.getContext(
-        "2d"
-      );
-
-
-    let drawing = false;
-
-    let lastX = 0;
-
-    let lastY = 0;
-
-    let drawingColor =
-      "#000000";
-
-
-    ctx.lineWidth = 4;
-
-    ctx.lineCap =
-      "round";
-
-    ctx.lineJoin =
-      "round";
-
-
-    /*
-      IMPORTANT:
-
-      Drawing data is sent as individual
-      line segments so every connected
-      user sees the drawing.
-    */
-
-
-    document
-      .querySelectorAll(
-        ".colorButton"
-      )
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            document
-              .querySelectorAll(
-                ".colorButton"
-              )
-              .forEach(btn => {
-
-                btn.classList.remove(
-                  "selected"
-                );
-
-              });
-
-
-            button.classList.add(
-              "selected"
-            );
-
-
-            drawingColor =
-              button.dataset.color;
-
-          }
-        );
-
-      });
-
-
-    function getCanvasPosition(
-      event
-    ) {
+    function getCanvasCoordinates(event) {
 
       const rect =
         canvas.getBoundingClientRect();
 
+      const scaleX =
+        canvas.width /
+        rect.width;
 
-      let clientX;
-      let clientY;
-
-
-      if (
-        event.touches &&
-        event.touches.length
-      ) {
-
-        clientX =
-          event.touches[0].clientX;
-
-        clientY =
-          event.touches[0].clientY;
-
-      } else {
-
-        clientX =
-          event.clientX;
-
-        clientY =
-          event.clientY;
-
-      }
-
+      const scaleY =
+        canvas.height /
+        rect.height;
 
       return {
-
         x:
-          (
-            clientX -
-            rect.left
-          ) *
-          (
-            canvas.width /
-            rect.width
-          ),
+          (event.clientX -
+            rect.left) *
+          scaleX,
 
         y:
-          (
-            clientY -
-            rect.top
-          ) *
-          (
-            canvas.height /
-            rect.height
-          )
-
+          (event.clientY -
+            rect.top) *
+          scaleY
       };
-
-    }
-
-
-    function startDrawing(
-      event
-    ) {
-
-      event.preventDefault();
-
-
-      drawing = true;
-
-
-      const position =
-        getCanvasPosition(
-          event
-        );
-
-
-      lastX =
-        position.x;
-
-
-      lastY =
-        position.y;
-
-    }
-
-
-    function draw(
-      event
-    ) {
-
-      if (!drawing) {
-        return;
-      }
-
-
-      event.preventDefault();
-
-
-      const position =
-        getCanvasPosition(
-          event
-        );
-
-
-      drawLine(
-        lastX,
-        lastY,
-        position.x,
-        position.y,
-        drawingColor
-      );
-
-
-      /*
-        Send drawing segment to everyone.
-      */
-
-      sendSocketData({
-
-        type:
-          "drawing",
-
-        x1:
-          lastX,
-
-        y1:
-          lastY,
-
-        x2:
-          position.x,
-
-        y2:
-          position.y,
-
-        color:
-          drawingColor
-
-      });
-
-
-      lastX =
-        position.x;
-
-
-      lastY =
-        position.y;
-
     }
 
 
@@ -2235,105 +1604,50 @@
       color
     ) {
 
-      ctx.strokeStyle =
-        color;
-
-
       ctx.beginPath();
-
 
       ctx.moveTo(
         x1,
         y1
       );
 
-
       ctx.lineTo(
         x2,
         y2
       );
 
+      ctx.strokeStyle =
+        color;
+
+      ctx.lineWidth =
+        4;
+
+      ctx.lineCap =
+        "round";
+
+      ctx.lineJoin =
+        "round";
 
       ctx.stroke();
-
     }
 
 
-    function stopDrawing() {
+    function drawRemoteLine(
+      x1,
+      y1,
+      x2,
+      y2,
+      color
+    ) {
 
-      drawing = false;
-
-    }
-
-
-    canvas.addEventListener(
-      "mousedown",
-      startDrawing
-    );
-
-
-    canvas.addEventListener(
-      "mousemove",
-      draw
-    );
-
-
-    canvas.addEventListener(
-      "mouseup",
-      stopDrawing
-    );
-
-
-    canvas.addEventListener(
-      "mouseleave",
-      stopDrawing
-    );
-
-
-    canvas.addEventListener(
-      "touchstart",
-      startDrawing,
-      {
-        passive: false
-      }
-    );
-
-
-    canvas.addEventListener(
-      "touchmove",
-      draw,
-      {
-        passive: false
-      }
-    );
-
-
-    canvas.addEventListener(
-      "touchend",
-      stopDrawing
-    );
-
-
-    document
-      .getElementById(
-        "clearCanvas"
-      )
-      .addEventListener(
-        "click",
-        () => {
-
-          clearCanvas();
-
-
-          sendSocketData({
-
-            type:
-              "drawingClear"
-
-          });
-
-        }
+      drawLine(
+        x1,
+        y1,
+        x2,
+        y2,
+        color || "#000000"
       );
+    }
 
 
     function clearCanvas() {
@@ -2345,624 +1659,199 @@
         canvas.height
       );
 
+      ctx.fillStyle =
+        "#ffffff";
+
+      ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
     }
 
 
-    // ========================================================
-    // CHECKERS STATE
-    // ========================================================
+    function startDrawing(event) {
 
-    function createEmptyBoard() {
+      event.preventDefault();
 
-      const newBoard = [];
+      const point =
+        getCanvasCoordinates(
+          event
+        );
 
+      drawing =
+        true;
 
-      for (
-        let row = 0;
-        row < 8;
-        row++
-      ) {
+      lastX =
+        point.x;
 
-        newBoard[row] = [];
-
-
-        for (
-          let col = 0;
-          col < 8;
-          col++
-        ) {
-
-          newBoard[row][col] =
-            null;
-
-        }
-
-      }
-
-
-      return newBoard;
-
+      lastY =
+        point.y;
     }
 
 
-    function applyCheckersState(
-      state
-    ) {
+    function continueDrawing(event) {
 
-      if (!state) {
+      if (!drawing) {
         return;
       }
 
-
-      if (
-        !Array.isArray(
-          state.board
-        )
-      ) {
-
-        return;
-
-      }
-
-
-      board =
-        state.board;
-
-
-      currentTurn =
-        state.turn;
-
-
-      gameOver =
-        !!state.gameOver;
-
-
-      winner =
-        state.winner ||
-        null;
-
-
-      selectedSquare =
-        null;
-
-
-      renderCheckers();
-
-      updateCheckerInfo();
-
-    }
-
-
-    // ========================================================
-    // CHECKERS SERVER MOVE
-    // ========================================================
-
-    function applyServerMove(
-      data
-    ) {
-
-      const move =
-        data.move;
-
-
-      if (!move) {
-        return;
-      }
-
-
-      /*
-        The server sends the already
-        validated move.
-
-        The client does NOT independently
-        decide whether the move is legal.
-      */
-
-
-      if (
-        !board[move.fromRow]
-      ) {
-        return;
-      }
-
-
-      const piece =
-        board[
-          move.fromRow
-        ][
-          move.fromCol
-        ];
-
-
-      /*
-        Remove captured piece.
-      */
-
-      if (
-        move.captured
-      ) {
-
-        board[
-          move.captured.row
-        ][
-          move.captured.col
-        ] = null;
-
-      }
-
-
-      /*
-        Move piece.
-      */
-
-      board[
-        move.fromRow
-      ][
-        move.fromCol
-      ] = null;
-
-
-      board[
-        move.toRow
-      ][
-        move.toCol
-      ] =
-        move.piece ||
-        piece;
-
-
-      /*
-        IMPORTANT:
-
-        Use the server's turn.
-      */
-
-      currentTurn =
-        data.turn;
-
-
-      gameOver =
-        !!data.gameOver;
-
-
-      winner =
-        data.winner ||
-        null;
-
-
-      selectedSquare =
-        null;
-
-
-      renderCheckers();
-
-      updateCheckerInfo();
-
-    }
-
-
-    // ========================================================
-    // CHECKERS PIECE HELPERS
-    // ========================================================
-
-    function getPieceColor(
-      piece
-    ) {
-
-      if (
-        piece === "red" ||
-        piece === "redKing"
-      ) {
-
-        return "red";
-
-      }
-
-
-      if (
-        piece === "black" ||
-        piece === "blackKing"
-      ) {
-
-        return "black";
-
-      }
-
-
-      return null;
-
-    }
-
-
-    function isKing(
-      piece
-    ) {
-
-      return (
-        piece === "redKing" ||
-        piece === "blackKing"
+      event.preventDefault();
+
+      const point =
+        getCanvasCoordinates(
+          event
+        );
+
+
+      drawLine(
+        lastX,
+        lastY,
+        point.x,
+        point.y,
+        currentColor
       );
 
+
+      send({
+        type: "drawing",
+
+        x1: lastX,
+        y1: lastY,
+
+        x2: point.x,
+        y2: point.y,
+
+        color: currentColor
+      });
+
+
+      lastX =
+        point.x;
+
+      lastY =
+        point.y;
     }
 
 
-    // ========================================================
-    // CLIENT-SIDE MOVE DISPLAY
-    // ========================================================
-    //
-    // This does NOT validate the actual game.
-    //
-    // The server is authoritative.
-    //
-    // This function only determines which
-    // squares should be highlighted.
-    // ========================================================
+    function stopDrawing(event) {
 
-    function isPossibleMove(
-      fromRow,
-      fromCol,
-      toRow,
-      toCol
-    ) {
-
-      if (
-        !board[fromRow] ||
-        !board[toRow]
-      ) {
-
-        return false;
-
+      if (event) {
+        event.preventDefault();
       }
 
-
-      const piece =
-        board[
-          fromRow
-        ][
-          fromCol
-        ];
-
-
-      if (!piece) {
-        return false;
-      }
-
-
-      if (
-        getPieceColor(piece) !==
-        checkerColor
-      ) {
-
-        return false;
-
-      }
-
-
-      if (
-        currentTurn !==
-        checkerColor
-      ) {
-
-        return false;
-
-      }
-
-
-      if (
-        board[
-          toRow
-        ][
-          toCol
-        ] !== null
-      ) {
-
-        return false;
-
-      }
-
-
-      if (
-        (toRow + toCol) % 2 === 0
-      ) {
-
-        return false;
-
-      }
-
-
-      const rowDifference =
-        toRow -
-        fromRow;
-
-
-      const colDifference =
-        toCol -
-        fromCol;
-
-
-      const absRow =
-        Math.abs(
-          rowDifference
-        );
-
-
-      const absCol =
-        Math.abs(
-          colDifference
-        );
-
-
-      /*
-        Normal move.
-      */
-
-      if (
-        absRow === 1 &&
-        absCol === 1
-      ) {
-
-        if (
-          isKing(piece)
-        ) {
-
-          return true;
-
-        }
-
-
-        if (
-          checkerColor ===
-          "red"
-        ) {
-
-          return (
-            rowDifference === -1
-          );
-
-        }
-
-
-        return (
-          rowDifference === 1
-        );
-
-      }
-
-
-      /*
-        Capture.
-      */
-
-      if (
-        absRow === 2 &&
-        absCol === 2
-      ) {
-
-        const middleRow =
-          fromRow +
-          rowDifference / 2;
-
-
-        const middleCol =
-          fromCol +
-          colDifference / 2;
-
-
-        const middlePiece =
-          board[
-            middleRow
-          ][
-            middleCol
-          ];
-
-
-        if (!middlePiece) {
-          return false;
-        }
-
-
-        if (
-          getPieceColor(
-            middlePiece
-          ) ===
-          checkerColor
-        ) {
-
-          return false;
-
-        }
-
-
-        if (
-          isKing(piece)
-        ) {
-
-          return true;
-
-        }
-
-
-        if (
-          checkerColor ===
-          "red"
-        ) {
-
-          return (
-            rowDifference === -2
-          );
-
-        }
-
-
-        return (
-          rowDifference === 2
-        );
-
-      }
-
-
-      return false;
-
+      drawing =
+        false;
     }
 
 
+    canvas.addEventListener(
+      "pointerdown",
+      startDrawing
+    );
+
+    canvas.addEventListener(
+      "pointermove",
+      continueDrawing
+    );
+
+    canvas.addEventListener(
+      "pointerup",
+      stopDrawing
+    );
+
+    canvas.addEventListener(
+      "pointercancel",
+      stopDrawing
+    );
+
+    canvas.addEventListener(
+      "pointerleave",
+      stopDrawing
+    );
+
+
     // ========================================================
-    // CHECKERS CLICK
+    // DRAWING COLORS
     // ========================================================
 
-    function handleCheckerClick(
-      row,
-      col
-    ) {
-
-      if (gameOver) {
-        return;
-      }
+    const colorButtons =
+      document.querySelectorAll(
+        ".colorButton"
+      );
 
 
-      /*
-        Spectators cannot move.
-      */
+    colorButtons.forEach(
+      button => {
 
-      if (!checkerColor) {
-        return;
-      }
+        button.addEventListener(
+          "click",
+          () => {
 
-
-      /*
-        Not your turn.
-      */
-
-      if (
-        currentTurn !==
-        checkerColor
-      ) {
-
-        return;
-      }
+            currentColor =
+              button.dataset.color;
 
 
-      const piece =
-        board[row][col];
+            colorButtons.forEach(
+              otherButton => {
+
+                otherButton.classList.remove(
+                  "selected"
+                );
+
+              }
+            );
 
 
-      /*
-        No piece selected.
-      */
-
-      if (!selectedSquare) {
-
-        if (
-          piece &&
-          getPieceColor(piece) ===
-          checkerColor
-        ) {
-
-          selectedSquare = {
-            row,
-            col
-          };
-
-
-          renderCheckers();
-
-        }
-
-        return;
-
-      }
-
-
-      /*
-        Selecting another one
-        of your pieces.
-      */
-
-      if (
-        piece &&
-        getPieceColor(piece) ===
-        checkerColor
-      ) {
-
-        selectedSquare = {
-          row,
-          col
-        };
-
-
-        renderCheckers();
-
-        return;
-
-      }
-
-
-      /*
-        Try to send move.
-
-        The server will decide whether
-        it is actually legal.
-      */
-
-      if (
-        isPossibleMove(
-          selectedSquare.row,
-          selectedSquare.col,
-          row,
-          col
-        )
-      ) {
-
-        sendSocketData({
-
-          type:
-            "checkersMove",
-
-          move: {
-
-            fromRow:
-              selectedSquare.row,
-
-            fromCol:
-              selectedSquare.col,
-
-            toRow:
-              row,
-
-            toCol:
-              col
+            button.classList.add(
+              "selected"
+            );
 
           }
-
-        });
-
-
-        selectedSquare =
-          null;
-
-
-        renderCheckers();
-
-      } else {
-
-        selectedSquare =
-          null;
-
-
-        renderCheckers();
+        );
 
       }
-
-    }
+    );
 
 
     // ========================================================
-    // RENDER CHECKERS
+    // CLEAR DRAWING
     // ========================================================
 
-    function renderCheckers() {
+    document
+      .getElementById(
+        "clearDrawingButton"
+      )
+      .addEventListener(
+        "click",
+        () => {
 
-      checkersBoard.innerHTML = "";
+          clearCanvas();
+
+          send({
+            type: "drawingClear"
+          });
+
+        }
+      );
+
+
+    // ========================================================
+    // CHECKERS
+    // ========================================================
+
+    function renderCheckersBoard() {
+
+      checkersBoard.innerHTML =
+        "";
+
+      if (
+        !checkersState.board ||
+        checkersState.board.length !== 8
+      ) {
+        return;
+      }
 
 
       for (
@@ -2983,71 +1872,24 @@
             );
 
 
-          square.classList.add(
-            "square"
-          );
-
-
-          if (
-            (row + col) % 2 === 0
-          ) {
-
-            square.classList.add(
-              "lightSquare"
+          square.className =
+            "checkerSquare " +
+            (
+              (row + col) % 2 === 0
+                ? "lightSquare"
+                : "darkSquare"
             );
 
-          } else {
 
-            square.classList.add(
-              "darkSquare"
-            );
+          square.dataset.row =
+            row;
 
-          }
-
-
-          /*
-            Selected square.
-          */
-
-          if (
-            selectedSquare &&
-            selectedSquare.row ===
-              row &&
-            selectedSquare.col ===
-              col
-          ) {
-
-            square.classList.add(
-              "selected"
-            );
-
-          }
-
-
-          /*
-            Possible destination.
-          */
-
-          if (
-            selectedSquare &&
-            isPossibleMove(
-              selectedSquare.row,
-              selectedSquare.col,
-              row,
-              col
-            )
-          ) {
-
-            square.classList.add(
-              "validMove"
-            );
-
-          }
+          square.dataset.col =
+            col;
 
 
           const piece =
-            board[row] &&
-            board[row][col];
+            checkersState.board[row][col];
 
 
           if (piece) {
@@ -3058,14 +1900,14 @@
               );
 
 
-            pieceElement.classList.add(
-              "piece"
-            );
+            pieceElement.className =
+              "checkerPiece";
 
 
             if (
-              piece === "red" ||
-              piece === "redKing"
+              getPieceColor(
+                piece
+              ) === "red"
             ) {
 
               pieceElement.classList.add(
@@ -3082,14 +1924,44 @@
 
 
             if (
-              isKing(piece)
+              isKing(
+                piece
+              )
             ) {
 
               pieceElement.classList.add(
-                "king"
+                "kingPiece"
               );
 
             }
+
+
+            if (
+              selectedChecker &&
+              selectedChecker.row === row &&
+              selectedChecker.col === col
+            ) {
+
+              pieceElement.classList.add(
+                "selectedChecker"
+              );
+
+            }
+
+
+            pieceElement.addEventListener(
+              "click",
+              event => {
+
+                event.stopPropagation();
+
+                selectCheckerPiece(
+                  row,
+                  col
+                );
+
+              }
+            );
 
 
             square.appendChild(
@@ -3099,199 +1971,777 @@
           }
 
 
-          square.addEventListener(
-            "click",
-            () => {
+          /*
+            Highlight selected piece's
+            legal destinations.
+          */
 
-              handleCheckerClick(
-                row,
-                col
+          if (
+            selectedChecker &&
+            isPossibleMove(
+              selectedChecker.row,
+              selectedChecker.col,
+              row,
+              col
+            )
+          ) {
+
+            square.classList.add(
+              "possibleMove"
+            );
+
+
+            if (
+              Math.abs(
+                row -
+                selectedChecker.row
+              ) === 2
+            ) {
+
+              square.classList.add(
+                "captureMove"
               );
 
             }
-          );
+
+
+            square.addEventListener(
+              "click",
+              () => {
+
+                makeCheckersMove(
+                  selectedChecker.row,
+                  selectedChecker.col,
+                  row,
+                  col
+                );
+
+              }
+            );
+
+          }
 
 
           checkersBoard.appendChild(
             square
           );
+        }
+      }
+    }
+
+
+    function getPieceColor(piece) {
+
+      if (
+        piece === "red" ||
+        piece === "redKing"
+      ) {
+        return "red";
+      }
+
+      if (
+        piece === "black" ||
+        piece === "blackKing"
+      ) {
+        return "black";
+      }
+
+      return null;
+    }
+
+
+    function isKing(piece) {
+
+      return (
+        piece === "redKing" ||
+        piece === "blackKing"
+      );
+    }
+
+
+    function isPossibleMove(
+      fromRow,
+      fromCol,
+      toRow,
+      toCol
+    ) {
+
+      if (
+        !checkerColor ||
+        checkersState.gameOver
+      ) {
+        return false;
+      }
+
+
+      if (
+        checkersState.turn !==
+        checkerColor
+      ) {
+        return false;
+      }
+
+
+      const board =
+        checkersState.board;
+
+
+      const piece =
+        board[fromRow][fromCol];
+
+
+      if (!piece) {
+        return false;
+      }
+
+
+      if (
+        getPieceColor(piece) !==
+        checkerColor
+      ) {
+        return false;
+      }
+
+
+      if (
+        board[toRow][toCol] !== null
+      ) {
+        return false;
+      }
+
+
+      if (
+        (toRow + toCol) % 2 === 0
+      ) {
+        return false;
+      }
+
+
+      const rowDifference =
+        toRow -
+        fromRow;
+
+      const colDifference =
+        toCol -
+        fromCol;
+
+
+      const absRow =
+        Math.abs(
+          rowDifference
+        );
+
+      const absCol =
+        Math.abs(
+          colDifference
+        );
+
+
+      // Normal move
+
+      if (
+        absRow === 1 &&
+        absCol === 1
+      ) {
+
+        if (
+          isKing(piece)
+        ) {
+          return true;
+        }
+
+
+        if (
+          checkerColor === "red"
+        ) {
+
+          return (
+            rowDifference === -1
+          );
 
         }
+
+
+        if (
+          checkerColor === "black"
+        ) {
+
+          return (
+            rowDifference === 1
+          );
+
+        }
+      }
+
+
+      // Capture
+
+      if (
+        absRow === 2 &&
+        absCol === 2
+      ) {
+
+        const middleRow =
+          fromRow +
+          rowDifference / 2;
+
+        const middleCol =
+          fromCol +
+          colDifference / 2;
+
+
+        const middlePiece =
+          board[middleRow][middleCol];
+
+
+        if (!middlePiece) {
+          return false;
+        }
+
+
+        if (
+          getPieceColor(
+            middlePiece
+          ) === checkerColor
+        ) {
+          return false;
+        }
+
+
+        if (
+          isKing(piece)
+        ) {
+          return true;
+        }
+
+
+        if (
+          checkerColor === "red"
+        ) {
+
+          return (
+            rowDifference === -2
+          );
+
+        }
+
+
+        if (
+          checkerColor === "black"
+        ) {
+
+          return (
+            rowDifference === 2
+          );
+
+        }
+      }
+
+
+      return false;
+    }
+
+
+    function selectCheckerPiece(
+      row,
+      col
+    ) {
+
+      if (
+        !checkerColor
+      ) {
+
+        showStatus(
+          "You are a spectator.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (
+        checkersState.gameOver
+      ) {
+        return;
+      }
+
+
+      if (
+        checkersState.turn !==
+        checkerColor
+      ) {
+
+        showStatus(
+          "It is not your turn.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const piece =
+        checkersState.board[row][col];
+
+
+      if (!piece) {
+        return;
+      }
+
+
+      if (
+        getPieceColor(piece) !==
+        checkerColor
+      ) {
+
+        showStatus(
+          "That is not your piece.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      selectedChecker = {
+        row,
+        col
+      };
+
+
+      renderCheckersBoard();
+    }
+
+
+    function makeCheckersMove(
+      fromRow,
+      fromCol,
+      toRow,
+      toCol
+    ) {
+
+      if (
+        !checkerColor
+      ) {
+        return;
+      }
+
+
+      if (
+        checkersState.gameOver
+      ) {
+        return;
+      }
+
+
+      if (
+        checkersState.turn !==
+        checkerColor
+      ) {
+        return;
+      }
+
+
+      if (
+        !isPossibleMove(
+          fromRow,
+          fromCol,
+          toRow,
+          toCol
+        )
+      ) {
+
+        showStatus(
+          "That is not a legal move.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      send({
+        type: "checkersMove",
+
+        move: {
+          fromRow,
+          fromCol,
+          toRow,
+          toCol
+        }
+      });
+
+
+      selectedChecker =
+        null;
+    }
+
+
+    function applyRemoteCheckersMove(
+      data
+    ) {
+
+      const move =
+        data.move;
+
+
+      if (!move) {
+        return;
+      }
+
+
+      const board =
+        checkersState.board;
+
+
+      /*
+        Move piece.
+      */
+
+      board[move.fromRow][move.fromCol] =
+        null;
+
+
+      /*
+        Remove captured piece.
+      */
+
+      if (
+        move.captured
+      ) {
+
+        board[
+          move.captured.row
+        ][
+          move.captured.col
+        ] = null;
 
       }
 
 
-      updateCheckerStatus();
+      /*
+        Place moved piece.
+      */
 
+      board[
+        move.toRow
+      ][
+        move.toCol
+      ] =
+        move.piece;
+
+
+      checkersState.turn =
+        data.turn;
+
+      checkersState.gameOver =
+        data.gameOver;
+
+      checkersState.winner =
+        data.winner;
+
+
+      selectedChecker =
+        null;
+
+
+      renderCheckersBoard();
+
+      updateCheckersStatus();
     }
 
 
-    // ========================================================
-    // CHECKERS STATUS
-    // ========================================================
+    function updateCheckersStatus() {
 
-    function updateCheckerStatus() {
+      if (
+        checkersState.gameOver
+      ) {
 
-      if (gameOver) {
-
-        if (winner) {
+        if (
+          checkersState.winner
+        ) {
 
           if (
-            winner ===
-            checkerColor
+            checkerColor ===
+            checkersState.winner
           ) {
 
-            gameStatus.textContent =
-              "You win!";
+            checkersStatus.textContent =
+              "You won!";
 
           } else {
 
-            gameStatus.textContent =
-              capitalize(
-                winner
-              ) +
+            checkersStatus.textContent =
+              checkersState.winner
+              .toUpperCase() +
               " wins!";
 
           }
 
         } else {
 
-          gameStatus.textContent =
-            "Game over";
+          checkersStatus.textContent =
+            "Game over.";
 
         }
 
-
         return;
-
-      }
-
-
-      if (!checkerColor) {
-
-        gameStatus.textContent =
-          capitalize(
-            currentTurn
-          ) +
-          "'s turn";
-
-
-        return;
-
       }
 
 
       if (
-        currentTurn ===
+        !checkerColor
+      ) {
+
+        checkersStatus.textContent =
+          "You are watching the game.";
+
+        return;
+      }
+
+
+      if (
+        checkersState.turn ===
         checkerColor
       ) {
 
-        gameStatus.textContent =
-          "Your turn!";
+        checkersStatus.textContent =
+          "Your turn (" +
+          checkerColor +
+          ")";
 
       } else {
 
-        gameStatus.textContent =
-          capitalize(
-            currentTurn
-          ) +
+        checkersStatus.textContent =
+          checkersState.turn
+          .toUpperCase() +
           "'s turn";
 
       }
-
     }
 
 
-    function updateCheckerInfo() {
+    // ========================================================
+    // NEW GAME
+    // ========================================================
 
-      if (!joined) {
+    newGameButton.addEventListener(
+      "click",
+      () => {
 
-        gameInfo.textContent =
-          "Connecting to the game...";
+        send({
+          type: "checkersReset"
+        });
+
+      }
+    );
+
+
+    // ========================================================
+    // JOIN ROOM
+    // ========================================================
+
+    function joinRoom() {
+
+      const room =
+        roomInput.value.trim();
+
+
+      if (!room) {
+
+        homeError.textContent =
+          "Please enter a room name.";
+
+        roomInput.focus();
 
         return;
-
       }
 
 
-      if (checkerColor === "red") {
-
-        gameInfo.textContent =
-          "You are Red. Red moves first.";
-
-      } else if (
-        checkerColor === "black"
-      ) {
-
-        gameInfo.textContent =
-          "You are Black.";
-
-      } else {
-
-        gameInfo.textContent =
-          "You are watching. The two checker players are already assigned.";
-
-      }
+      homeError.textContent =
+        "";
 
 
-      updateCheckerStatus();
+      /*
+        Show app immediately while
+        connection is being established.
+      */
 
-    }
+      homePage.style.display =
+        "none";
 
-
-    function capitalize(
-      text
-    ) {
-
-      if (!text) {
-        return "";
-      }
+      appPage.style.display =
+        "flex";
 
 
-      return (
-        text.charAt(0).toUpperCase() +
-        text.slice(1)
+      messages.innerHTML =
+        "";
+
+      clearCanvas();
+
+
+      checkersState = {
+        board: [],
+        turn: "red",
+        gameOver: false,
+        winner: null
+      };
+
+
+      checkerColor =
+        null;
+
+      selectedChecker =
+        null;
+
+
+      renderCheckersBoard();
+
+      updateCheckersStatus();
+
+      updateCheckerRole();
+
+
+      connectToServer(
+        room
       );
-
     }
 
 
+    joinButton.addEventListener(
+      "click",
+      joinRoom
+    );
+
+
+    roomInput.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key ===
+          "Enter"
+        ) {
+
+          event.preventDefault();
+
+          joinRoom();
+        }
+
+      }
+    );
+
+
     // ========================================================
-    // NEW CHECKERS GAME
+    // HOME BUTTON
     // ========================================================
 
-    document
-      .getElementById(
-        "newGameButton"
-      )
-      .addEventListener(
-        "click",
-        () => {
+    homeButton.addEventListener(
+      "click",
+      () => {
 
-          sendSocketData({
+        if (socket) {
 
-            type:
-              "checkersReset"
-
-          });
+          try {
+            socket.close();
+          } catch (error) {
+            console.error(error);
+          }
 
         }
-      );
+
+
+        socket =
+          null;
+
+        currentRoom =
+          "";
+
+        checkerColor =
+          null;
+
+        selectedChecker =
+          null;
+
+
+        appPage.style.display =
+          "none";
+
+        homePage.style.display =
+          "flex";
+
+
+        roomNameDisplay.textContent =
+          "---";
+
+        userCount.textContent =
+          "0 / 5 users";
+
+        checkerRole.textContent =
+          "Spectator";
+
+        checkerRole.style.background =
+          "#444";
+
+
+        messages.innerHTML =
+          "";
+
+        clearCanvas();
+
+
+        checkersState = {
+          board: [],
+          turn: "red",
+          gameOver: false,
+          winner: null
+        };
+
+
+        renderCheckersBoard();
+
+        updateCheckersStatus();
+
+
+        roomInput.value =
+          "";
+
+        homeError.textContent =
+          "";
+
+        roomInput.focus();
+
+      }
+    );
 
 
     // ========================================================
-    // INITIAL CHECKERS BOARD
+    // INITIALIZE CANVAS
     // ========================================================
 
-    board =
-      createEmptyBoard();
+    clearCanvas();
 
 
-    renderCheckers();
+    // ========================================================
+    // INITIALIZE CHECKERS
+    // ========================================================
+
+    renderCheckersBoard();
+
+    updateCheckersStatus();
+
+
+    // ========================================================
+    // INITIAL ROOM INPUT FOCUS
+    // ========================================================
+
+    roomInput.focus();
 
   </script>
 
 </body>
-
 </html>
-```
+
+
+
