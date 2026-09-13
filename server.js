@@ -16,12 +16,71 @@ const MAX_DRAWING_COLOR_LENGTH = 30;
 // HTTP SERVER
 // ============================================================
 
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const WebSocket = require("ws");
+
+const PORT = process.env.PORT || 10000;
+
 const server = http.createServer((req, res) => {
-  res.writeHead(200, {
+
+  // Serve index.html
+  if (req.url === "/" || req.url === "/index.html") {
+
+    const filePath =
+      path.join(__dirname, "index.html");
+
+    fs.readFile(filePath, (error, data) => {
+
+      if (error) {
+
+        console.error(
+          "Could not load index.html:",
+          error
+        );
+
+        res.writeHead(500, {
+          "Content-Type": "text/plain"
+        });
+
+        res.end(
+          "Could not load index.html."
+        );
+
+        return;
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "text/html; charset=utf-8"
+      });
+
+      res.end(data);
+    });
+
+    return;
+  }
+
+
+  // Simple health check
+  if (req.url === "/health") {
+
+    res.writeHead(200, {
+      "Content-Type": "text/plain"
+    });
+
+    res.end("OK");
+
+    return;
+  }
+
+
+  // Everything else
+  res.writeHead(404, {
     "Content-Type": "text/plain"
   });
 
-  res.end("Chat server is running.");
+  res.end("Not found.");
 });
 
 
@@ -1412,8 +1471,8 @@ wss.on("connection", ws => {
 // START SERVER
 // ============================================================
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `Server running on port ${PORT}`
+    `Server running on 0.0.0.0:${PORT}`
   );
 });
