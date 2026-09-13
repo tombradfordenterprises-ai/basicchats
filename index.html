@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
-  <title>Basic Chat</title>
+  <title>Chat Room</title>
 
   <style>
     * {
@@ -20,68 +20,68 @@
       margin: 0;
       padding: 0;
       width: 100%;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: white;
-    }
-
-    body {
-      overflow: hidden;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f2f2;
+      color: #222;
     }
 
     button,
-    input {
-      font: inherit;
+    input,
+    textarea {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     /* =========================
-       LOGIN SCREEN
+       HOME / JOIN SCREEN
        ========================= */
 
-    #loginScreen {
-      width: 100%;
-      height: 100%;
+    #homeScreen {
+      min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
     }
 
-    #loginBox {
+    .homeBox {
       width: 100%;
-      max-width: 420px;
-      background: #1e1e1e;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      max-width: 430px;
+      background: white;
+      padding: 35px 25px;
+      border-radius: 18px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+      text-align: center;
     }
 
-    #loginBox h1 {
+    .homeBox h1 {
       margin-top: 0;
       margin-bottom: 10px;
-      text-align: center;
+      font-size: 32px;
     }
 
-    #loginBox p {
-      text-align: center;
-      color: #aaa;
+    .homeBox p {
+      color: #666;
       margin-bottom: 25px;
     }
 
-    #loginBox input {
+    #roomInput {
       width: 100%;
       padding: 14px;
-      margin-bottom: 12px;
-      border: none;
+      border: 1px solid #ccc;
       border-radius: 10px;
-      background: #2b2b2b;
-      color: white;
+      font-size: 16px;
+      margin-bottom: 12px;
       outline: none;
     }
 
-    #loginBox input:focus {
-      box-shadow: 0 0 0 2px #4caf50;
+    #roomInput:focus {
+      border-color: #667eea;
     }
 
     #joinButton {
@@ -89,445 +89,408 @@
       padding: 14px;
       border: none;
       border-radius: 10px;
-      background: #4caf50;
+      background: #667eea;
       color: white;
+      font-size: 17px;
       font-weight: bold;
-      cursor: pointer;
     }
 
     #joinButton:hover {
-      background: #43a047;
+      background: #5568d9;
     }
 
-    #joinButton:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #loginError {
-      color: #ff6b6b;
-      text-align: center;
-      margin-top: 15px;
+    #homeError {
+      color: #d93025;
+      margin-top: 12px;
       min-height: 20px;
+      font-size: 14px;
     }
 
     /* =========================
-       CHAT SCREEN
+       MAIN APP
        ========================= */
 
-    #chatScreen {
+    #app {
       display: none;
-      width: 100%;
-      height: 100%;
+      min-height: 100vh;
       flex-direction: column;
     }
 
-    #chatHeader {
-      flex-shrink: 0;
-      min-height: 65px;
+    /* =========================
+       TOP BAR
+       ========================= */
+
+    #topBar {
+      background: #222;
+      color: white;
       padding: 10px 15px;
-      background: #1e1e1e;
-      border-bottom: 1px solid #333;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
-    #chatInfo {
-      flex: 1;
-      min-width: 0;
-    }
-
-    #chatName {
-      font-size: 20px;
+    #roomTitle {
+      font-size: 18px;
       font-weight: bold;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     #userCount {
-      font-size: 13px;
-      color: #aaa;
-      margin-top: 3px;
+      font-size: 14px;
+      color: #ccc;
     }
 
     #homeButton {
-      flex-shrink: 0;
-      padding: 9px 13px;
       border: none;
-      border-radius: 8px;
-      background: #333;
+      background: #444;
       color: white;
-      cursor: pointer;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 14px;
     }
 
     #homeButton:hover {
-      background: #444;
+      background: #555;
     }
 
     /* =========================
-       MESSAGES
+       TABS
        ========================= */
+
+    #tabs {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tabButton {
+      flex: 1;
+      padding: 13px 10px;
+      border: none;
+      background: white;
+      font-size: 15px;
+      font-weight: bold;
+      color: #666;
+    }
+
+    .tabButton.active {
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+    }
+
+    /* =========================
+       CONTENT
+       ========================= */
+
+    .page {
+      display: none;
+      flex: 1;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    /* =========================
+       CHAT
+       ========================= */
+
+    #chatPage {
+      flex-direction: column;
+      min-height: calc(100vh - 105px);
+    }
 
     #messages {
       flex: 1;
       overflow-y: auto;
       padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      overscroll-behavior: contain;
+      background: #f5f5f5;
     }
 
     .message {
+      margin-bottom: 10px;
       max-width: 85%;
       padding: 10px 13px;
-      border-radius: 12px;
-      background: #252525;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
-    }
-
-    .message .username {
-      font-size: 12px;
-      font-weight: bold;
-      color: #81c784;
-      margin-bottom: 4px;
-    }
-
-    .message .messageText {
-      white-space: pre-wrap;
-    }
-
-    .systemMessage {
-      text-align: center;
-      color: #888;
-      font-size: 13px;
-      padding: 3px 10px;
-    }
-
-    .drawingMessage {
-      max-width: 90%;
-    }
-
-    .drawingMessage .username {
-      font-size: 12px;
-      font-weight: bold;
-      color: #81c784;
-      margin-bottom: 6px;
-    }
-
-    .drawingMessage img {
-      display: block;
-      max-width: 100%;
-      height: auto;
       background: white;
-      border-radius: 8px;
-      border: 1px solid #444;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      word-wrap: break-word;
     }
 
-    /* =========================
-       INPUT AREA
-       ========================= */
+    .message.system {
+      background: #e8e8e8;
+      color: #666;
+      font-style: italic;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      font-size: 13px;
+    }
 
-    #inputArea {
-      flex-shrink: 0;
-      padding: 10px;
-      background: #1e1e1e;
-      border-top: 1px solid #333;
+    #chatInputArea {
       display: flex;
       gap: 8px;
-      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #ddd;
     }
 
     #messageInput {
       flex: 1;
       min-width: 0;
       padding: 12px;
-      border: none;
+      border: 1px solid #ccc;
       border-radius: 10px;
-      background: #2b2b2b;
-      color: white;
+      font-size: 16px;
       outline: none;
     }
 
-    #messageInput:focus {
-      box-shadow: 0 0 0 2px #4caf50;
-    }
-
-    #sendButton,
-    #drawButton {
-      border: none;
-      border-radius: 10px;
-      padding: 0 15px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-    }
-
     #sendButton {
-      background: #4caf50;
-    }
-
-    #sendButton:hover {
-      background: #43a047;
-    }
-
-    #drawButton {
-      background: #555;
-    }
-
-    #drawButton:hover {
-      background: #666;
-    }
-
-    /* =========================
-       DRAWING OVERLAY
-       ========================= */
-
-    #drawingOverlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      background: rgba(0, 0, 0, 0.85);
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-    }
-
-    #drawingBox {
-      width: 100%;
-      max-width: 700px;
-      max-height: 95vh;
-      background: #1e1e1e;
-      border-radius: 16px;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    #drawingTitle {
-      text-align: center;
-      font-size: 20px;
+      border: none;
+      background: #667eea;
+      color: white;
+      padding: 0 18px;
+      border-radius: 10px;
       font-weight: bold;
     }
 
     /* =========================
-       COLOR PICKER
+       DRAWING
        ========================= */
 
-    #colorSection {
-      display: flex;
+    #drawingPage {
       flex-direction: column;
-      gap: 8px;
+      background: #eee;
+      padding: 10px;
     }
 
-    #colorLabel {
-      font-size: 13px;
-      color: #aaa;
-    }
-
-    #colorPalette {
+    #drawingControls {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
 
     .colorButton {
       width: 34px;
       height: 34px;
-      padding: 0;
       border-radius: 50%;
-      border: 3px solid #555;
-      cursor: pointer;
-      transition: transform 0.1s, border-color 0.1s;
-    }
-
-    .colorButton:hover {
-      transform: scale(1.08);
+      border: 2px solid #ccc;
     }
 
     .colorButton.selected {
-      border-color: white;
-      box-shadow: 0 0 0 2px #4caf50;
-      transform: scale(1.08);
+      border: 3px solid #000;
     }
 
-    #customColor {
-      width: 40px;
-      height: 40px;
-      padding: 2px;
-      border: 3px solid #555;
-      border-radius: 50%;
-      background: transparent;
-      cursor: pointer;
-    }
-
-    #customColor.selected {
-      border-color: white;
-      box-shadow: 0 0 0 2px #4caf50;
-    }
-
-    /* =========================
-       CANVAS
-       ========================= */
-
-    #canvasContainer {
-      width: 100%;
-      overflow: hidden;
-      border-radius: 10px;
-      background: white;
+    #clearCanvas {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 7px;
+      background: #333;
+      color: white;
+      margin-left: auto;
     }
 
     #drawingCanvas {
-      display: block;
-      width: 100%;
-      height: min(55vh, 450px);
       background: white;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
       touch-action: none;
-      cursor: crosshair;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
     }
 
     /* =========================
-       DRAWING CONTROLS
+       CHECKERS
        ========================= */
 
-    #drawingControls {
-      display: flex;
-      gap: 8px;
+    #checkersPage {
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+      background: #e9e9e9;
+      min-height: calc(100vh - 105px);
+      overflow-y: auto;
     }
 
-    #drawingControls button {
-      flex: 1;
-      min-height: 44px;
-      border: none;
-      border-radius: 10px;
+    #checkersHeader {
+      width: 100%;
+      max-width: 650px;
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    #checkersHeader h2 {
+      margin: 0 0 8px;
+    }
+
+    #gameStatus {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    #gameInfo {
+      margin-top: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    #checkersBoard {
+      width: min(90vw, 600px);
+      height: min(90vw, 600px);
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      border: 5px solid #222;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .square {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightSquare {
+      background: #f0d9b5;
+    }
+
+    .darkSquare {
+      background: #b58863;
+    }
+
+    .square.selected {
+      box-shadow: inset 0 0 0 5px #ffd700;
+    }
+
+    .square.validMove {
       cursor: pointer;
+    }
+
+    .square.validMove::after {
+      content: "";
+      position: absolute;
+      width: 25%;
+      height: 25%;
+      background: rgba(0, 255, 0, 0.65);
+      border-radius: 50%;
+    }
+
+    .piece {
+      width: 75%;
+      height: 75%;
+      border-radius: 50%;
+      position: relative;
+      z-index: 2;
+      box-shadow:
+        inset 0 3px 4px rgba(255, 255, 255, 0.25),
+        inset 0 -5px 7px rgba(0, 0, 0, 0.35),
+        0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .redPiece {
+      background: #d62828;
+      border: 3px solid #9d1515;
+    }
+
+    .blackPiece {
+      background: #222;
+      border: 3px solid #000;
+    }
+
+    .piece.king::after {
+      content: "K";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffd700;
+      font-weight: bold;
+      font-size: clamp(14px, 4vw, 30px);
+    }
+
+    #checkersControls {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      margin-bottom: 20px;
+    }
+
+    #newGameButton {
+      border: none;
+      padding: 11px 18px;
+      border-radius: 9px;
+      background: #667eea;
       color: white;
       font-weight: bold;
+      font-size: 15px;
     }
 
-    #clearDrawingButton {
-      background: #555;
-    }
-
-    #cancelDrawingButton {
-      background: #8b2f2f;
-    }
-
-    #sendDrawingButton {
-      background: #4caf50;
-    }
-
-    #clearDrawingButton:hover {
-      background: #666;
-    }
-
-    #cancelDrawingButton:hover {
-      background: #a33a3a;
-    }
-
-    #sendDrawingButton:hover {
-      background: #43a047;
+    #newGameButton:hover {
+      background: #5568d9;
     }
 
     /* =========================
-       MOBILE
+       RESPONSIVE
        ========================= */
 
     @media (max-width: 600px) {
-      #loginBox {
-        padding: 22px;
+      #topBar {
+        padding: 9px 10px;
       }
 
-      #chatHeader {
-        min-height: 60px;
-        padding: 8px 10px;
-      }
-
-      #chatName {
-        font-size: 18px;
+      #roomTitle {
+        font-size: 16px;
       }
 
       #homeButton {
         padding: 8px 10px;
+      }
+
+      .tabButton {
         font-size: 13px;
+        padding: 11px 5px;
       }
 
-      #messages {
-        padding: 10px;
+      #chatPage {
+        min-height: calc(100vh - 98px);
       }
 
-      #inputArea {
-        gap: 6px;
+      #drawingPage {
+        padding: 7px;
+      }
+
+      #checkersPage {
         padding: 8px;
       }
 
-      #messageInput {
-        padding: 11px;
+      #checkersBoard {
+        width: 96vw;
+        height: 96vw;
       }
 
-      #sendButton,
-      #drawButton {
-        padding: 0 11px;
+      #checkersHeader {
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+
+      #gameInfo {
         font-size: 13px;
-      }
-
-      #drawingOverlay {
-        padding: 8px;
-      }
-
-      #drawingBox {
-        padding: 10px;
-        border-radius: 12px;
-      }
-
-      #drawingCanvas {
-        height: 50vh;
-      }
-
-      .colorButton {
-        width: 32px;
-        height: 32px;
-      }
-
-      #drawingControls button {
-        min-height: 42px;
-        font-size: 13px;
-      }
-    }
-
-    @media (max-width: 400px) {
-      #drawButton {
-        font-size: 0;
-      }
-
-      #drawButton::after {
-        content: "✏️";
-        font-size: 18px;
-      }
-
-      #sendButton {
-        font-size: 0;
-      }
-
-      #sendButton::after {
-        content: "➤";
-        font-size: 18px;
-      }
-
-      #homeButton {
-        font-size: 0;
-      }
-
-      #homeButton::after {
-        content: "⌂";
-        font-size: 20px;
       }
     }
   </style>
@@ -536,44 +499,32 @@
 <body>
 
   <!-- =========================
-       LOGIN SCREEN
+       HOME SCREEN
        ========================= -->
 
-  <div id="loginScreen">
+  <div id="homeScreen">
 
-    <div id="loginBox">
+    <div class="homeBox">
 
-      <h1>Basic Chat</h1>
+      <h1>Chat Room</h1>
 
       <p>
-        Enter your name and the name of the chat you want to join.
+        Enter a room name to join or create a private room.
       </p>
 
       <input
-        id="usernameInput"
+        id="roomInput"
         type="text"
-        placeholder="Your name"
-        maxlength="30"
+        maxlength="40"
+        placeholder="Enter room name"
         autocomplete="off"
       >
 
-      <input
-        id="chatNameInput"
-        type="text"
-        placeholder="Chat name"
-        maxlength="50"
-        autocomplete="off"
-      >
-
-      <button
-        id="joinButton"
-        type="button"
-        onclick="joinChat()"
-      >
-        Join Chat
+      <button id="joinButton">
+        Join Room
       </button>
 
-      <div id="loginError"></div>
+      <div id="homeError"></div>
 
     </div>
 
@@ -581,236 +532,195 @@
 
 
   <!-- =========================
-       CHAT SCREEN
+       MAIN APP
        ========================= -->
 
-  <div id="chatScreen">
+  <div id="app">
 
-    <div id="chatHeader">
+    <!-- TOP BAR -->
 
-      <div id="chatInfo">
+    <div id="topBar">
 
-        <div id="chatName">
-          Chat
+      <div>
+        <div id="roomTitle">
+          Room
         </div>
 
         <div id="userCount">
-          0 / 5 users
+          Connecting...
         </div>
-
       </div>
 
-      <button
-        id="homeButton"
-        type="button"
-        onclick="goHome()"
-      >
+      <button id="homeButton">
         Home
       </button>
 
     </div>
 
 
-    <div id="messages"></div>
+    <!-- TABS -->
 
-
-    <div id="inputArea">
-
-      <input
-        id="messageInput"
-        type="text"
-        placeholder="Type a message..."
-        maxlength="1000"
-        autocomplete="off"
-      >
+    <div id="tabs">
 
       <button
-        id="drawButton"
-        type="button"
-        onclick="openDrawing()"
+        class="tabButton active"
+        data-page="chatPage"
       >
-        Draw
+        Chat
       </button>
 
       <button
-        id="sendButton"
-        type="button"
-        onclick="sendMessage()"
+        class="tabButton"
+        data-page="drawingPage"
       >
-        Send
+        Drawing
+      </button>
+
+      <button
+        class="tabButton"
+        data-page="checkersPage"
+      >
+        Checkers
       </button>
 
     </div>
 
-  </div>
 
+    <!-- =========================
+         CHAT PAGE
+         ========================= -->
 
-  <!-- =========================
-       DRAWING POPUP
-       ========================= -->
+    <div
+      id="chatPage"
+      class="page active"
+    >
 
-  <div id="drawingOverlay">
+      <div id="messages"></div>
 
-    <div id="drawingBox">
+      <div id="chatInputArea">
 
-      <div id="drawingTitle">
-        Draw Something
-      </div>
+        <input
+          id="messageInput"
+          type="text"
+          maxlength="1000"
+          placeholder="Type a message..."
+          autocomplete="off"
+        >
 
-
-      <div id="colorSection">
-
-        <div id="colorLabel">
-          Drawing color
-        </div>
-
-        <div id="colorPalette">
-
-          <button
-            class="colorButton selected"
-            type="button"
-            title="Black"
-            aria-label="Black"
-            data-color="#000000"
-            style="background:#000000;"
-            onclick="selectDrawingColor('#000000', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Red"
-            aria-label="Red"
-            data-color="#ff0000"
-            style="background:#ff0000;"
-            onclick="selectDrawingColor('#ff0000', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Blue"
-            aria-label="Blue"
-            data-color="#0066ff"
-            style="background:#0066ff;"
-            onclick="selectDrawingColor('#0066ff', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Green"
-            aria-label="Green"
-            data-color="#00a000"
-            style="background:#00a000;"
-            onclick="selectDrawingColor('#00a000', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Yellow"
-            aria-label="Yellow"
-            data-color="#ffd700"
-            style="background:#ffd700;"
-            onclick="selectDrawingColor('#ffd700', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Purple"
-            aria-label="Purple"
-            data-color="#8000ff"
-            style="background:#8000ff;"
-            onclick="selectDrawingColor('#8000ff', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Orange"
-            aria-label="Orange"
-            data-color="#ff8000"
-            style="background:#ff8000;"
-            onclick="selectDrawingColor('#ff8000', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Pink"
-            aria-label="Pink"
-            data-color="#ff1493"
-            style="background:#ff1493;"
-            onclick="selectDrawingColor('#ff1493', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Brown"
-            aria-label="Brown"
-            data-color="#8b4513"
-            style="background:#8b4513;"
-            onclick="selectDrawingColor('#8b4513', this)"
-          ></button>
-
-          <button
-            class="colorButton"
-            type="button"
-            title="Cyan"
-            aria-label="Cyan"
-            data-color="#00bcd4"
-            style="background:#00bcd4;"
-            onclick="selectDrawingColor('#00bcd4', this)"
-          ></button>
-
-          <input
-            id="customColor"
-            type="color"
-            value="#000000"
-            title="Choose a custom color"
-            aria-label="Choose a custom color"
-            onchange="selectCustomColor(this)"
-          >
-
-        </div>
+        <button id="sendButton">
+          Send
+        </button>
 
       </div>
 
+    </div>
 
-      <div id="canvasContainer">
 
-        <canvas id="drawingCanvas"></canvas>
+    <!-- =========================
+         DRAWING PAGE
+         ========================= -->
 
-      </div>
-
+    <div
+      id="drawingPage"
+      class="page"
+    >
 
       <div id="drawingControls">
 
         <button
-          id="clearDrawingButton"
-          type="button"
-          onclick="clearDrawing()"
-        >
+          class="colorButton selected"
+          data-color="#000000"
+          style="background:#000000"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#ff0000"
+          style="background:#ff0000"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#0000ff"
+          style="background:#0000ff"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#00aa00"
+          style="background:#00aa00"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#ffff00"
+          style="background:#ffff00"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#ff00ff"
+          style="background:#ff00ff"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#00ffff"
+          style="background:#00ffff"
+        ></button>
+
+        <button
+          class="colorButton"
+          data-color="#ffffff"
+          style="background:#ffffff"
+        ></button>
+
+        <button id="clearCanvas">
           Clear
         </button>
 
-        <button
-          id="cancelDrawingButton"
-          type="button"
-          onclick="closeDrawing()"
-        >
-          Cancel
-        </button>
+      </div>
 
-        <button
-          id="sendDrawingButton"
-          type="button"
-          onclick="sendDrawing()"
-        >
-          Send Drawing
+      <canvas
+        id="drawingCanvas"
+        width="1200"
+        height="800"
+      ></canvas>
+
+    </div>
+
+
+    <!-- =========================
+         CHECKERS PAGE
+         ========================= -->
+
+    <div
+      id="checkersPage"
+      class="page"
+    >
+
+      <div id="checkersHeader">
+
+        <h2>Checkers</h2>
+
+        <div id="gameStatus">
+          Red's turn
+        </div>
+
+        <div id="gameInfo">
+          Click a piece and then click where you want to move it.
+        </div>
+
+      </div>
+
+
+      <div id="checkersBoard"></div>
+
+
+      <div id="checkersControls">
+
+        <button id="newGameButton">
+          New Game
         </button>
 
       </div>
@@ -822,286 +732,424 @@
 
   <script>
 
-    /* =========================
-       WEBSOCKET
-       ========================= */
+    /* =========================================================
+       BASIC SETTINGS
+       ========================================================= */
 
-    const SERVER_URL =
-      "wss://basicchats.onrender.com";
+    const homeScreen = document.getElementById("homeScreen");
+    const app = document.getElementById("app");
 
+    const roomInput = document.getElementById("roomInput");
+    const joinButton = document.getElementById("joinButton");
+    const homeError = document.getElementById("homeError");
+
+    const homeButton = document.getElementById("homeButton");
+
+    const roomTitle = document.getElementById("roomTitle");
+    const userCount = document.getElementById("userCount");
+
+    const messages = document.getElementById("messages");
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+
+    let currentRoom = "";
     let socket = null;
 
-    let currentUsername = "";
-    let currentChatName = "";
+
+    /* =========================================================
+       TAB SYSTEM
+       ========================================================= */
+
+    const tabButtons = document.querySelectorAll(".tabButton");
+    const pages = document.querySelectorAll(".page");
+
+    tabButtons.forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const pageId = button.dataset.page;
+
+        tabButtons.forEach(btn => {
+          btn.classList.remove("active");
+        });
+
+        pages.forEach(page => {
+          page.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        document
+          .getElementById(pageId)
+          .classList.add("active");
+
+      });
+
+    });
 
 
-    /* =========================
-       DRAWING VARIABLES
-       ========================= */
+    /* =========================================================
+       JOIN ROOM
+       ========================================================= */
 
-    let drawingCanvas = null;
-    let drawingContext = null;
-    let drawing = false;
+    function joinRoom() {
 
-    let drawingColor = "#000000";
+      const room = roomInput.value.trim();
 
+      if (!room) {
 
-    /* =========================
-       ELEMENTS
-       ========================= */
+        homeError.textContent =
+          "Please enter a room name.";
 
-    const loginScreen =
-      document.getElementById("loginScreen");
-
-    const chatScreen =
-      document.getElementById("chatScreen");
-
-    const usernameInput =
-      document.getElementById("usernameInput");
-
-    const chatNameInput =
-      document.getElementById("chatNameInput");
-
-    const joinButton =
-      document.getElementById("joinButton");
-
-    const loginError =
-      document.getElementById("loginError");
-
-    const chatName =
-      document.getElementById("chatName");
-
-    const userCount =
-      document.getElementById("userCount");
-
-    const messages =
-      document.getElementById("messages");
-
-    const messageInput =
-      document.getElementById("messageInput");
-
-    const drawingOverlay =
-      document.getElementById("drawingOverlay");
-
-    const customColor =
-      document.getElementById("customColor");
-
-
-    /* =========================
-       JOIN CHAT
-       ========================= */
-
-    function joinChat() {
-
-      const username =
-        usernameInput.value.trim();
-
-      const chat =
-        chatNameInput.value.trim();
-
-      loginError.textContent = "";
-
-      if (!username) {
-        loginError.textContent =
-          "Please enter your name.";
         return;
       }
 
-      if (!chat) {
-        loginError.textContent =
-          "Please enter a chat name.";
+      if (room.length < 1) {
+
+        homeError.textContent =
+          "Room name is too short.";
+
         return;
       }
 
-      joinButton.disabled = true;
+      currentRoom = room;
 
-      currentUsername = username;
-      currentChatName = chat;
+      roomTitle.textContent =
+        "Room: " + currentRoom;
 
-      socket = new WebSocket(SERVER_URL);
+      homeError.textContent = "";
 
-      socket.addEventListener("open", () => {
+      homeScreen.style.display = "none";
+      app.style.display = "flex";
 
-        socket.send(
-          JSON.stringify({
-            type: "join",
-            username: username,
-            chatName: chat
-          })
-        );
-
-      });
-
-
-      socket.addEventListener("message", (event) => {
-
-        let data;
-
-        try {
-          data = JSON.parse(event.data);
-        } catch (error) {
-          console.error(
-            "Invalid server response."
-          );
-          return;
-        }
-
-
-        /* =========================
-           JOINED
-           ========================= */
-
-        if (data.type === "joined") {
-
-          currentChatName =
-            data.chatName;
-
-          chatName.textContent =
-            data.chatName;
-
-          userCount.textContent =
-            `${data.userCount} / ${data.maxUsers} users`;
-
-          loginScreen.style.display =
-            "none";
-
-          chatScreen.style.display =
-            "flex";
-
-          messages.innerHTML = "";
-
-          messageInput.focus();
-
-          return;
-        }
-
-
-        /* =========================
-           JOIN ERROR
-           ========================= */
-
-        if (data.type === "joinError") {
-
-          loginError.textContent =
-            data.message;
-
-          joinButton.disabled = false;
-
-          if (socket) {
-            socket.close();
-          }
-
-          return;
-        }
-
-
-        /* =========================
-           USER COUNT
-           ========================= */
-
-        if (data.type === "userCount") {
-
-          userCount.textContent =
-            `${data.userCount} / ${data.maxUsers} users`;
-
-          return;
-        }
-
-
-        /* =========================
-           SYSTEM MESSAGE
-           ========================= */
-
-        if (data.type === "system") {
-
-          addSystemMessage(
-            data.message
-          );
-
-          return;
-        }
-
-
-        /* =========================
-           CHAT MESSAGE
-           ========================= */
-
-        if (data.type === "message") {
-
-          addMessage(
-            data.username,
-            data.text
-          );
-
-          return;
-        }
-
-
-        /* =========================
-           DRAWING
-           ========================= */
-
-        if (data.type === "drawing") {
-
-          addDrawing(
-            data.username,
-            data.image
-          );
-
-          return;
-        }
-
-
-        /* =========================
-           SERVER ERROR
-           ========================= */
-
-        if (data.type === "error") {
-
-          console.error(
-            "Server error:",
-            data.message
-          );
-
-          alert(data.message);
-
-          return;
-        }
-
-      });
-
-
-      socket.addEventListener("close", () => {
-
-        joinButton.disabled = false;
-
-      });
-
-
-      socket.addEventListener("error", () => {
-
-        loginError.textContent =
-          "Could not connect to the chat server.";
-
-        joinButton.disabled = false;
-
-      });
+      connectWebSocket();
 
     }
 
 
-    /* =========================
-       SEND TEXT MESSAGE
-       ========================= */
+    joinButton.addEventListener(
+      "click",
+      joinRoom
+    );
 
-    function sendMessage() {
+
+    roomInput.addEventListener(
+      "keydown",
+      event => {
+
+        if (event.key === "Enter") {
+          joinRoom();
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       HOME BUTTON
+       ========================================================= */
+
+    homeButton.addEventListener(
+      "click",
+      () => {
+
+        if (socket) {
+
+          try {
+            socket.close();
+          } catch (error) {}
+
+          socket = null;
+
+        }
+
+        currentRoom = "";
+
+        app.style.display = "none";
+        homeScreen.style.display = "flex";
+
+        roomInput.value = "";
+
+        messages.innerHTML = "";
+
+        userCount.textContent =
+          "Disconnected";
+
+      }
+    );
+
+
+    /* =========================================================
+       WEBSOCKET CONNECTION
+       ========================================================= */
+
+    function connectWebSocket() {
+
+      /*
+       * This uses the same host that served the webpage.
+       *
+       * If your Render server is:
+       *
+       * https://your-app.onrender.com
+       *
+       * the WebSocket becomes:
+       *
+       * wss://your-app.onrender.com
+       */
+
+      const protocol =
+        window.location.protocol === "https:"
+          ? "wss:"
+          : "ws:";
+
+      const wsUrl =
+        protocol +
+        "//" +
+        window.location.host;
+
+      try {
+
+        socket = new WebSocket(wsUrl);
+
+      } catch (error) {
+
+        addSystemMessage(
+          "Could not connect to server."
+        );
+
+        return;
+
+      }
+
+
+      socket.addEventListener(
+        "open",
+        () => {
+
+          userCount.textContent =
+            "Connected";
+
+          /*
+           * Tell the server which room
+           * this client wants to join.
+           */
+
+          sendSocketData({
+            type: "join",
+            room: currentRoom
+          });
+
+        }
+      );
+
+
+      socket.addEventListener(
+        "close",
+        () => {
+
+          userCount.textContent =
+            "Disconnected";
+
+        }
+      );
+
+
+      socket.addEventListener(
+        "error",
+        () => {
+
+          userCount.textContent =
+            "Connection error";
+
+        }
+      );
+
+
+      socket.addEventListener(
+        "message",
+        event => {
+
+          handleSocketMessage(event.data);
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       SEND WEBSOCKET DATA
+       ========================================================= */
+
+    function sendSocketData(data) {
 
       if (
-        !socket ||
-        socket.readyState !== WebSocket.OPEN
+        socket &&
+        socket.readyState === WebSocket.OPEN
       ) {
-        return;
+
+        socket.send(
+          JSON.stringify(data)
+        );
+
       }
+
+    }
+
+
+    /* =========================================================
+       RECEIVE WEBSOCKET DATA
+       ========================================================= */
+
+    function handleSocketMessage(data) {
+
+      let parsed;
+
+      try {
+
+        parsed = JSON.parse(data);
+
+      } catch (error) {
+
+        /*
+         * If your existing server sends ordinary
+         * text messages, display them as chat.
+         */
+
+        addMessage(data);
+
+        return;
+
+      }
+
+
+      /* =========================
+         USER COUNT
+         ========================= */
+
+      if (parsed.type === "userCount") {
+
+        userCount.textContent =
+          parsed.count +
+          (parsed.count === 1
+            ? " user"
+            : " users");
+
+        return;
+
+      }
+
+
+      /* =========================
+         CHAT
+         ========================= */
+
+      if (parsed.type === "chat") {
+
+        addMessage(
+          parsed.message,
+          parsed.sender
+        );
+
+        return;
+
+      }
+
+
+      /* =========================
+         CHECKERS MOVE
+         ========================= */
+
+      if (parsed.type === "checkersMove") {
+
+        applyRemoteMove(
+          parsed.move
+        );
+
+        return;
+
+      }
+
+
+      /* =========================
+         CHECKERS RESET
+         ========================= */
+
+      if (parsed.type === "checkersReset") {
+
+        resetCheckers(
+          false
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    /* =========================================================
+       CHAT
+       ========================================================= */
+
+    function addMessage(
+      text,
+      sender = ""
+    ) {
+
+      const div =
+        document.createElement("div");
+
+      div.className = "message";
+
+      if (sender) {
+
+        const senderElement =
+          document.createElement("strong");
+
+        senderElement.textContent =
+          sender + ": ";
+
+        div.appendChild(
+          senderElement
+        );
+
+      }
+
+      const messageText =
+        document.createTextNode(text);
+
+      div.appendChild(
+        messageText
+      );
+
+      messages.appendChild(div);
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    }
+
+
+    function addSystemMessage(text) {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "message system";
+
+      div.textContent = text;
+
+      messages.appendChild(div);
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    }
+
+
+    function sendChatMessage() {
 
       const text =
         messageInput.value.trim();
@@ -1110,315 +1158,162 @@
         return;
       }
 
-      socket.send(
-        JSON.stringify({
-          type: "message",
-          text: text
-        })
-      );
+      /*
+       * Send structured chat data.
+       */
+
+      sendSocketData({
+        type: "chat",
+        room: currentRoom,
+        message: text
+      });
+
+      /*
+       * If your server does not echo messages
+       * back to the sender, uncomment this:
+       *
+       * addMessage(text, "You");
+       */
 
       messageInput.value = "";
 
       messageInput.focus();
+
     }
 
 
-    /* =========================
-       ADD MESSAGE
-       ========================= */
-
-    function addMessage(
-      username,
-      text
-    ) {
-
-      const message =
-        document.createElement("div");
-
-      message.className =
-        "message";
-
-      const name =
-        document.createElement("div");
-
-      name.className =
-        "username";
-
-      name.textContent =
-        username;
-
-      const messageText =
-        document.createElement("div");
-
-      messageText.className =
-        "messageText";
-
-      messageText.textContent =
-        text;
-
-      message.appendChild(name);
-      message.appendChild(messageText);
-
-      messages.appendChild(message);
-
-      scrollMessagesToBottom();
-    }
+    sendButton.addEventListener(
+      "click",
+      sendChatMessage
+    );
 
 
-    /* =========================
-       SYSTEM MESSAGE
-       ========================= */
+    messageInput.addEventListener(
+      "keydown",
+      event => {
 
-    function addSystemMessage(text) {
+        if (event.key === "Enter") {
 
-      const message =
-        document.createElement("div");
+          event.preventDefault();
 
-      message.className =
-        "systemMessage";
+          sendChatMessage();
 
-      message.textContent =
-        text;
+        }
 
-      messages.appendChild(message);
-
-      scrollMessagesToBottom();
-    }
+      }
+    );
 
 
-    /* =========================
-       ADD DRAWING
-       ========================= */
+    /* =========================================================
+       DRAWING
+       ========================================================= */
 
-    function addDrawing(
-      username,
-      image
-    ) {
+    const canvas =
+      document.getElementById(
+        "drawingCanvas"
+      );
 
-      const message =
-        document.createElement("div");
+    const ctx =
+      canvas.getContext("2d");
 
-      message.className =
-        "drawingMessage";
+    let drawing = false;
+    let lastX = 0;
+    let lastY = 0;
 
-      const name =
-        document.createElement("div");
+    let drawingColor = "#000000";
 
-      name.className =
-        "username";
-
-      name.textContent =
-        username;
-
-      const imageElement =
-        document.createElement("img");
-
-      imageElement.src =
-        image;
-
-      imageElement.alt =
-        `${username}'s drawing`;
-
-      message.appendChild(name);
-      message.appendChild(imageElement);
-
-      messages.appendChild(message);
-
-      imageElement.onload =
-        scrollMessagesToBottom;
-
-      scrollMessagesToBottom();
-    }
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
 
-    /* =========================
-       SCROLL
-       ========================= */
+    document
+      .querySelectorAll(".colorButton")
+      .forEach(button => {
 
-    function scrollMessagesToBottom() {
+        button.addEventListener(
+          "click",
+          () => {
 
-      messages.scrollTop =
-        messages.scrollHeight;
-    }
+            document
+              .querySelectorAll(".colorButton")
+              .forEach(btn => {
+                btn.classList.remove(
+                  "selected"
+                );
+              });
 
+            button.classList.add(
+              "selected"
+            );
 
-    /* =========================
-       DRAWING SETUP
-       ========================= */
+            drawingColor =
+              button.dataset.color;
 
-    function setupDrawingCanvas() {
-
-      drawingCanvas =
-        document.getElementById(
-          "drawingCanvas"
+          }
         );
 
-      drawingContext =
-        drawingCanvas.getContext("2d");
-
-      resizeDrawingCanvas();
-
-      drawingCanvas.addEventListener(
-        "pointerdown",
-        startDrawing
-      );
-
-      drawingCanvas.addEventListener(
-        "pointermove",
-        draw
-      );
-
-      drawingCanvas.addEventListener(
-        "pointerup",
-        stopDrawing
-      );
-
-      drawingCanvas.addEventListener(
-        "pointercancel",
-        stopDrawing
-      );
-
-      drawingCanvas.addEventListener(
-        "pointerleave",
-        stopDrawing
-      );
-
-    }
+      });
 
 
-    /* =========================
-       RESIZE CANVAS
-       ========================= */
-
-    function resizeDrawingCanvas() {
-
-      if (!drawingCanvas) {
-        return;
-      }
+    function getCanvasPosition(event) {
 
       const rect =
-        drawingCanvas.getBoundingClientRect();
+        canvas.getBoundingClientRect();
 
-      const ratio =
-        window.devicePixelRatio || 1;
+      let clientX;
+      let clientY;
 
-      drawingCanvas.width =
-        rect.width * ratio;
+      if (
+        event.touches &&
+        event.touches.length
+      ) {
 
-      drawingCanvas.height =
-        rect.height * ratio;
+        clientX =
+          event.touches[0].clientX;
 
-      drawingContext.setTransform(
-        ratio,
-        0,
-        0,
-        ratio,
-        0,
-        0
-      );
+        clientY =
+          event.touches[0].clientY;
 
-      drawingContext.fillStyle =
-        "#ffffff";
+      } else {
 
-      drawingContext.fillRect(
-        0,
-        0,
-        rect.width,
-        rect.height
-      );
+        clientX =
+          event.clientX;
 
-      setDrawingStyle();
+        clientY =
+          event.clientY;
 
-    }
-
-
-    /* =========================
-       DRAWING STYLE
-       ========================= */
-
-    function setDrawingStyle() {
-
-      if (!drawingContext) {
-        return;
       }
-
-      drawingContext.strokeStyle =
-        drawingColor;
-
-      drawingContext.fillStyle =
-        drawingColor;
-
-      drawingContext.lineWidth =
-        3;
-
-      drawingContext.lineCap =
-        "round";
-
-      drawingContext.lineJoin =
-        "round";
-    }
-
-
-    /* =========================
-       GET DRAWING POSITION
-       ========================= */
-
-    function getDrawingPosition(event) {
-
-      const rect =
-        drawingCanvas.getBoundingClientRect();
 
       return {
+
         x:
-          event.clientX -
-          rect.left,
+          (clientX - rect.left) *
+          (canvas.width / rect.width),
 
         y:
-          event.clientY -
-          rect.top
+          (clientY - rect.top) *
+          (canvas.height / rect.height)
+
       };
 
     }
 
 
-    /* =========================
-       START DRAWING
-       ========================= */
-
     function startDrawing(event) {
 
-      if (!drawingCanvas) {
-        return;
-      }
+      event.preventDefault();
 
       drawing = true;
 
-      drawingCanvas.setPointerCapture(
-        event.pointerId
-      );
+      const pos =
+        getCanvasPosition(event);
 
-      const position =
-        getDrawingPosition(event);
+      lastX = pos.x;
+      lastY = pos.y;
 
-      drawingContext.beginPath();
-
-      drawingContext.moveTo(
-        position.x,
-        position.y
-      );
-
-      drawingContext.lineTo(
-        position.x + 0.01,
-        position.y + 0.01
-      );
-
-      drawingContext.stroke();
     }
 
-
-    /* =========================
-       DRAW
-       ========================= */
 
     function draw(event) {
 
@@ -1426,313 +1321,1056 @@
         return;
       }
 
-      const position =
-        getDrawingPosition(event);
+      event.preventDefault();
 
-      drawingContext.lineTo(
-        position.x,
-        position.y
+      const pos =
+        getCanvasPosition(event);
+
+      ctx.strokeStyle =
+        drawingColor;
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        lastX,
+        lastY
       );
 
-      drawingContext.stroke();
+      ctx.lineTo(
+        pos.x,
+        pos.y
+      );
+
+      ctx.stroke();
+
+      lastX = pos.x;
+      lastY = pos.y;
+
     }
 
 
-    /* =========================
-       STOP DRAWING
-       ========================= */
-
-    function stopDrawing(event) {
-
-      if (!drawing) {
-        return;
-      }
+    function stopDrawing() {
 
       drawing = false;
 
-      drawingContext.closePath();
-
-      if (
-        event &&
-        drawingCanvas.hasPointerCapture(
-          event.pointerId
-        )
-      ) {
-        drawingCanvas.releasePointerCapture(
-          event.pointerId
-        );
-      }
     }
 
 
-    /* =========================
-       SELECT COLOR
-       ========================= */
+    canvas.addEventListener(
+      "mousedown",
+      startDrawing
+    );
 
-    function selectDrawingColor(
-      color,
-      button
+    canvas.addEventListener(
+      "mousemove",
+      draw
+    );
+
+    canvas.addEventListener(
+      "mouseup",
+      stopDrawing
+    );
+
+    canvas.addEventListener(
+      "mouseleave",
+      stopDrawing
+    );
+
+
+    canvas.addEventListener(
+      "touchstart",
+      startDrawing,
+      { passive: false }
+    );
+
+    canvas.addEventListener(
+      "touchmove",
+      draw,
+      { passive: false }
+    );
+
+    canvas.addEventListener(
+      "touchend",
+      stopDrawing
+    );
+
+
+    document
+      .getElementById("clearCanvas")
+      .addEventListener(
+        "click",
+        () => {
+
+          ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+        }
+      );
+
+
+    /* =========================================================
+       CHECKERS
+       ========================================================= */
+
+    const checkersBoard =
+      document.getElementById(
+        "checkersBoard"
+      );
+
+    const gameStatus =
+      document.getElementById(
+        "gameStatus"
+      );
+
+    let board = [];
+
+    let selectedSquare = null;
+
+    let currentTurn = "red";
+
+    let myCheckerColor = null;
+
+    let gameOver = false;
+
+
+    /*
+     * Board values:
+     *
+     * null
+     * "red"
+     * "black"
+     * "redKing"
+     * "blackKing"
+     */
+
+    function createInitialBoard() {
+
+      board = [];
+
+      for (
+        let row = 0;
+        row < 8;
+        row++
+      ) {
+
+        board[row] = [];
+
+        for (
+          let col = 0;
+          col < 8;
+          col++
+        ) {
+
+          board[row][col] = null;
+
+          /*
+           * Black pieces start at the top.
+           */
+
+          if (
+            row < 3 &&
+            (row + col) % 2 === 1
+          ) {
+
+            board[row][col] =
+              "black";
+
+          }
+
+
+          /*
+           * Red pieces start at the bottom.
+           */
+
+          if (
+            row > 4 &&
+            (row + col) % 2 === 1
+          ) {
+
+            board[row][col] =
+              "red";
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+    function renderCheckers() {
+
+      checkersBoard.innerHTML = "";
+
+      for (
+        let row = 0;
+        row < 8;
+        row++
+      ) {
+
+        for (
+          let col = 0;
+          col < 8;
+          col++
+        ) {
+
+          const square =
+            document.createElement(
+              "div"
+            );
+
+          square.classList.add(
+            "square"
+          );
+
+          if (
+            (row + col) % 2 === 0
+          ) {
+
+            square.classList.add(
+              "lightSquare"
+            );
+
+          } else {
+
+            square.classList.add(
+              "darkSquare"
+            );
+
+          }
+
+
+          square.dataset.row = row;
+          square.dataset.col = col;
+
+
+          if (
+            selectedSquare &&
+            selectedSquare.row === row &&
+            selectedSquare.col === col
+          ) {
+
+            square.classList.add(
+              "selected"
+            );
+
+          }
+
+
+          const piece =
+            board[row][col];
+
+
+          if (piece) {
+
+            const pieceElement =
+              document.createElement(
+                "div"
+              );
+
+            pieceElement.classList.add(
+              "piece"
+            );
+
+            if (
+              piece === "red" ||
+              piece === "redKing"
+            ) {
+
+              pieceElement.classList.add(
+                "redPiece"
+              );
+
+            } else {
+
+              pieceElement.classList.add(
+                "blackPiece"
+              );
+
+            }
+
+
+            if (
+              piece === "redKing" ||
+              piece === "blackKing"
+            ) {
+
+              pieceElement.classList.add(
+                "king"
+              );
+
+            }
+
+            square.appendChild(
+              pieceElement
+            );
+
+          }
+
+
+          /*
+           * Highlight legal moves.
+           */
+
+          if (
+            selectedSquare &&
+            isValidDestination(
+              selectedSquare.row,
+              selectedSquare.col,
+              row,
+              col
+            )
+          ) {
+
+            square.classList.add(
+              "validMove"
+            );
+
+          }
+
+
+          square.addEventListener(
+            "click",
+            () => {
+
+              handleSquareClick(
+                row,
+                col
+              );
+
+            }
+          );
+
+
+          checkersBoard.appendChild(
+            square
+          );
+
+        }
+
+      }
+
+
+      updateGameStatus();
+
+    }
+
+
+    /* =========================================================
+       CHECKERS CLICK HANDLER
+       ========================================================= */
+
+    function handleSquareClick(
+      row,
+      col
     ) {
 
-      drawingColor = color;
-
-      document
-        .querySelectorAll(".colorButton")
-        .forEach((element) => {
-          element.classList.remove(
-            "selected"
-          );
-        });
-
-      customColor.classList.remove(
-        "selected"
-      );
-
-      button.classList.add(
-        "selected"
-      );
-
-      setDrawingStyle();
-    }
-
-
-    /* =========================
-       CUSTOM COLOR
-       ========================= */
-
-    function selectCustomColor(
-      input
-    ) {
-
-      drawingColor =
-        input.value;
-
-      document
-        .querySelectorAll(".colorButton")
-        .forEach((element) => {
-          element.classList.remove(
-            "selected"
-          );
-        });
-
-      customColor.classList.add(
-        "selected"
-      );
-
-      setDrawingStyle();
-    }
-
-
-    /* =========================
-       OPEN DRAWING
-       ========================= */
-
-    function openDrawing() {
-
-      drawingOverlay.style.display =
-        "flex";
-
-      if (!drawingCanvas) {
-        setupDrawingCanvas();
-      } else {
-        resizeDrawingCanvas();
-      }
-
-    }
-
-
-    /* =========================
-       CLOSE DRAWING
-       ========================= */
-
-    function closeDrawing() {
-
-      drawing = false;
-
-      drawingOverlay.style.display =
-        "none";
-    }
-
-
-    /* =========================
-       CLEAR DRAWING
-       ========================= */
-
-    function clearDrawing() {
-
-      if (!drawingCanvas) {
+      if (gameOver) {
         return;
       }
 
-      const rect =
-        drawingCanvas.getBoundingClientRect();
 
-      const ratio =
-        window.devicePixelRatio || 1;
-
-      drawingContext.setTransform(
-        ratio,
-        0,
-        0,
-        ratio,
-        0,
-        0
-      );
-
-      drawingContext.fillStyle =
-        "#ffffff";
-
-      drawingContext.fillRect(
-        0,
-        0,
-        rect.width,
-        rect.height
-      );
-
-      setDrawingStyle();
-    }
-
-
-    /* =========================
-       SEND DRAWING
-       ========================= */
-
-    function sendDrawing() {
+      /*
+       * If this client has been assigned
+       * a color, enforce it.
+       *
+       * If no color has been assigned yet,
+       * the first move determines it.
+       */
 
       if (
-        !socket ||
-        socket.readyState !== WebSocket.OPEN
+        myCheckerColor &&
+        currentTurn !== myCheckerColor
       ) {
+
         return;
-      }
-
-      if (!drawingCanvas) {
-        return;
-      }
-
-      const image =
-        drawingCanvas.toDataURL(
-          "image/png"
-        );
-
-      socket.send(
-        JSON.stringify({
-          type: "drawing",
-          image: image
-        })
-      );
-
-      closeDrawing();
-    }
-
-
-    /* =========================
-       HOME BUTTON
-       ========================= */
-
-    function goHome() {
-
-      if (socket) {
-
-        try {
-          socket.close();
-        } catch (error) {
-          console.error(error);
-        }
-
-        socket = null;
-      }
-
-      currentUsername = "";
-      currentChatName = "";
-
-      messages.innerHTML = "";
-
-      chatScreen.style.display =
-        "none";
-
-      loginScreen.style.display =
-        "flex";
-
-      loginError.textContent = "";
-
-      joinButton.disabled = false;
-
-      usernameInput.value = "";
-      chatNameInput.value = "";
-
-      messageInput.value = "";
-
-      closeDrawing();
-
-      usernameInput.focus();
-    }
-
-
-    /* =========================
-       ENTER KEY
-       ========================= */
-
-    usernameInput.addEventListener(
-      "keydown",
-      function(event) {
-
-        if (event.key === "Enter") {
-          chatNameInput.focus();
-        }
 
       }
-    );
 
 
-    chatNameInput.addEventListener(
-      "keydown",
-      function(event) {
-
-        if (event.key === "Enter") {
-          joinChat();
-        }
-
-      }
-    );
+      const piece =
+        board[row][col];
 
 
-    messageInput.addEventListener(
-      "keydown",
-      function(event) {
+      /*
+       * No piece selected yet.
+       */
 
-        if (event.key === "Enter") {
-          sendMessage();
-        }
-
-      }
-    );
-
-
-    /* =========================
-       WINDOW RESIZE
-       ========================= */
-
-    window.addEventListener(
-      "resize",
-      function() {
+      if (!selectedSquare) {
 
         if (
-          drawingOverlay.style.display ===
-          "flex"
+          piece &&
+          getPieceColor(piece) === currentTurn
         ) {
-          resizeDrawingCanvas();
+
+          selectedSquare = {
+            row,
+            col
+          };
+
+          renderCheckers();
+
+        }
+
+        return;
+
+      }
+
+
+      /*
+       * Clicking another own piece
+       * changes the selected piece.
+       */
+
+      if (
+        piece &&
+        getPieceColor(piece) === currentTurn
+      ) {
+
+        selectedSquare = {
+          row,
+          col
+        };
+
+        renderCheckers();
+
+        return;
+
+      }
+
+
+      /*
+       * Try moving the selected piece.
+       */
+
+      if (
+        isValidDestination(
+          selectedSquare.row,
+          selectedSquare.col,
+          row,
+          col
+        )
+      ) {
+
+        makeMove(
+          selectedSquare.row,
+          selectedSquare.col,
+          row,
+          col
+        );
+
+      } else {
+
+        selectedSquare = null;
+
+        renderCheckers();
+
+      }
+
+    }
+
+
+    /* =========================================================
+       CHECKERS PIECE HELPERS
+       ========================================================= */
+
+    function getPieceColor(piece) {
+
+      if (
+        piece === "red" ||
+        piece === "redKing"
+      ) {
+
+        return "red";
+
+      }
+
+      return "black";
+
+    }
+
+
+    function isKing(piece) {
+
+      return (
+        piece === "redKing" ||
+        piece === "blackKing"
+      );
+
+    }
+
+
+    /* =========================================================
+       VALID MOVE
+       ========================================================= */
+
+    function isValidDestination(
+      fromRow,
+      fromCol,
+      toRow,
+      toCol
+    ) {
+
+      if (
+        fromRow === toRow &&
+        fromCol === toCol
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        toRow < 0 ||
+        toRow > 7 ||
+        toCol < 0 ||
+        toCol > 7
+      ) {
+
+        return false;
+
+      }
+
+
+      if (board[toRow][toCol]) {
+
+        return false;
+
+      }
+
+
+      const piece =
+        board[fromRow][fromCol];
+
+      if (!piece) {
+        return false;
+      }
+
+
+      const color =
+        getPieceColor(piece);
+
+
+      if (color !== currentTurn) {
+        return false;
+      }
+
+
+      /*
+       * Check that the destination is
+       * on a dark square.
+       */
+
+      if (
+        (toRow + toCol) % 2 === 0
+      ) {
+
+        return false;
+
+      }
+
+
+      const rowDifference =
+        toRow - fromRow;
+
+      const colDifference =
+        toCol - fromCol;
+
+      const absRow =
+        Math.abs(rowDifference);
+
+      const absCol =
+        Math.abs(colDifference);
+
+
+      /*
+       * Normal one-square movement.
+       */
+
+      if (
+        absRow === 1 &&
+        absCol === 1
+      ) {
+
+        if (isKing(piece)) {
+          return true;
+        }
+
+
+        if (color === "red") {
+
+          /*
+           * Red moves upward.
+           */
+
+          return rowDifference === -1;
+
+        } else {
+
+          /*
+           * Black moves downward.
+           */
+
+          return rowDifference === 1;
+
+        }
+
+      }
+
+
+      /*
+       * Capture.
+       */
+
+      if (
+        absRow === 2 &&
+        absCol === 2
+      ) {
+
+        const middleRow =
+          fromRow +
+          rowDifference / 2;
+
+        const middleCol =
+          fromCol +
+          colDifference / 2;
+
+        const middlePiece =
+          board[middleRow][middleCol];
+
+
+        if (!middlePiece) {
+          return false;
+        }
+
+
+        if (
+          getPieceColor(
+            middlePiece
+          ) === color
+        ) {
+
+          return false;
+
+        }
+
+
+        /*
+         * Kings can capture in either direction.
+         */
+
+        if (isKing(piece)) {
+          return true;
+        }
+
+
+        if (color === "red") {
+
+          return rowDifference === -2;
+
+        } else {
+
+          return rowDifference === 2;
+
+        }
+
+      }
+
+
+      return false;
+
+    }
+
+
+    /* =========================================================
+       MAKE MOVE
+       ========================================================= */
+
+    function makeMove(
+      fromRow,
+      fromCol,
+      toRow,
+      toCol,
+      broadcast = true
+    ) {
+
+      const piece =
+        board[fromRow][fromCol];
+
+      if (!piece) {
+        return;
+      }
+
+
+      const rowDifference =
+        toRow - fromRow;
+
+      const colDifference =
+        toCol - fromCol;
+
+
+      /*
+       * Check for capture.
+       */
+
+      let captured = null;
+
+      if (
+        Math.abs(rowDifference) === 2 &&
+        Math.abs(colDifference) === 2
+      ) {
+
+        const middleRow =
+          fromRow +
+          rowDifference / 2;
+
+        const middleCol =
+          fromCol +
+          colDifference / 2;
+
+        captured = {
+          row: middleRow,
+          col: middleCol
+        };
+
+        board[middleRow][middleCol] =
+          null;
+
+      }
+
+
+      /*
+       * Move piece.
+       */
+
+      board[fromRow][fromCol] =
+        null;
+
+      let newPiece = piece;
+
+
+      /*
+       * King promotion.
+       */
+
+      if (
+        piece === "red" &&
+        toRow === 0
+      ) {
+
+        newPiece = "redKing";
+
+      }
+
+
+      if (
+        piece === "black" &&
+        toRow === 7
+      ) {
+
+        newPiece = "blackKing";
+
+      }
+
+
+      board[toRow][toCol] =
+        newPiece;
+
+
+      selectedSquare = null;
+
+
+      /*
+       * Broadcast the move.
+       */
+
+      if (broadcast) {
+
+        sendSocketData({
+
+          type: "checkersMove",
+
+          room: currentRoom,
+
+          move: {
+
+            fromRow,
+            fromCol,
+
+            toRow,
+            toCol
+
+          }
+
+        });
+
+      }
+
+
+      /*
+       * Switch turns.
+       */
+
+      currentTurn =
+        currentTurn === "red"
+          ? "black"
+          : "red";
+
+
+      renderCheckers();
+
+
+      /*
+       * Check whether somebody won.
+       */
+
+      checkForWinner();
+
+    }
+
+
+    /* =========================================================
+       APPLY REMOTE MOVE
+       ========================================================= */
+
+    function applyRemoteMove(move) {
+
+      if (!move) {
+        return;
+      }
+
+
+      makeMove(
+
+        move.fromRow,
+        move.fromCol,
+
+        move.toRow,
+        move.toCol,
+
+        false
+
+      );
+
+    }
+
+
+    /* =========================================================
+       CHECK FOR WINNER
+       ========================================================= */
+
+    function checkForWinner() {
+
+      let redPieces = 0;
+      let blackPieces = 0;
+
+
+      for (
+        let row = 0;
+        row < 8;
+        row++
+      ) {
+
+        for (
+          let col = 0;
+          col < 8;
+          col++
+        ) {
+
+          const piece =
+            board[row][col];
+
+          if (!piece) {
+            continue;
+          }
+
+
+          if (
+            getPieceColor(piece) === "red"
+          ) {
+
+            redPieces++;
+
+          } else {
+
+            blackPieces++;
+
+          }
+
+        }
+
+      }
+
+
+      if (redPieces === 0) {
+
+        gameOver = true;
+
+        gameStatus.textContent =
+          "Black wins!";
+
+        return;
+
+      }
+
+
+      if (blackPieces === 0) {
+
+        gameOver = true;
+
+        gameStatus.textContent =
+          "Red wins!";
+
+        return;
+
+      }
+
+    }
+
+
+    /* =========================================================
+       GAME STATUS
+       ========================================================= */
+
+    function updateGameStatus() {
+
+      if (gameOver) {
+        return;
+      }
+
+
+      if (
+        myCheckerColor &&
+        currentTurn === myCheckerColor
+      ) {
+
+        gameStatus.textContent =
+          "Your turn (" +
+          capitalize(
+            currentTurn
+          ) +
+          ")";
+
+      } else {
+
+        gameStatus.textContent =
+          capitalize(
+            currentTurn
+          ) +
+          "'s turn";
+
+      }
+
+    }
+
+
+    function capitalize(text) {
+
+      return (
+        text.charAt(0).toUpperCase() +
+        text.slice(1)
+      );
+
+    }
+
+
+    /* =========================================================
+       RESET CHECKERS
+       ========================================================= */
+
+    function resetCheckers(
+      broadcast = true
+    ) {
+
+      createInitialBoard();
+
+      selectedSquare = null;
+
+      currentTurn = "red";
+
+      gameOver = false;
+
+      /*
+       * The first player to move gets red.
+       * The other player gets black.
+       */
+
+      myCheckerColor = null;
+
+      renderCheckers();
+
+
+      if (broadcast) {
+
+        sendSocketData({
+
+          type: "checkersReset",
+
+          room: currentRoom
+
+        });
+
+      }
+
+    }
+
+
+    document
+      .getElementById("newGameButton")
+      .addEventListener(
+        "click",
+        () => {
+
+          resetCheckers(true);
+
+        }
+      );
+
+
+    /* =========================================================
+       INITIALIZE CHECKERS
+       ========================================================= */
+
+    createInitialBoard();
+
+    renderCheckers();
+
+
+    /* =========================================================
+       OPTIONAL COLOR ASSIGNMENT
+       =========================================================
+
+       This assigns a checker color when the player
+       first makes a move.
+
+       Red moves first.
+
+    */
+
+    checkersBoard.addEventListener(
+      "click",
+      () => {
+
+        if (!myCheckerColor) {
+
+          if (
+            currentTurn === "red"
+          ) {
+
+            myCheckerColor = "red";
+
+          }
+
         }
 
       }
     );
-
-
-    /* =========================
-       INITIAL FOCUS
-       ========================= */
-
-    usernameInput.focus();
 
   </script>
 
