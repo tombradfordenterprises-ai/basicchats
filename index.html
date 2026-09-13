@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -2327,61 +2327,32 @@
     /* =========================
        SEND DRAWING
        ========================= */
+function sendDrawing() {
 
-    function sendDrawing() {
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    alert("You are not connected to the chat.");
+    return;
+  }
 
-      if (
-        !socket ||
-        socket.readyState !==
-          WebSocket.OPEN
-      ) {
+  if (!drawingCanvas) {
+    alert("Drawing canvas is not ready.");
+    return;
+  }
 
-        return;
+  const image = drawingCanvas.toDataURL("image/png");
 
-      }
+  console.log("Sending drawing...");
+  console.log("Drawing size:", image.length);
 
+  socket.send(
+    JSON.stringify({
+      type: "drawing",
+      image: image
+    })
+  );
 
-      if (
-        !drawingCanvas
-      ) {
-
-        return;
-
-      }
-
-
-      /*
-       * Convert canvas into a
-       * PNG image.
-       */
-
-      const image =
-        drawingCanvas.toDataURL(
-          "image/png"
-        );
-
-
-      /*
-       * Send it through the
-       * WebSocket.
-       */
-
-      socket.send(
-        JSON.stringify({
-
-          type:
-            "drawing",
-
-          image:
-            image
-
-        })
-      );
-
-
-      closeDrawing();
-
-    }
+  closeDrawing();
+}
 
 
 
