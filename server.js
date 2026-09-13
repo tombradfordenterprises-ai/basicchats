@@ -1,7 +1,9 @@
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
 const WebSocket = require("ws");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 const MAX_USERS_PER_CHAT = 5;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -16,20 +18,12 @@ const MAX_DRAWING_COLOR_LENGTH = 30;
 // HTTP SERVER
 // ============================================================
 
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
-const WebSocket = require("ws");
-
-const PORT = process.env.PORT || 10000;
-
 const server = http.createServer((req, res) => {
 
   // Serve index.html
   if (req.url === "/" || req.url === "/index.html") {
 
-    const filePath =
-      path.join(__dirname, "index.html");
+    const filePath = path.join(__dirname, "index.html");
 
     fs.readFile(filePath, (error, data) => {
 
@@ -62,7 +56,7 @@ const server = http.createServer((req, res) => {
   }
 
 
-  // Simple health check
+  // Health check
   if (req.url === "/health") {
 
     res.writeHead(200, {
@@ -97,30 +91,7 @@ const wss = new WebSocket.Server({
 // ROOM STORAGE
 // ============================================================
 
-/*
-  rooms:
-
-  Map {
-    "room-name" => Set<WebSocket>
-  }
-*/
-
 const rooms = new Map();
-
-
-/*
-  checkersGames:
-
-  Map {
-    "room-name" => {
-      board: [...],
-      turn: "red" | "black",
-      gameOver: false,
-      winner: null
-    }
-  }
-*/
-
 const checkersGames = new Map();
 
 
@@ -129,16 +100,19 @@ const checkersGames = new Map();
 // ============================================================
 
 function sendJSON(ws, data) {
+
   if (
     ws &&
     ws.readyState === WebSocket.OPEN
   ) {
     ws.send(JSON.stringify(data));
   }
+
 }
 
 
 function broadcastToRoom(roomName, data) {
+
   const room = rooms.get(roomName);
 
   if (!room) {
@@ -148,10 +122,12 @@ function broadcastToRoom(roomName, data) {
   room.forEach(client => {
     sendJSON(client, data);
   });
+
 }
 
 
 function normalizeRoomName(name) {
+
   if (typeof name !== "string") {
     return "";
   }
@@ -162,19 +138,23 @@ function normalizeRoomName(name) {
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9_-]/g, "")
     .slice(0, MAX_ROOM_NAME_LENGTH);
+
 }
 
 
 function getRoom(roomName) {
+
   if (!rooms.has(roomName)) {
     rooms.set(roomName, new Set());
   }
 
   return rooms.get(roomName);
+
 }
 
 
 function sendUserCount(roomName) {
+
   const room = rooms.get(roomName);
 
   if (!room) {
@@ -185,6 +165,7 @@ function sendUserCount(roomName) {
     type: "userCount",
     count: room.size
   });
+
 }
 
 
@@ -193,15 +174,18 @@ function sendUserCount(roomName) {
 // ============================================================
 
 function isValidDrawingNumber(value) {
+
   return (
     typeof value === "number" &&
     Number.isFinite(value) &&
     Math.abs(value) <= MAX_DRAWING_COORDINATE
   );
+
 }
 
 
 function isValidDrawingColor(color) {
+
   if (typeof color !== "string") {
     return false;
   }
@@ -214,21 +198,8 @@ function isValidDrawingColor(color) {
     return false;
   }
 
-  /*
-    Allow normal CSS colors such as:
-
-    #ff0000
-    red
-    rgb(...)
-    rgba(...)
-    hsl(...)
-    etc.
-
-    The client is still responsible for choosing
-    the actual drawing color.
-  */
-
   return true;
+
 }
 
 
@@ -237,18 +208,19 @@ function isValidDrawingColor(color) {
 // ============================================================
 
 function createInitialCheckersBoard() {
+
   const board = [];
 
   for (let row = 0; row < 8; row++) {
+
     board[row] = [];
 
     for (let col = 0; col < 8; col++) {
+
       board[row][col] = null;
 
-      /*
-        Black starts at the top.
-      */
 
+      // Black starts at the top
       if (
         row < 3 &&
         (row + col) % 2 === 1
@@ -256,46 +228,54 @@ function createInitialCheckersBoard() {
         board[row][col] = "black";
       }
 
-      /*
-        Red starts at the bottom.
-      */
 
+      // Red starts at the bottom
       if (
         row > 4 &&
         (row + col) % 2 === 1
       ) {
         board[row][col] = "red";
       }
+
     }
+
   }
 
   return board;
+
 }
 
 
 function createCheckersGame() {
+
   return {
     board: createInitialCheckersBoard(),
     turn: "red",
     gameOver: false,
     winner: null
   };
+
 }
 
 
 function getCheckersGame(roomName) {
+
   if (!checkersGames.has(roomName)) {
+
     checkersGames.set(
       roomName,
       createCheckersGame()
     );
+
   }
 
   return checkersGames.get(roomName);
+
 }
 
 
 function getPieceColor(piece) {
+
   if (
     piece === "red" ||
     piece === "redKing"
@@ -311,14 +291,17 @@ function getPieceColor(piece) {
   }
 
   return null;
+
 }
 
 
 function isKing(piece) {
+
   return (
     piece === "redKing" ||
     piece === "blackKing"
   );
+
 }
 
 
@@ -334,12 +317,11 @@ function isValidCheckersMove(
   toCol,
   playerColor
 ) {
+
   const board = game.board;
 
-  /*
-    Bounds.
-  */
 
+  // Bounds
   if (
     fromRow < 0 ||
     fromRow > 7 ||
@@ -353,51 +335,42 @@ function isValidCheckersMove(
     return false;
   }
 
-  /*
-    Destination must be empty.
-  */
 
+  // Destination must be empty
   if (board[toRow][toCol] !== null) {
     return false;
   }
 
-  /*
-    There must be a piece at the starting position.
-  */
 
+  // There must be a piece at the starting position
   const piece = board[fromRow][fromCol];
 
   if (!piece) {
     return false;
   }
 
-  /*
-    Player must own the piece.
-  */
 
+  // Player must own the piece
   if (
     getPieceColor(piece) !== playerColor
   ) {
     return false;
   }
 
-  /*
-    It must be that player's turn.
-  */
 
+  // It must be that player's turn
   if (game.turn !== playerColor) {
     return false;
   }
 
-  /*
-    Only dark squares can contain pieces.
-  */
 
+  // Only dark squares can contain pieces
   if (
     (toRow + toCol) % 2 === 0
   ) {
     return false;
   }
+
 
   const rowDifference =
     toRow - fromRow;
@@ -412,48 +385,44 @@ function isValidCheckersMove(
     Math.abs(colDifference);
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // NORMAL MOVE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   if (
     absRow === 1 &&
     absCol === 1
   ) {
-    /*
-      Kings may move either direction.
-    */
 
+    // Kings may move either direction
     if (isKing(piece)) {
       return true;
     }
 
-    /*
-      Red moves upward.
-    */
 
+    // Red moves upward
     if (playerColor === "red") {
       return rowDifference === -1;
     }
 
-    /*
-      Black moves downward.
-    */
 
+    // Black moves downward
     if (playerColor === "black") {
       return rowDifference === 1;
     }
+
   }
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // CAPTURE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   if (
     absRow === 2 &&
     absCol === 2
   ) {
+
     const middleRow =
       fromRow +
       rowDifference / 2;
@@ -465,14 +434,12 @@ function isValidCheckersMove(
     const middlePiece =
       board[middleRow][middleCol];
 
-    /*
-      There must be an opponent piece
-      between the two squares.
-    */
 
+    // There must be an opponent piece
     if (!middlePiece) {
       return false;
     }
+
 
     if (
       getPieceColor(middlePiece) ===
@@ -481,32 +448,29 @@ function isValidCheckersMove(
       return false;
     }
 
-    /*
-      Kings can capture either direction.
-    */
 
+    // Kings can capture either direction
     if (isKing(piece)) {
       return true;
     }
 
-    /*
-      Red captures upward.
-    */
 
+    // Red captures upward
     if (playerColor === "red") {
       return rowDifference === -2;
     }
 
-    /*
-      Black captures downward.
-    */
 
+    // Black captures downward
     if (playerColor === "black") {
       return rowDifference === 2;
     }
+
   }
 
+
   return false;
+
 }
 
 
@@ -518,9 +482,11 @@ function playerHasAnyLegalMove(
   game,
   playerColor
 ) {
+
   const board = game.board;
 
   for (let row = 0; row < 8; row++) {
+
     for (let col = 0; col < 8; col++) {
 
       const piece =
@@ -537,11 +503,9 @@ function playerHasAnyLegalMove(
         continue;
       }
 
-      /*
-        Try every possible destination.
-      */
 
       for (let toRow = 0; toRow < 8; toRow++) {
+
         for (let toCol = 0; toCol < 8; toCol++) {
 
           if (
@@ -558,11 +522,15 @@ function playerHasAnyLegalMove(
           }
 
         }
+
       }
+
     }
+
   }
 
   return false;
+
 }
 
 
@@ -575,12 +543,16 @@ function applyCheckersMove(
   move,
   playerColor
 ) {
+
   if (!move) {
+
     return {
       success: false,
       reason: "Missing move."
     };
+
   }
+
 
   const fromRow =
     Number(move.fromRow);
@@ -601,18 +573,22 @@ function applyCheckersMove(
     !Number.isInteger(toRow) ||
     !Number.isInteger(toCol)
   ) {
+
     return {
       success: false,
       reason: "Invalid move coordinates."
     };
+
   }
 
 
   if (game.gameOver) {
+
     return {
       success: false,
       reason: "The game is over."
     };
+
   }
 
 
@@ -626,10 +602,12 @@ function applyCheckersMove(
       playerColor
     )
   ) {
+
     return {
       success: false,
       reason: "Illegal move."
     };
+
   }
 
 
@@ -650,14 +628,12 @@ function applyCheckersMove(
   let captured = null;
 
 
-  /*
-    Capture.
-  */
-
+  // Capture
   if (
     Math.abs(rowDifference) === 2 &&
     Math.abs(colDifference) === 2
   ) {
+
     const middleRow =
       fromRow +
       rowDifference / 2;
@@ -674,13 +650,11 @@ function applyCheckersMove(
 
     board[middleRow][middleCol] =
       null;
+
   }
 
 
-  /*
-    Move piece.
-  */
-
+  // Move piece
   board[fromRow][fromCol] =
     null;
 
@@ -689,10 +663,7 @@ function applyCheckersMove(
     piece;
 
 
-  /*
-    Promote red.
-  */
-
+  // Promote red
   if (
     piece === "red" &&
     toRow === 0
@@ -701,10 +672,7 @@ function applyCheckersMove(
   }
 
 
-  /*
-    Promote black.
-  */
-
+  // Promote black
   if (
     piece === "black" &&
     toRow === 7
@@ -717,14 +685,13 @@ function applyCheckersMove(
     newPiece;
 
 
-  /*
-    Count remaining pieces.
-  */
-
+  // Count remaining pieces
   let redPieces = 0;
   let blackPieces = 0;
 
+
   for (let row = 0; row < 8; row++) {
+
     for (let col = 0; col < 8; col++) {
 
       const currentPiece =
@@ -734,6 +701,7 @@ function applyCheckersMove(
         continue;
       }
 
+
       if (
         getPieceColor(currentPiece) ===
         "red"
@@ -741,13 +709,16 @@ function applyCheckersMove(
         redPieces++;
       }
 
+
       if (
         getPieceColor(currentPiece) ===
         "black"
       ) {
         blackPieces++;
       }
+
     }
+
   }
 
 
@@ -758,26 +729,21 @@ function applyCheckersMove(
     winner = "black";
   }
 
+
   if (blackPieces === 0) {
     winner = "red";
   }
 
 
-  /*
-    Switch turn.
-  */
-
+  // Switch turn
   game.turn =
     game.turn === "red"
       ? "black"
       : "red";
 
 
-  /*
-    If the next player has no legal moves,
-    the current player wins.
-  */
-
+  // If next player has no legal moves,
+  // current player wins
   if (
     !winner &&
     !playerHasAnyLegalMove(
@@ -785,20 +751,25 @@ function applyCheckersMove(
       game.turn
     )
   ) {
+
     winner =
       game.turn === "red"
         ? "black"
         : "red";
+
   }
 
 
   if (winner) {
+
     game.gameOver = true;
     game.winner = winner;
+
   }
 
 
   return {
+
     success: true,
 
     move: {
@@ -818,7 +789,9 @@ function applyCheckersMove(
 
     winner:
       game.winner
+
   };
+
 }
 
 
@@ -831,8 +804,8 @@ wss.on("connection", ws => {
   ws.room = null;
 
   /*
-    "red" = red checkers player
-    "black" = black checkers player
+    red = red checkers player
+    black = black checkers player
     null = spectator
   */
 
@@ -852,11 +825,14 @@ wss.on("connection", ws => {
 
     let data;
 
+
     try {
+
       data =
         JSON.parse(
           rawData.toString()
         );
+
     } catch (error) {
 
       sendJSON(ws, {
@@ -883,11 +859,7 @@ wss.on("connection", ws => {
 
     if (data.type === "join") {
 
-      /*
-        Don't allow the same connection
-        to join multiple rooms.
-      */
-
+      // Don't allow same connection to join multiple rooms
       if (ws.room) {
 
         sendJSON(ws, {
@@ -922,10 +894,7 @@ wss.on("connection", ws => {
         getRoom(roomName);
 
 
-      /*
-        Enforce five-user maximum.
-      */
-
+      // Maximum five users
       if (
         room.size >=
         MAX_USERS_PER_CHAT
@@ -941,26 +910,17 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Add user.
-      */
-
+      // Add user
       room.add(ws);
 
       ws.room =
         roomName;
 
 
-      /*
-        Assign checkers player color.
-
-        First player = red
-        Second player = black
-        Remaining users = spectator
-      */
-
+      // Assign checker color
       let redTaken = false;
       let blackTaken = false;
+
 
       room.forEach(client => {
 
@@ -970,6 +930,7 @@ wss.on("connection", ws => {
         ) {
           redTaken = true;
         }
+
 
         if (
           client.checkerColor ===
@@ -999,20 +960,14 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Make sure the game exists.
-      */
-
+      // Make sure game exists
       const game =
         getCheckersGame(
           roomName
         );
 
 
-      /*
-        Tell the player they joined.
-      */
-
+      // Tell player they joined
       sendJSON(ws, {
 
         type: "joined",
@@ -1029,15 +984,13 @@ wss.on("connection", ws => {
       });
 
 
-      /*
-        Send current checkers state.
-      */
-
+      // Send current checkers state
       sendJSON(ws, {
 
         type: "checkersState",
 
         state: {
+
           board:
             game.board,
 
@@ -1049,24 +1002,19 @@ wss.on("connection", ws => {
 
           winner:
             game.winner
+
         }
 
       });
 
 
-      /*
-        Update everyone.
-      */
-
+      // Update everyone
       sendUserCount(
         roomName
       );
 
 
-      /*
-        Tell existing users.
-      */
-
+      // Tell existing users
       broadcastToRoom(
         roomName,
         {
@@ -1135,18 +1083,10 @@ wss.on("connection", ws => {
 
     if (data.type === "drawing") {
 
-      /*
-        User must be in a room.
-      */
-
       if (!ws.room) {
         return;
       }
 
-
-      /*
-        Validate all coordinates.
-      */
 
       if (
         !isValidDrawingNumber(data.x1) ||
@@ -1158,22 +1098,12 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Validate color.
-      */
-
       if (
         !isValidDrawingColor(data.color)
       ) {
         return;
       }
 
-
-      /*
-        Broadcast the drawing stroke
-        to everyone in the room,
-        including the person who drew it.
-      */
 
       broadcastToRoom(
         ws.room,
@@ -1209,11 +1139,6 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Clear the drawing for
-        everyone in the room.
-      */
-
       broadcastToRoom(
         ws.room,
         {
@@ -1240,10 +1165,7 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Spectators cannot move.
-      */
-
+      // Spectators cannot move
       if (!ws.checkerColor) {
 
         sendJSON(ws, {
@@ -1282,10 +1204,7 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Broadcast the validated move.
-      */
-
+      // Broadcast validated move
       broadcastToRoom(
         ws.room,
         {
@@ -1324,11 +1243,6 @@ wss.on("connection", ws => {
       }
 
 
-      /*
-        Anyone in the room may request
-        a new game.
-      */
-
       const newGame =
         createCheckersGame();
 
@@ -1345,6 +1259,7 @@ wss.on("connection", ws => {
           type: "checkersState",
 
           state: {
+
             board:
               newGame.board,
 
@@ -1356,7 +1271,9 @@ wss.on("connection", ws => {
 
             winner:
               newGame.winner
+
           }
+
         }
       );
 
@@ -1391,28 +1308,16 @@ wss.on("connection", ws => {
     }
 
 
-    /*
-      Remove user.
-    */
-
+    // Remove user
     room.delete(ws);
 
 
-    /*
-      Free checker position.
-
-      The remaining player keeps their color.
-      A new user can take the vacant color.
-    */
-
+    // Free checker position
     ws.checkerColor =
       null;
 
 
-    /*
-      Tell remaining users.
-    */
-
+    // Tell remaining users
     if (room.size > 0) {
 
       broadcastToRoom(
@@ -1424,6 +1329,7 @@ wss.on("connection", ws => {
         }
       );
 
+
       sendUserCount(
         roomName
       );
@@ -1431,11 +1337,7 @@ wss.on("connection", ws => {
     }
 
 
-    /*
-      If nobody remains,
-      destroy the room and game.
-    */
-
+    // Destroy empty room
     if (room.size === 0) {
 
       rooms.delete(
@@ -1471,8 +1373,14 @@ wss.on("connection", ws => {
 // START SERVER
 // ============================================================
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    `Server running on 0.0.0.0:${PORT}`
-  );
-});
+server.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+
+    console.log(
+      `Server running on 0.0.0.0:${PORT}`
+    );
+
+  }
+);
