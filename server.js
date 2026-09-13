@@ -1,4 +1,3 @@
-```js
 const http = require("http");
 const WebSocket = require("ws");
 
@@ -7,6 +6,10 @@ const PORT = process.env.PORT || 3000;
 const MAX_USERS_PER_CHAT = 5;
 const MAX_MESSAGE_LENGTH = 1000;
 const MAX_ROOM_NAME_LENGTH = 40;
+
+// Drawing limits
+const MAX_DRAWING_COORDINATE = 5000;
+const MAX_DRAWING_COLOR_LENGTH = 30;
 
 
 // ============================================================
@@ -123,6 +126,50 @@ function sendUserCount(roomName) {
     type: "userCount",
     count: room.size
   });
+}
+
+
+// ============================================================
+// DRAWING VALIDATION
+// ============================================================
+
+function isValidDrawingNumber(value) {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    Math.abs(value) <= MAX_DRAWING_COORDINATE
+  );
+}
+
+
+function isValidDrawingColor(color) {
+  if (typeof color !== "string") {
+    return false;
+  }
+
+  if (color.length === 0) {
+    return false;
+  }
+
+  if (color.length > MAX_DRAWING_COLOR_LENGTH) {
+    return false;
+  }
+
+  /*
+    Allow normal CSS colors such as:
+
+    #ff0000
+    red
+    rgb(...)
+    rgba(...)
+    hsl(...)
+    etc.
+
+    The client is still responsible for choosing
+    the actual drawing color.
+  */
+
+  return true;
 }
 
 
@@ -453,7 +500,6 @@ function playerHasAnyLegalMove(
 
         }
       }
-
     }
   }
 
@@ -613,7 +659,7 @@ function applyCheckersMove(
 
 
   /*
-    Check whether the opponent still has pieces.
+    Count remaining pieces.
   */
 
   let redPieces = 0;
@@ -705,7 +751,8 @@ function applyCheckersMove(
       piece: newPiece
     },
 
-    turn: game.turn,
+    turn:
+      game.turn,
 
     gameOver:
       game.gameOver,
@@ -723,6 +770,13 @@ function applyCheckersMove(
 wss.on("connection", ws => {
 
   ws.room = null;
+
+  /*
+    "red" = red checkers player
+    "black" = black checkers player
+    null = spectator
+  */
+
   ws.checkerColor = null;
 
 
@@ -1017,6 +1071,103 @@ wss.on("connection", ws => {
 
 
     // ========================================================
+    // DRAWING
+    // ========================================================
+
+    if (data.type === "drawing") {
+
+      /*
+        User must be in a room.
+      */
+
+      if (!ws.room) {
+        return;
+      }
+
+
+      /*
+        Validate all coordinates.
+      */
+
+      if (
+        !isValidDrawingNumber(data.x1) ||
+        !isValidDrawingNumber(data.y1) ||
+        !isValidDrawingNumber(data.x2) ||
+        !isValidDrawingNumber(data.y2)
+      ) {
+        return;
+      }
+
+
+      /*
+        Validate color.
+      */
+
+      if (
+        !isValidDrawingColor(data.color)
+      ) {
+        return;
+      }
+
+
+      /*
+        Broadcast the drawing stroke
+        to everyone in the room,
+        including the person who drew it.
+      */
+
+      broadcastToRoom(
+        ws.room,
+        {
+          type: "drawing",
+
+          x1: data.x1,
+          y1: data.y1,
+
+          x2: data.x2,
+          y2: data.y2,
+
+          color: data.color
+        }
+      );
+
+
+      return;
+    }
+
+
+    // ========================================================
+    // DRAWING CLEAR
+    // ========================================================
+
+    if (
+      data.type ===
+      "drawingClear"
+    ) {
+
+      if (!ws.room) {
+        return;
+      }
+
+
+      /*
+        Clear the drawing for
+        everyone in the room.
+      */
+
+      broadcastToRoom(
+        ws.room,
+        {
+          type: "drawingClear"
+        }
+      );
+
+
+      return;
+    }
+
+
+    // ========================================================
     // CHECKERS MOVE
     // ========================================================
 
@@ -1191,7 +1342,6 @@ wss.on("connection", ws => {
     /*
       Free checker position.
 
-      Important:
       The remaining player keeps their color.
       A new user can take the vacant color.
     */
@@ -1263,6 +1413,7 @@ wss.on("connection", ws => {
 // ============================================================
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(
+    `Server running on port ${PORT}`
+  );
 });
-```
