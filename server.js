@@ -1,9 +1,7 @@
-```js
 const http = require("http");
 const WebSocket = require("ws");
 
 const MAX_USERS_PER_CHAT = 5;
-
 const MAX_DRAWING_SIZE = 2 * 1024 * 1024; // 2 MB
 
 
@@ -12,13 +10,14 @@ const MAX_DRAWING_SIZE = 2 * 1024 * 1024; // 2 MB
 // =========================
 
 const server = http.createServer((req, res) => {
-
   res.writeHead(200);
-
   res.end("Chat server is running");
-
 });
 
+
+// =========================
+// WEBSOCKET SERVER
+// =========================
 
 const wss = new WebSocket.Server({
   server
@@ -29,19 +28,6 @@ const wss = new WebSocket.Server({
 // CHAT ROOMS
 // =========================
 
-// Each chat has its own Set of connected users.
-//
-// Example:
-//
-// "gaming night"
-//      -> user 1
-//      -> user 2
-//      -> user 3
-//
-// "movie night"
-//      -> user 4
-//      -> user 5
-
 const chats = new Map();
 
 
@@ -50,29 +36,21 @@ const chats = new Map();
 // =========================
 
 function cleanChatName(name) {
-
   return String(name || "")
     .trim()
     .slice(0, 50);
-
 }
 
-
 function cleanUsername(name) {
-
   return String(name || "")
     .trim()
     .slice(0, 30);
-
 }
 
-
 function cleanMessage(text) {
-
   return String(text || "")
     .trim()
     .slice(0, 1000);
-
 }
 
 
@@ -81,56 +59,31 @@ function cleanMessage(text) {
 // =========================
 
 function send(socket, data) {
-
-  if (
-    socket.readyState ===
-    WebSocket.OPEN
-  ) {
-
-    socket.send(
-      JSON.stringify(data)
-    );
-
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(data));
   }
-
 }
 
 
 // =========================
 // BROADCAST TO CHAT
 // =========================
-//
-// Sends a message to everyone
-// in the same chat.
-//
-// excludeSocket can be used to
-// prevent the sender from receiving
-// the message back.
 
 function broadcastToChat(
   chat,
   data,
   excludeSocket = null
 ) {
-
-  for (
-    const client of chat.users
-  ) {
+  for (const client of chat.users) {
 
     if (
       client !== excludeSocket &&
-      client.readyState ===
-        WebSocket.OPEN
+      client.readyState === WebSocket.OPEN
     ) {
-
-      client.send(
-        JSON.stringify(data)
-      );
-
+      client.send(JSON.stringify(data));
     }
 
   }
-
 }
 
 
@@ -140,33 +93,25 @@ function broadcastToChat(
 
 function sendUserCount(chat) {
 
-  broadcastToChat(
-    chat,
-    {
-      type: "userCount",
-
-      userCount:
-        chat.users.size,
-
-      maxUsers:
-        MAX_USERS_PER_CHAT
-    }
-  );
+  broadcastToChat(chat, {
+    type: "userCount",
+    userCount: chat.users.size,
+    maxUsers: MAX_USERS_PER_CHAT
+  });
 
 }
 
 
 // =========================
-// WEBSOCKET CONNECTION
+// NEW WEBSOCKET CONNECTION
 // =========================
 
 wss.on("connection", (socket) => {
 
+  console.log("New WebSocket connection.");
 
   let joined = false;
-
   let chat = null;
-
   let username = "";
 
 
@@ -178,32 +123,20 @@ wss.on("connection", (socket) => {
 
     let message;
 
-
-    // =========================
-    // PARSE MESSAGE
-    // =========================
-
     try {
 
-      message =
-        JSON.parse(
-          data.toString()
-        );
+      message = JSON.parse(data.toString());
 
     } catch (error) {
 
-      send(
-        socket,
-        {
-          type: "error",
+      console.error("Invalid JSON received.");
 
-          message:
-            "Invalid request."
-        }
-      );
+      send(socket, {
+        type: "error",
+        message: "Invalid request."
+      });
 
       return;
-
     }
 
 
@@ -216,79 +149,42 @@ wss.on("connection", (socket) => {
       message.type === "join"
     ) {
 
-      username =
-        cleanUsername(
-          message.username
-        );
+      username = cleanUsername(
+        message.username
+      );
 
+      const chatName = cleanChatName(
+        message.chatName
+      );
 
-      const chatName =
-        cleanChatName(
-          message.chatName
-        );
-
-
-      // =========================
-      // VALIDATE USERNAME
-      // =========================
 
       if (!username) {
 
-        send(
-          socket,
-          {
-            type: "joinError",
-
-            message:
-              "Please enter your name."
-          }
-        );
+        send(socket, {
+          type: "joinError",
+          message: "Please enter your name."
+        });
 
         return;
-
       }
 
-
-      // =========================
-      // VALIDATE CHAT NAME
-      // =========================
 
       if (!chatName) {
 
-        send(
-          socket,
-          {
-            type: "joinError",
-
-            message:
-              "Please enter a chat name."
-          }
-        );
+        send(socket, {
+          type: "joinError",
+          message: "Please enter a chat name."
+        });
 
         return;
-
       }
 
-
-      // =========================
-      // CHAT ROOM KEY
-      // =========================
-      //
-      // "Gaming Night"
-      // "gaming night"
-      //
-      // are treated as the same room.
 
       const chatKey =
         chatName.toLowerCase();
 
 
-      // =========================
-      // FIND EXISTING CHAT
-      // =========================
-
-      chat =
-        chats.get(chatKey);
+      chat = chats.get(chatKey);
 
 
       // =========================
@@ -298,26 +194,19 @@ wss.on("connection", (socket) => {
       if (!chat) {
 
         chat = {
-
-          name:
-            chatName,
-
-          users:
-            new Set()
-
+          name: chatName,
+          users: new Set()
         };
-
 
         chats.set(
           chatKey,
           chat
         );
-
       }
 
 
       // =========================
-      // CHECK CHAT CAPACITY
+      // CHAT FULL
       // =========================
 
       if (
@@ -325,35 +214,13 @@ wss.on("connection", (socket) => {
         MAX_USERS_PER_CHAT
       ) {
 
-        send(
-          socket,
-          {
-            type: "joinError",
-
-            message:
-              "This chat is full. A chat can only have 5 people."
-          }
-        );
-
-
-        /*
-         * Remove an empty chat
-         * if necessary.
-         */
-
-        if (
-          chat.users.size === 0
-        ) {
-
-          chats.delete(
-            chatKey
-          );
-
-        }
-
+        send(socket, {
+          type: "joinError",
+          message:
+            "This chat is full. A chat can only have 5 people."
+        });
 
         return;
-
       }
 
 
@@ -361,51 +228,39 @@ wss.on("connection", (socket) => {
       // ADD USER
       // =========================
 
-      chat.users.add(
-        socket
-      );
+      chat.users.add(socket);
 
-
-      socket.chatKey =
-        chatKey;
-
+      socket.chatKey = chatKey;
 
       joined = true;
 
 
-      // =========================
-      // TELL USER THEY JOINED
-      // =========================
-
-      send(
-        socket,
-        {
-          type: "joined",
-
-          chatName:
-            chat.name,
-
-          userCount:
-            chat.users.size,
-
-          maxUsers:
-            MAX_USERS_PER_CHAT,
-
-          username:
-            username
-        }
+      console.log(
+        `${username} joined "${chat.name}".`
       );
 
 
       // =========================
-      // TELL EVERYONE ELSE
+      // CONFIRM JOIN
+      // =========================
+
+      send(socket, {
+        type: "joined",
+        chatName: chat.name,
+        userCount: chat.users.size,
+        maxUsers: MAX_USERS_PER_CHAT,
+        username: username
+      });
+
+
+      // =========================
+      // TELL OTHER USERS
       // =========================
 
       broadcastToChat(
         chat,
         {
           type: "system",
-
           message:
             `${username} joined the chat.`
         },
@@ -413,22 +268,14 @@ wss.on("connection", (socket) => {
       );
 
 
-      // =========================
-      // UPDATE USER COUNT
-      // =========================
-
-      sendUserCount(
-        chat
-      );
-
+      sendUserCount(chat);
 
       return;
-
     }
 
 
     // =========================
-    // NORMAL CHAT MESSAGE
+    // NORMAL MESSAGE
     // =========================
 
     if (
@@ -443,49 +290,41 @@ wss.on("connection", (socket) => {
 
 
       if (!text) {
-
         return;
-
       }
 
 
-      /*
-       * Send the message to
-       * everyone in the room,
-       * INCLUDING the sender.
-       *
-       * This is intentional because
-       * the HTML client waits for the
-       * server to display messages.
-       */
+      console.log(
+        `${username} sent a message in "${chat.name}".`
+      );
+
 
       broadcastToChat(
         chat,
         {
           type: "message",
-
-          username:
-            username,
-
-          text:
-            text
+          username: username,
+          text: text
         }
       );
 
-
       return;
-
     }
 
 
     // =========================
-    // DRAWING MESSAGE
+    // DRAWING
     // =========================
 
     if (
       joined &&
       message.type === "drawing"
     ) {
+
+      console.log(
+        `${username} is sending a drawing.`
+      );
+
 
       const image =
         String(
@@ -494,18 +333,27 @@ wss.on("connection", (socket) => {
 
 
       // =========================
-      // MAKE SURE AN IMAGE EXISTS
+      // CHECK IMAGE EXISTS
       // =========================
 
       if (!image) {
 
-        return;
+        console.log(
+          "Drawing rejected: no image."
+        );
 
+        send(socket, {
+          type: "error",
+          message:
+            "No drawing was received."
+        });
+
+        return;
       }
 
 
       // =========================
-      // VERIFY IMAGE TYPE
+      // CHECK IMAGE FORMAT
       // =========================
 
       if (
@@ -514,75 +362,104 @@ wss.on("connection", (socket) => {
         )
       ) {
 
-        send(
-          socket,
-          {
-            type: "error",
-
-            message:
-              "Invalid drawing."
-          }
+        console.log(
+          "Drawing rejected: invalid image format."
         );
 
-        return;
+        send(socket, {
+          type: "error",
+          message:
+            "Invalid drawing format."
+        });
 
+        return;
       }
 
 
       // =========================
-      // DRAWING SIZE LIMIT
+      // CHECK SIZE
       // =========================
 
-      if (
+      const drawingSize =
         Buffer.byteLength(
           image,
           "utf8"
-        ) > MAX_DRAWING_SIZE
-      ) {
-
-        send(
-          socket,
-          {
-            type: "error",
-
-            message:
-              "That drawing is too large."
-          }
         );
 
-        return;
 
+      console.log(
+        `Drawing size: ${drawingSize} bytes`
+      );
+
+
+      if (
+        drawingSize >
+        MAX_DRAWING_SIZE
+      ) {
+
+        console.log(
+          "Drawing rejected: too large."
+        );
+
+        send(socket, {
+          type: "error",
+          message:
+            "That drawing is too large."
+        });
+
+        return;
       }
 
 
       // =========================
-      // BROADCAST DRAWING
+      // SEND DRAWING
       // =========================
-      //
-      // Send the drawing to
-      // everyone in this chat.
-      //
-      // The sender also receives it,
-      // which means their own drawing
-      // appears in their chat.
+
+      console.log(
+        `Broadcasting drawing from ${username}.`
+      );
+
 
       broadcastToChat(
         chat,
         {
           type: "drawing",
-
-          username:
-            username,
-
-          image:
-            image
+          username: username,
+          image: image
         }
       );
 
 
       return;
+    }
+
+
+    // =========================
+    // UNKNOWN MESSAGE
+    // =========================
+
+    if (joined) {
+
+      console.log(
+        "Unknown message type:",
+        message.type
+      );
 
     }
+
+  });
+
+
+  // =========================
+  // WEBSOCKET ERROR
+  // =========================
+
+  socket.on("error", (error) => {
+
+    console.error(
+      "WebSocket error:",
+      error
+    );
 
   });
 
@@ -593,52 +470,34 @@ wss.on("connection", (socket) => {
 
   socket.on("close", () => {
 
+    console.log(
+      `${username || "Unknown user"} disconnected.`
+    );
+
+
     if (
       !joined ||
       !chat
     ) {
-
       return;
-
     }
 
 
-    // =========================
-    // REMOVE USER
-    // =========================
+    chat.users.delete(socket);
 
-    chat.users.delete(
-      socket
-    );
-
-
-    // =========================
-    // TELL REMAINING USERS
-    // =========================
 
     broadcastToChat(
       chat,
       {
         type: "system",
-
         message:
           `${username} left the chat.`
       }
     );
 
 
-    // =========================
-    // UPDATE USER COUNT
-    // =========================
+    sendUserCount(chat);
 
-    sendUserCount(
-      chat
-    );
-
-
-    // =========================
-    // DELETE EMPTY CHAT
-    // =========================
 
     if (
       chat.users.size === 0
@@ -673,4 +532,3 @@ server.listen(
 
   }
 );
-```
