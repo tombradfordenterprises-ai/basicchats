@@ -5,7 +5,8 @@ const WebSocket = require("ws");
 const PORT = process.env.PORT || 3000;
 
 const MAX_USERS_PER_CHAT = 5;
-const MAX_DRAWING_SIZE = 2 * 1024 * 1024; // 2 MB
+const MAX_MESSAGE_LENGTH = 1000;
+const MAX_ROOM_NAME_LENGTH = 40;
 
 
 // ============================================================
@@ -26,35 +27,83 @@ const server = http.createServer((req, res) => {
 // ============================================================
 
 const wss = new WebSocket.Server({
-  server: server
+  server
 });
 
 
 // ============================================================
-// ROOMS
+// ROOM STORAGE
 // ============================================================
-//
-// rooms looks like:
-//
-// rooms = {
-//   "room-name": Set<WebSocket>
-// }
-//
-// Each WebSocket also stores:
-//
-// ws.room
-// ws.checkerColor
-//
+
+/*
+  rooms:
+
+  Map {
+    "room-name" => Set<WebSocket>
+  }
+*/
 
 const rooms = new Map();
 
 
+/*
+  checkersGames:
+
+  Map {
+    "room-name" => {
+      board: [...],
+      turn: "red" | "black",
+      gameOver: false,
+      winner: null
+    }
+  }
+*/
+
+const checkersGames = new Map();
+
+
 // ============================================================
-// CREATE / GET ROOM
+// GENERAL HELPERS
 // ============================================================
+
+function sendJSON(ws, data) {
+  if (
+    ws &&
+    ws.readyState === WebSocket.OPEN
+  ) {
+    ws.send(JSON.stringify(data));
+  }
+}
+
+
+function broadcastToRoom(roomName, data) {
+  const room = rooms.get(roomName);
+
+  if (!room) {
+    return;
+  }
+
+  room.forEach(client => {
+    sendJSON(client, data);
+  });
+}
+
+
+function normalizeRoomName(name) {
+  if (typeof name !== "string") {
+    return "";
+  }
+
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9_-]/g, "")
+    .slice(0, MAX_ROOM_NAME_LENGTH);
+}
+
 
 function getRoom(roomName) {
-
   if (!rooms.has(roomName)) {
     rooms.set(roomName, new Set());
   }
@@ -63,305 +112,112 @@ function getRoom(roomName) {
 }
 
 
-// ============================================================
-// SEND JSON
-// ============================================================
-
-function sendJSON(ws, data) {
-
-  if (
-    ws &&
-    ws.readyState === WebSocket.OPEN
-  ) {
-
-    ws.send(
-      JSON.stringify(data)
-    );
-
-  }
-
-}
-
-
-// ============================================================
-// BROADCAST TO ROOM
-// ============================================================
-
-function broadcastToRoom(
-  roomName,
-  data,
-  excludeSocket = null
-) {
-
-  const room = rooms.get(roomName);
-
-  if (!room) {
-    return;
-  }
-
-  room.forEach(ws => {
-
-    if (
-      ws !== excludeSocket &&
-      ws.readyState === WebSocket.OPEN
-    ) {
-
-      sendJSON(ws, data);
-
-    }
-
-  });
-
-}
-
-
-// ============================================================
-// SEND USER COUNT
-// ============================================================
-
 function sendUserCount(roomName) {
-
   const room = rooms.get(roomName);
 
   if (!room) {
     return;
   }
 
-  const count = room.size;
-
-  room.forEach(ws => {
-
-    sendJSON(ws, {
-      type: "userCount",
-      count: count
-    });
-
+  broadcastToRoom(roomName, {
+    type: "userCount",
+    count: room.size
   });
-
 }
 
 
 // ============================================================
-// NORMALIZE ROOM NAME
+// CHECKERS
 // ============================================================
-
-function normalizeRoomName(roomName) {
-
-  if (
-    typeof roomName !== "string"
-  ) {
-
-    return "";
-
-  }
-
-  return roomName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .slice(0, 40);
-
-}
-
-
-// ============================================================
-// CHECKERS COLORS
-// ============================================================
-//
-// Maximum of two players can play checkers.
-//
-// Player 1 = red
-// Player 2 = black
-//
-// Additional users can still be in the chat room,
-// but they cannot control either checker side.
-// ============================================================
-
-function assignCheckerColor(ws, room) {
-
-  /*
-   * If someone already has red, try black.
-   */
-
-  let redTaken = false;
-  let blackTaken = false;
-
-  room.forEach(client => {
-
-    if (client.checkerColor === "red") {
-      redTaken = true;
-    }
-
-    if (client.checkerColor === "black") {
-      blackTaken = true;
-    }
-
-  });
-
-
-  if (!redTaken) {
-
-    ws.checkerColor = "red";
-
-    return "red";
-
-  }
-
-
-  if (!blackTaken) {
-
-    ws.checkerColor = "black";
-
-    return "black";
-
-  }
-
-
-  ws.checkerColor = null;
-
-  return null;
-
-}
-
-
-// ============================================================
-// CHECKERS GAME STATE
-// ============================================================
-//
-// The server maintains the authoritative game state.
-//
-// This prevents a browser from simply telling the server:
-// "I moved an opponent's piece."
-//
 
 function createInitialCheckersBoard() {
-
   const board = [];
 
   for (let row = 0; row < 8; row++) {
-
     board[row] = [];
 
     for (let col = 0; col < 8; col++) {
-
       board[row][col] = null;
 
-
-      // Black starts at the top.
+      /*
+        Black starts at the top.
+      */
 
       if (
         row < 3 &&
         (row + col) % 2 === 1
       ) {
-
         board[row][col] = "black";
-
       }
 
-
-      // Red starts at the bottom.
+      /*
+        Red starts at the bottom.
+      */
 
       if (
         row > 4 &&
         (row + col) % 2 === 1
       ) {
-
         board[row][col] = "red";
-
       }
-
     }
-
   }
 
   return board;
-
 }
 
 
 function createCheckersGame() {
-
   return {
-
     board: createInitialCheckersBoard(),
-
     turn: "red",
-
-    gameOver: false
-
+    gameOver: false,
+    winner: null
   };
-
 }
 
 
-// ============================================================
-// CHECKERS GAME STATE PER ROOM
-// ============================================================
-
-const checkersGames = new Map();
-
-
-// ============================================================
-// GET CHECKERS GAME
-// ============================================================
-
 function getCheckersGame(roomName) {
-
   if (!checkersGames.has(roomName)) {
-
     checkersGames.set(
       roomName,
       createCheckersGame()
     );
-
   }
 
   return checkersGames.get(roomName);
-
 }
 
 
-// ============================================================
-// CHECKERS HELPERS
-// ============================================================
-
 function getPieceColor(piece) {
-
   if (
     piece === "red" ||
     piece === "redKing"
   ) {
-
     return "red";
-
   }
 
   if (
     piece === "black" ||
     piece === "blackKing"
   ) {
-
     return "black";
-
   }
 
   return null;
-
 }
 
 
 function isKing(piece) {
-
   return (
     piece === "redKing" ||
     piece === "blackKing"
   );
-
 }
 
 
 // ============================================================
-// VALIDATE CHECKERS MOVE
+// CHECKERS MOVE VALIDATION
 // ============================================================
 
 function isValidCheckersMove(
@@ -372,11 +228,11 @@ function isValidCheckersMove(
   toCol,
   playerColor
 ) {
-
   const board = game.board;
 
-
-  // Coordinates must be valid.
+  /*
+    Bounds.
+  */
 
   if (
     fromRow < 0 ||
@@ -388,71 +244,60 @@ function isValidCheckersMove(
     toCol < 0 ||
     toCol > 7
   ) {
-
     return false;
-
   }
 
+  /*
+    Destination must be empty.
+  */
 
-  // Destination must be empty.
-
-  if (board[toRow][toCol]) {
-
+  if (board[toRow][toCol] !== null) {
     return false;
-
   }
 
+  /*
+    There must be a piece at the starting position.
+  */
 
-  const piece =
-    board[fromRow][fromCol];
-
+  const piece = board[fromRow][fromCol];
 
   if (!piece) {
-
     return false;
-
   }
 
-
-  // Player must own the piece.
+  /*
+    Player must own the piece.
+  */
 
   if (
     getPieceColor(piece) !== playerColor
   ) {
-
     return false;
-
   }
 
+  /*
+    It must be that player's turn.
+  */
 
-  // It must be that player's turn.
-
-  if (
-    game.turn !== playerColor
-  ) {
-
+  if (game.turn !== playerColor) {
     return false;
-
   }
 
-
-  // Destination must be a dark square.
+  /*
+    Only dark squares can contain pieces.
+  */
 
   if (
     (toRow + toCol) % 2 === 0
   ) {
-
     return false;
-
   }
-
 
   const rowDifference =
     toRow - fromRow;
 
   const colDifference =
     toCol - fromCol;
-
 
   const absRow =
     Math.abs(rowDifference);
@@ -469,27 +314,29 @@ function isValidCheckersMove(
     absRow === 1 &&
     absCol === 1
   ) {
+    /*
+      Kings may move either direction.
+    */
 
     if (isKing(piece)) {
-
       return true;
-
     }
 
+    /*
+      Red moves upward.
+    */
 
     if (playerColor === "red") {
-
       return rowDifference === -1;
-
     }
 
+    /*
+      Black moves downward.
+    */
 
     if (playerColor === "black") {
-
       return rowDifference === 1;
-
     }
-
   }
 
 
@@ -501,7 +348,6 @@ function isValidCheckersMove(
     absRow === 2 &&
     absCol === 2
   ) {
-
     const middleRow =
       fromRow +
       rowDifference / 2;
@@ -510,70 +356,108 @@ function isValidCheckersMove(
       fromCol +
       colDifference / 2;
 
-
     const middlePiece =
       board[middleRow][middleCol];
 
+    /*
+      There must be an opponent piece
+      between the two squares.
+    */
 
     if (!middlePiece) {
-
       return false;
-
     }
-
-
-    /*
-     * Cannot capture your own piece.
-     */
 
     if (
-      getPieceColor(
-        middlePiece
-      ) === playerColor
+      getPieceColor(middlePiece) ===
+      playerColor
     ) {
-
       return false;
-
     }
 
-
     /*
-     * Kings can capture in either direction.
-     */
+      Kings can capture either direction.
+    */
 
     if (isKing(piece)) {
-
       return true;
-
     }
 
-
     /*
-     * Red moves upward.
-     */
+      Red captures upward.
+    */
 
     if (playerColor === "red") {
-
       return rowDifference === -2;
-
     }
-
 
     /*
-     * Black moves downward.
-     */
+      Black captures downward.
+    */
 
     if (playerColor === "black") {
-
       return rowDifference === 2;
-
     }
-
   }
 
+  return false;
+}
+
+
+// ============================================================
+// CHECK FOR AVAILABLE MOVES
+// ============================================================
+
+function playerHasAnyLegalMove(
+  game,
+  playerColor
+) {
+  const board = game.board;
+
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+
+      const piece =
+        board[row][col];
+
+      if (!piece) {
+        continue;
+      }
+
+      if (
+        getPieceColor(piece) !==
+        playerColor
+      ) {
+        continue;
+      }
+
+      /*
+        Try every possible destination.
+      */
+
+      for (let toRow = 0; toRow < 8; toRow++) {
+        for (let toCol = 0; toCol < 8; toCol++) {
+
+          if (
+            isValidCheckersMove(
+              game,
+              row,
+              col,
+              toRow,
+              toCol,
+              playerColor
+            )
+          ) {
+            return true;
+          }
+
+        }
+      }
+
+    }
+  }
 
   return false;
-
 }
 
 
@@ -586,19 +470,12 @@ function applyCheckersMove(
   move,
   playerColor
 ) {
-
-  if (
-    !move ||
-    typeof move !== "object"
-  ) {
-
+  if (!move) {
     return {
       success: false,
-      reason: "Invalid move."
+      reason: "Missing move."
     };
-
   }
-
 
   const fromRow =
     Number(move.fromRow);
@@ -619,12 +496,18 @@ function applyCheckersMove(
     !Number.isInteger(toRow) ||
     !Number.isInteger(toCol)
   ) {
-
     return {
       success: false,
-      reason: "Invalid coordinates."
+      reason: "Invalid move coordinates."
     };
+  }
 
+
+  if (game.gameOver) {
+    return {
+      success: false,
+      reason: "The game is over."
+    };
   }
 
 
@@ -638,16 +521,15 @@ function applyCheckersMove(
       playerColor
     )
   ) {
-
     return {
       success: false,
       reason: "Illegal move."
     };
-
   }
 
 
-  const board = game.board;
+  const board =
+    game.board;
 
   const piece =
     board[fromRow][fromCol];
@@ -660,17 +542,17 @@ function applyCheckersMove(
     toCol - fromCol;
 
 
-  /*
-   * Capture.
-   */
-
   let captured = null;
+
+
+  /*
+    Capture.
+  */
 
   if (
     Math.abs(rowDifference) === 2 &&
     Math.abs(colDifference) === 2
   ) {
-
     const middleRow =
       fromRow +
       rowDifference / 2;
@@ -679,55 +561,50 @@ function applyCheckersMove(
       fromCol +
       colDifference / 2;
 
-
     captured = {
       row: middleRow,
-      col: middleCol
+      col: middleCol,
+      piece: board[middleRow][middleCol]
     };
-
 
     board[middleRow][middleCol] =
       null;
-
   }
 
 
   /*
-   * Move piece.
-   */
+    Move piece.
+  */
 
   board[fromRow][fromCol] =
     null;
 
 
-  let newPiece = piece;
+  let newPiece =
+    piece;
 
 
   /*
-   * Promote red.
-   */
+    Promote red.
+  */
 
   if (
     piece === "red" &&
     toRow === 0
   ) {
-
     newPiece = "redKing";
-
   }
 
 
   /*
-   * Promote black.
-   */
+    Promote black.
+  */
 
   if (
     piece === "black" &&
     toRow === 7
   ) {
-
     newPiece = "blackKing";
-
   }
 
 
@@ -736,8 +613,54 @@ function applyCheckersMove(
 
 
   /*
-   * Switch turns.
-   */
+    Check whether the opponent still has pieces.
+  */
+
+  let redPieces = 0;
+  let blackPieces = 0;
+
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+
+      const currentPiece =
+        board[row][col];
+
+      if (!currentPiece) {
+        continue;
+      }
+
+      if (
+        getPieceColor(currentPiece) ===
+        "red"
+      ) {
+        redPieces++;
+      }
+
+      if (
+        getPieceColor(currentPiece) ===
+        "black"
+      ) {
+        blackPieces++;
+      }
+    }
+  }
+
+
+  let winner = null;
+
+
+  if (redPieces === 0) {
+    winner = "black";
+  }
+
+  if (blackPieces === 0) {
+    winner = "red";
+  }
+
+
+  /*
+    Switch turn.
+  */
 
   game.turn =
     game.turn === "red"
@@ -746,88 +669,50 @@ function applyCheckersMove(
 
 
   /*
-   * Check for winner.
-   */
+    If the next player has no legal moves,
+    the current player wins.
+  */
 
-  let redPieces = 0;
-  let blackPieces = 0;
-
-
-  for (let row = 0; row < 8; row++) {
-
-    for (let col = 0; col < 8; col++) {
-
-      const currentPiece =
-        board[row][col];
-
-
-      if (!currentPiece) {
-        continue;
-      }
-
-
-      if (
-        getPieceColor(
-          currentPiece
-        ) === "red"
-      ) {
-
-        redPieces++;
-
-      } else {
-
-        blackPieces++;
-
-      }
-
-    }
-
+  if (
+    !winner &&
+    !playerHasAnyLegalMove(
+      game,
+      game.turn
+    )
+  ) {
+    winner =
+      game.turn === "red"
+        ? "black"
+        : "red";
   }
 
 
-  let winner = null;
-
-
-  if (redPieces === 0) {
-
-    winner = "black";
-
+  if (winner) {
     game.gameOver = true;
-
-  }
-
-
-  if (blackPieces === 0) {
-
-    winner = "red";
-
-    game.gameOver = true;
-
+    game.winner = winner;
   }
 
 
   return {
-
     success: true,
 
     move: {
-
       fromRow,
       fromCol,
-
       toRow,
       toCol,
-
-      captured
-
+      captured,
+      piece: newPiece
     },
 
     turn: game.turn,
 
-    winner: winner
+    gameOver:
+      game.gameOver,
 
+    winner:
+      game.winner
   };
-
 }
 
 
@@ -835,540 +720,542 @@ function applyCheckersMove(
 // WEBSOCKET CONNECTION
 // ============================================================
 
-wss.on(
-  "connection",
-  ws => {
+wss.on("connection", ws => {
 
-    /*
-     * Store connection information.
-     */
+  ws.room = null;
+  ws.checkerColor = null;
 
-    ws.room = null;
 
-    ws.checkerColor = null;
+  console.log(
+    "New WebSocket connection."
+  );
 
 
-    console.log(
-      "New WebSocket connection."
-    );
+  // ==========================================================
+  // MESSAGE
+  // ==========================================================
 
+  ws.on("message", rawData => {
 
-    // --------------------------------------------------------
-    // MESSAGE
-    // --------------------------------------------------------
+    let data;
 
-    ws.on(
-      "message",
-      rawData => {
+    try {
+      data =
+        JSON.parse(
+          rawData.toString()
+        );
+    } catch (error) {
 
-        let data;
+      sendJSON(ws, {
+        type: "error",
+        message:
+          "Invalid message format."
+      });
 
-        try {
+      return;
+    }
 
-          data =
-            JSON.parse(
-              rawData.toString()
-            );
 
-        } catch (error) {
+    if (
+      !data ||
+      typeof data !== "object"
+    ) {
+      return;
+    }
 
-          sendJSON(ws, {
-            type: "error",
-            message: "Invalid message format."
-          });
 
-          return;
+    // ========================================================
+    // JOIN
+    // ========================================================
 
-        }
+    if (data.type === "join") {
 
+      /*
+        Don't allow the same connection
+        to join multiple rooms.
+      */
 
-        if (
-          !data ||
-          typeof data !== "object"
-        ) {
+      if (ws.room) {
 
-          return;
+        sendJSON(ws, {
+          type: "error",
+          message:
+            "You are already in a room."
+        });
 
-        }
-
-
-        // ====================================================
-        // JOIN ROOM
-        // ====================================================
-
-        if (data.type === "join") {
-
-          const roomName =
-            normalizeRoomName(
-              data.room
-            );
-
-
-          if (!roomName) {
-
-            sendJSON(ws, {
-              type: "error",
-              message: "Invalid room name."
-            });
-
-            return;
-
-          }
-
-
-          /*
-           * If already in a room, don't join again.
-           */
-
-          if (ws.room) {
-
-            return;
-
-          }
-
-
-          const room =
-            getRoom(roomName);
-
-
-          /*
-           * Enforce five-user limit.
-           */
-
-          if (
-            room.size >= MAX_USERS_PER_CHAT
-          ) {
-
-            sendJSON(ws, {
-              type: "error",
-              message:
-                "This chat room is full. Maximum 5 users."
-            });
-
-            return;
-
-          }
-
-
-          /*
-           * Add the client to the room.
-           */
-
-          room.add(ws);
-
-          ws.room = roomName;
-
-
-          /*
-           * Assign a checker color if available.
-           */
-
-          const checkerColor =
-            assignCheckerColor(
-              ws,
-              room
-            );
-
-
-          /*
-           * Create game if needed.
-           */
-
-          const game =
-            getCheckersGame(
-              roomName
-            );
-
-
-          /*
-           * Tell the joining player
-           * what checker color they have.
-           */
-
-          sendJSON(ws, {
-
-            type: "joined",
-
-            room: roomName,
-
-            checkerColor:
-              checkerColor
-
-          });
-
-
-          /*
-           * Send current game state.
-           */
-
-          sendJSON(ws, {
-
-            type: "checkersState",
-
-            state: {
-
-              board: game.board,
-
-              turn: game.turn,
-
-              gameOver:
-                game.gameOver
-
-            }
-
-          });
-
-
-          /*
-           * Tell everyone the room count.
-           */
-
-          sendUserCount(
-            roomName
-          );
-
-
-          /*
-           * Notify existing users.
-           */
-
-          broadcastToRoom(
-            roomName,
-            {
-              type: "system",
-              message:
-                "A user joined the room."
-            },
-            ws
-          );
-
-
-          return;
-
-        }
-
-
-        // ====================================================
-        // CHAT
-        // ====================================================
-
-        if (data.type === "chat") {
-
-          if (!ws.room) {
-
-            return;
-
-          }
-
-
-          let message =
-            typeof data.message === "string"
-              ? data.message.trim()
-              : "";
-
-
-          if (!message) {
-
-            return;
-
-          }
-
-
-          /*
-           * Prevent enormous chat messages.
-           */
-
-          message =
-            message.slice(0, 1000);
-
-
-          broadcastToRoom(
-            ws.room,
-            {
-
-              type: "chat",
-
-              message: message
-
-            }
-          );
-
-
-          return;
-
-        }
-
-
-        // ====================================================
-        // CHECKERS MOVE
-        // ====================================================
-
-        if (
-          data.type === "checkersMove"
-        ) {
-
-          if (!ws.room) {
-
-            return;
-
-          }
-
-
-          /*
-           * A player needs an assigned
-           * checker color.
-           */
-
-          if (!ws.checkerColor) {
-
-            sendJSON(ws, {
-
-              type: "error",
-
-              message:
-                "You are not one of the two checkers players."
-
-            });
-
-            return;
-
-          }
-
-
-          const game =
-            getCheckersGame(
-              ws.room
-            );
-
-
-          if (game.gameOver) {
-
-            return;
-
-          }
-
-
-          /*
-           * Server validates the move.
-           */
-
-          const result =
-            applyCheckersMove(
-              game,
-              data.move,
-              ws.checkerColor
-            );
-
-
-          if (!result.success) {
-
-            sendJSON(ws, {
-
-              type: "error",
-
-              message: result.reason
-
-            });
-
-            return;
-
-          }
-
-
-          /*
-           * Send the validated move to everyone.
-           */
-
-          broadcastToRoom(
-            ws.room,
-            {
-
-              type: "checkersMove",
-
-              move: result.move,
-
-              turn: result.turn,
-
-              winner: result.winner
-
-            }
-          );
-
-
-          return;
-
-        }
-
-
-        // ====================================================
-        // CHECKERS RESET
-        // ====================================================
-
-        if (
-          data.type === "checkersReset"
-        ) {
-
-          if (!ws.room) {
-
-            return;
-
-          }
-
-
-          /*
-           * Only one of the two players needs
-           * to request a new game.
-           */
-
-          const game =
-            createCheckersGame();
-
-
-          checkersGames.set(
-            ws.room,
-            game
-          );
-
-
-          /*
-           * Send the reset to everyone.
-           */
-
-          broadcastToRoom(
-            ws.room,
-            {
-
-              type: "checkersReset",
-
-              state: {
-
-                board: game.board,
-
-                turn: game.turn,
-
-                gameOver:
-                  game.gameOver
-
-              }
-
-            }
-          );
-
-
-          return;
-
-        }
-
-
+        return;
       }
-    );
 
 
-    // --------------------------------------------------------
-    // DISCONNECT
-    // --------------------------------------------------------
-
-    ws.on(
-      "close",
-      () => {
-
-        const roomName =
-          ws.room;
-
-
-        if (!roomName) {
-          return;
-        }
-
-
-        const room =
-          rooms.get(roomName);
-
-
-        if (!room) {
-          return;
-        }
-
-
-        /*
-         * Remove this user.
-         */
-
-        room.delete(ws);
-
-
-        /*
-         * Free their checker color.
-         */
-
-        ws.checkerColor = null;
-
-
-        /*
-         * Notify remaining users.
-         */
-
-        broadcastToRoom(
-          roomName,
-          {
-
-            type: "system",
-
-            message:
-              "A user left the room."
-
-          }
+      const roomName =
+        normalizeRoomName(
+          data.room
         );
 
 
-        /*
-         * Update user count.
-         */
+      if (!roomName) {
 
-        sendUserCount(
+        sendJSON(ws, {
+          type: "error",
+          message:
+            "Please enter a valid room name."
+        });
+
+        return;
+      }
+
+
+      const room =
+        getRoom(roomName);
+
+
+      /*
+        Enforce five-user maximum.
+      */
+
+      if (
+        room.size >=
+        MAX_USERS_PER_CHAT
+      ) {
+
+        sendJSON(ws, {
+          type: "roomFull",
+          message:
+            "This room is full. Maximum 5 users."
+        });
+
+        return;
+      }
+
+
+      /*
+        Add user.
+      */
+
+      room.add(ws);
+
+      ws.room =
+        roomName;
+
+
+      /*
+        Assign checkers player color.
+
+        First player = red
+        Second player = black
+        Remaining users = spectator
+      */
+
+      let redTaken = false;
+      let blackTaken = false;
+
+      room.forEach(client => {
+
+        if (
+          client.checkerColor ===
+          "red"
+        ) {
+          redTaken = true;
+        }
+
+        if (
+          client.checkerColor ===
+          "black"
+        ) {
+          blackTaken = true;
+        }
+
+      });
+
+
+      if (!redTaken) {
+
+        ws.checkerColor =
+          "red";
+
+      } else if (!blackTaken) {
+
+        ws.checkerColor =
+          "black";
+
+      } else {
+
+        ws.checkerColor =
+          null;
+
+      }
+
+
+      /*
+        Make sure the game exists.
+      */
+
+      const game =
+        getCheckersGame(
           roomName
         );
 
 
-        /*
-         * If the room is empty,
-         * remove the room and game.
-         */
+      /*
+        Tell the player they joined.
+      */
 
-        if (room.size === 0) {
+      sendJSON(ws, {
 
-          rooms.delete(
-            roomName
-          );
+        type: "joined",
 
-          checkersGames.delete(
-            roomName
-          );
+        room:
+          roomName,
 
+        checkerColor:
+          ws.checkerColor,
+
+        userCount:
+          room.size
+
+      });
+
+
+      /*
+        Send current checkers state.
+      */
+
+      sendJSON(ws, {
+
+        type: "checkersState",
+
+        state: {
+          board:
+            game.board,
+
+          turn:
+            game.turn,
+
+          gameOver:
+            game.gameOver,
+
+          winner:
+            game.winner
         }
 
+      });
+
+
+      /*
+        Update everyone.
+      */
+
+      sendUserCount(
+        roomName
+      );
+
+
+      /*
+        Tell existing users.
+      */
+
+      broadcastToRoom(
+        roomName,
+        {
+          type: "system",
+          message:
+            "A user joined the room."
+        }
+      );
+
+
+      return;
+    }
+
+
+    // ========================================================
+    // CHAT
+    // ========================================================
+
+    if (data.type === "chat") {
+
+      if (!ws.room) {
+        return;
       }
-    );
 
 
-    // --------------------------------------------------------
-    // ERROR
-    // --------------------------------------------------------
+      if (
+        typeof data.message !==
+        "string"
+      ) {
+        return;
+      }
 
-    ws.on(
-      "error",
-      error => {
 
-        console.error(
-          "WebSocket error:",
-          error
+      let message =
+        data.message.trim();
+
+
+      if (!message) {
+        return;
+      }
+
+
+      message =
+        message.slice(
+          0,
+          MAX_MESSAGE_LENGTH
         );
 
+
+      broadcastToRoom(
+        ws.room,
+        {
+          type: "chat",
+          message
+        }
+      );
+
+
+      return;
+    }
+
+
+    // ========================================================
+    // CHECKERS MOVE
+    // ========================================================
+
+    if (
+      data.type ===
+      "checkersMove"
+    ) {
+
+      if (!ws.room) {
+        return;
       }
+
+
+      /*
+        Spectators cannot move.
+      */
+
+      if (!ws.checkerColor) {
+
+        sendJSON(ws, {
+          type: "error",
+          message:
+            "You are watching this game. Only the two assigned players can move."
+        });
+
+        return;
+      }
+
+
+      const game =
+        getCheckersGame(
+          ws.room
+        );
+
+
+      const result =
+        applyCheckersMove(
+          game,
+          data.move,
+          ws.checkerColor
+        );
+
+
+      if (!result.success) {
+
+        sendJSON(ws, {
+          type: "error",
+          message:
+            result.reason
+        });
+
+        return;
+      }
+
+
+      /*
+        Broadcast the validated move.
+      */
+
+      broadcastToRoom(
+        ws.room,
+        {
+          type: "checkersMove",
+
+          move:
+            result.move,
+
+          turn:
+            result.turn,
+
+          gameOver:
+            result.gameOver,
+
+          winner:
+            result.winner
+        }
+      );
+
+
+      return;
+    }
+
+
+    // ========================================================
+    // CHECKERS RESET
+    // ========================================================
+
+    if (
+      data.type ===
+      "checkersReset"
+    ) {
+
+      if (!ws.room) {
+        return;
+      }
+
+
+      /*
+        Anyone in the room may request
+        a new game.
+      */
+
+      const newGame =
+        createCheckersGame();
+
+
+      checkersGames.set(
+        ws.room,
+        newGame
+      );
+
+
+      broadcastToRoom(
+        ws.room,
+        {
+          type: "checkersState",
+
+          state: {
+            board:
+              newGame.board,
+
+            turn:
+              newGame.turn,
+
+            gameOver:
+              newGame.gameOver,
+
+            winner:
+              newGame.winner
+          }
+        }
+      );
+
+
+      return;
+    }
+
+  });
+
+
+  // ==========================================================
+  // DISCONNECT
+  // ==========================================================
+
+  ws.on("close", () => {
+
+    const roomName =
+      ws.room;
+
+
+    if (!roomName) {
+      return;
+    }
+
+
+    const room =
+      rooms.get(roomName);
+
+
+    if (!room) {
+      return;
+    }
+
+
+    /*
+      Remove user.
+    */
+
+    room.delete(ws);
+
+
+    /*
+      Free checker position.
+
+      Important:
+      The remaining player keeps their color.
+      A new user can take the vacant color.
+    */
+
+    ws.checkerColor =
+      null;
+
+
+    /*
+      Tell remaining users.
+    */
+
+    if (room.size > 0) {
+
+      broadcastToRoom(
+        roomName,
+        {
+          type: "system",
+          message:
+            "A user left the room."
+        }
+      );
+
+      sendUserCount(
+        roomName
+      );
+
+    }
+
+
+    /*
+      If nobody remains,
+      destroy the room and game.
+    */
+
+    if (room.size === 0) {
+
+      rooms.delete(
+        roomName
+      );
+
+      checkersGames.delete(
+        roomName
+      );
+
+    }
+
+  });
+
+
+  // ==========================================================
+  // ERROR
+  // ==========================================================
+
+  ws.on("error", error => {
+
+    console.error(
+      "WebSocket error:",
+      error
     );
 
-  }
-);
+  });
+
+});
 
 
 // ============================================================
