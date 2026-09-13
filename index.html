@@ -3,30 +3,53 @@
 
 <head>
 
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#2563eb"
+  >
 
   <title>Simple P2P Chat</title>
 
 
   <style>
 
+    /* =========================
+       RESET
+       ========================= */
+
     * {
       box-sizing: border-box;
     }
 
 
+    html,
     body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+
+      overflow: hidden;
+
       font-family: Arial, sans-serif;
+
       background: #111827;
       color: white;
-      height: 100vh;
+    }
 
+
+    /* =========================
+       MAIN CHAT CONTAINER
+       ========================= */
+
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -36,6 +59,7 @@
     .chat {
       width: 100%;
       max-width: 600px;
+
       height: 90vh;
 
       background: #1f2937;
@@ -49,33 +73,79 @@
     }
 
 
+    /* =========================
+       HEADER
+       ========================= */
+
     header {
-      padding: 18px;
+      flex-shrink: 0;
+
+      min-height: 64px;
+
+      padding: 14px 18px;
 
       background: #2563eb;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 12px;
+    }
+
+
+    #chatName {
+      display: inline-block;
+
+      max-width: 380px;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      vertical-align: middle;
+    }
+
+
+    .chat-title {
+      min-width: 0;
 
       font-size: 20px;
       font-weight: bold;
 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      overflow: hidden;
     }
 
 
     #userCount {
+      flex-shrink: 0;
+
       font-size: 13px;
       font-weight: normal;
+
       opacity: 0.9;
+
+      white-space: nowrap;
     }
 
+
+    /* =========================
+       MESSAGES
+       ========================= */
 
     #messages {
       flex: 1;
 
+      min-height: 0;
+
       padding: 20px;
 
       overflow-y: auto;
+      overflow-x: hidden;
+
+      -webkit-overflow-scrolling: touch;
+
+      scroll-behavior: smooth;
     }
 
 
@@ -87,41 +157,62 @@
       background: #374151;
 
       border-radius: 8px;
+
+      overflow-wrap: anywhere;
+
+      word-break: break-word;
     }
 
 
     .name {
+      margin-bottom: 4px;
+
       font-size: 12px;
 
       color: #93c5fd;
 
-      margin-bottom: 4px;
+      font-weight: bold;
     }
 
 
     .system-message {
+      margin: 10px 0;
+
       color: #9ca3af;
 
       font-size: 13px;
 
       text-align: center;
 
-      margin: 10px 0;
+      overflow-wrap: anywhere;
     }
 
 
-    .input-area {
-      display: flex;
+    /* =========================
+       MESSAGE INPUT
+       ========================= */
 
-      padding: 12px;
+    .input-area {
+      flex-shrink: 0;
+
+      display: flex;
 
       gap: 8px;
 
+      padding: 12px;
+
       background: #111827;
+
+      /* Safe area for phones with
+         a bottom home indicator */
+      padding-bottom:
+        max(12px, env(safe-area-inset-bottom));
     }
 
 
-    input {
+    #messageInput {
+      min-width: 0;
+
       flex: 1;
 
       padding: 12px;
@@ -132,11 +223,24 @@
 
       outline: none;
 
-      font-size: 15px;
+      font-size: 16px;
+
+      background: white;
+
+      color: #111827;
+    }
+
+
+    #messageInput::placeholder {
+      color: #6b7280;
     }
 
 
     button {
+      flex-shrink: 0;
+
+      min-height: 46px;
+
       padding: 12px 18px;
 
       border: none;
@@ -150,6 +254,8 @@
       cursor: pointer;
 
       font-size: 15px;
+
+      -webkit-tap-highlight-color: transparent;
     }
 
 
@@ -158,61 +264,103 @@
     }
 
 
+    button:active {
+      transform: scale(0.98);
+    }
+
+
     button:disabled {
       background: #4b5563;
 
       cursor: not-allowed;
+
+      transform: none;
     }
 
 
+    /* =========================
+       LOGIN SCREEN
+       ========================= */
+
     #login {
-      position: absolute;
+      position: fixed;
 
       z-index: 10;
 
-      background: #1f2937;
+      width: calc(100% - 32px);
 
-      padding: 30px;
+      max-width: 360px;
+
+      padding: 28px;
+
+      background: #1f2937;
 
       border-radius: 12px;
 
-      width: 300px;
-
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
 
     #login h2 {
-      margin-top: 0;
+      margin: 0 0 20px;
 
-      margin-bottom: 20px;
+      font-size: 24px;
+
+      text-align: center;
     }
 
 
     #login input {
       width: 100%;
 
+      height: 48px;
+
       margin-bottom: 10px;
+
+      padding: 12px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      outline: none;
+
+      font-size: 16px;
     }
 
 
     #login button {
       width: 100%;
+
+      margin-top: 4px;
+
+      min-height: 48px;
+
+      font-size: 16px;
     }
 
 
     #connectionStatus {
-      font-size: 12px;
+      min-height: 18px;
+
+      margin-top: 10px;
 
       color: #d1d5db;
 
-      margin-top: 10px;
+      font-size: 12px;
+
+      line-height: 18px;
 
       text-align: center;
     }
 
 
-    @media (max-width: 600px) {
+    /* =========================
+       TABLETS / SMALL LAPTOPS
+       ========================= */
+
+    @media (max-width: 700px) {
 
       body {
         align-items: stretch;
@@ -220,26 +368,200 @@
 
 
       .chat {
-        height: 100vh;
-
+        width: 100%;
         max-width: none;
+
+        height: 100dvh;
+        min-height: 100dvh;
 
         border-radius: 0;
       }
 
+    }
+
+
+    /* =========================
+       PHONES
+       ========================= */
+
+    @media (max-width: 480px) {
 
       header {
-        padding: 15px;
+        min-height: 58px;
+
+        padding: 12px 14px;
+      }
+
+
+      .chat-title {
+        font-size: 17px;
+      }
+
+
+      #chatName {
+        max-width: 190px;
+      }
+
+
+      #userCount {
+        font-size: 12px;
       }
 
 
       #messages {
-        padding: 15px;
+        padding: 14px;
+      }
+
+
+      .message {
+        padding: 10px 12px;
+
+        margin-bottom: 10px;
+
+        font-size: 15px;
+
+        border-radius: 8px;
+      }
+
+
+      .name {
+        font-size: 11px;
       }
 
 
       .input-area {
+        gap: 6px;
+
+        padding: 8px;
+
+        padding-bottom:
+          max(8px, env(safe-area-inset-bottom));
+      }
+
+
+      #messageInput {
+        min-height: 46px;
+
+        padding: 11px;
+
+        font-size: 16px;
+      }
+
+
+      .input-area button {
+        min-width: 68px;
+
+        padding: 11px 12px;
+
+        font-size: 14px;
+      }
+
+
+      #login {
+        width: calc(100% - 28px);
+
+        padding: 24px 20px;
+      }
+
+
+      #login h2 {
+        font-size: 22px;
+
+        margin-bottom: 18px;
+      }
+
+    }
+
+
+    /* =========================
+       VERY SMALL PHONES
+       ========================= */
+
+    @media (max-width: 360px) {
+
+      .chat-title {
+        font-size: 16px;
+      }
+
+
+      #chatName {
+        max-width: 150px;
+      }
+
+
+      #userCount {
+        font-size: 11px;
+      }
+
+
+      #messages {
         padding: 10px;
+      }
+
+
+      .message {
+        font-size: 14px;
+      }
+
+
+      .input-area button {
+        min-width: 60px;
+
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+    }
+
+
+    /* =========================
+       LANDSCAPE PHONES
+       ========================= */
+
+    @media (
+      max-height: 500px
+    ) and (
+      orientation: landscape
+    ) {
+
+      .chat {
+        height: 100dvh;
+        min-height: 100dvh;
+      }
+
+
+      header {
+        min-height: 48px;
+
+        padding: 8px 14px;
+      }
+
+
+      #messages {
+        padding: 10px 14px;
+      }
+
+
+      .input-area {
+        padding: 6px;
+
+        padding-bottom:
+          max(6px, env(safe-area-inset-bottom));
+      }
+
+
+      #messageInput,
+      .input-area button {
+        min-height: 40px;
+      }
+
+
+      #login {
+        max-height: calc(100dvh - 20px);
+
+        overflow-y: auto;
+
+        padding: 18px;
       }
 
     }
@@ -266,8 +588,9 @@
       type="text"
       placeholder="Your name"
       maxlength="30"
-      autocomplete="off"
-    />
+      autocomplete="name"
+      autocapitalize="words"
+    >
 
 
     <input
@@ -276,7 +599,8 @@
       placeholder="Chat name"
       maxlength="50"
       autocomplete="off"
-    />
+      autocapitalize="words"
+    >
 
 
     <button onclick="joinChat()">
@@ -299,7 +623,7 @@
 
     <header>
 
-      <div>
+      <div class="chat-title">
         💬 <span id="chatName">Chat</span>
       </div>
 
@@ -312,13 +636,17 @@
 
 
 
-    <!-- MESSAGES -->
+    <!-- =========================
+         MESSAGES
+         ========================= -->
 
     <div id="messages"></div>
 
 
 
-    <!-- MESSAGE INPUT -->
+    <!-- =========================
+         MESSAGE INPUT
+         ========================= -->
 
     <div class="input-area">
 
@@ -328,8 +656,9 @@
         placeholder="Type a message..."
         maxlength="1000"
         autocomplete="off"
+        enterkeyhint="send"
         onkeydown="handleKey(event)"
-      />
+      >
 
 
       <button
@@ -379,23 +708,27 @@
         );
 
 
-      // Require username
-
       if (!username) {
 
         status.textContent =
           "Please enter your name.";
 
+        document
+          .getElementById("username")
+          .focus();
+
         return;
       }
 
-
-      // Require chat name
 
       if (!chatName) {
 
         status.textContent =
           "Please enter a chat name.";
+
+        document
+          .getElementById("chatNameInput")
+          .focus();
 
         return;
       }
@@ -405,7 +738,15 @@
         "Connecting...";
 
 
-      // Connect to WebSocket server
+      document
+        .getElementById("username")
+        .disabled = true;
+
+
+      document
+        .getElementById("chatNameInput")
+        .disabled = true;
+
 
       socket = new WebSocket(
         "wss://basicchats.onrender.com"
@@ -413,13 +754,10 @@
 
 
       // =========================
-      // CONNECTED
+      // CONNECTION OPEN
       // =========================
 
       socket.onopen = () => {
-
-        // Send the username and chat name
-        // to the server.
 
         socket.send(
           JSON.stringify({
@@ -469,6 +807,17 @@
 
           status.textContent =
             data.message;
+
+
+          document
+            .getElementById("username")
+            .disabled = false;
+
+
+          document
+            .getElementById("chatNameInput")
+            .disabled = false;
+
 
           return;
         }
@@ -563,13 +912,22 @@
 
 
       // =========================
-      // ERROR
+      // CONNECTION ERROR
       // =========================
 
       socket.onerror = () => {
 
         status.textContent =
           "Unable to connect to the chat server.";
+
+        document
+          .getElementById("username")
+          .disabled = false;
+
+
+        document
+          .getElementById("chatNameInput")
+          .disabled = false;
 
       };
 
@@ -584,9 +942,6 @@
           .getElementById("sendButton")
           .disabled = true;
 
-
-        // Only display this after
-        // successfully joining.
 
         if (
           document
@@ -643,9 +998,7 @@
       );
 
 
-      // The server doesn't send the
-      // message back to the sender,
-      // so display it locally.
+      // Display your own message immediately.
 
       addMessage(
         "You",
