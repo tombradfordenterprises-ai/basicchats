@@ -1436,6 +1436,17 @@
           return;
 
         }
+        if (data.type === "error") {
+
+  console.error(
+    "Server error:",
+    data.message
+  );
+
+  alert(data.message);
+
+  return;
+}
 
 
 
