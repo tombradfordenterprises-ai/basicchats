@@ -1,6 +1,7 @@
 {
-  "name": "p2p-chat-backend",
+  "name": "chat-room",
   "version": "1.0.0",
+  "description": "Real-time chat, drawing, and checkers room",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
