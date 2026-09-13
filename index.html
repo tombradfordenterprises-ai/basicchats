@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Simple P2P Chat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chat {
+      width: 100%;
+      max-width: 600px;
+      height: 90vh;
+      background: #1f2937;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      padding: 18px;
+      background: #2563eb;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: #374151;
+      border-radius: 8px;
+    }
+
+    .name {
+      font-size: 12px;
+      color: #93c5fd;
+      margin-bottom: 4px;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 12px;
+      gap: 8px;
+      background: #111827;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    #login {
+      position: absolute;
+      background: #1f2937;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+    }
+
+    #login input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    #login button {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login">
+    <h2>Join Chat</h2>
+
+    <input
+      id="username"
+      placeholder="Enter your name"
+    />
+
+    <button onclick="joinChat()">
+      Join
+    </button>
+  </div>
+
+  <div class="chat">
+    <header>
+      💬 Simple P2P Chat
+    </header>
+
+    <div id="messages"></div>
+
+    <div class="input-area">
+      <input
+        id="messageInput"
+        placeholder="Type a message..."
+        onkeydown="handleKey(event)"
+      />
+
+      <button onclick="sendMessage()">
+        Send
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let username = "";
+    let socket;
+
+    function joinChat() {
+      username = document.getElementById("username").value.trim();
+
+      if (!username) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      document.getElementById("login").style.display = "none";
+
+      socket = new WebSocket(
+  "wss://my-chat-backend.onrender.com"
+);
+
+
+      socket.onopen = () => {
+        addMessage("System", "You joined the chat.");
+      };
+
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        addMessage(message.username, message.text);
+      };
+
+      socket.onclose = () => {
+        addMessage("System", "Disconnected from server.");
+      };
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+
+      if (!text || !socket) return;
+
+      const message = {
+        username: username,
+        text: text
+      };
+
+      socket.send(JSON.stringify(message));
+
+      addMessage("You", text);
+
+      input.value = "";
+      input.focus();
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+
+    function addMessage(name, text) {
+      const messages = document.getElementById("messages");
+
+      const div = document.createElement("div");
+      div.className = "message";
+
+      const nameElement = document.createElement("div");
+      nameElement.className = "name";
+      nameElement.textContent = name;
+
+      const textElement = document.createElement("div");
+      textElement.textContent = text;
+
+      div.appendChild(nameElement);
+      div.appendChild(textElement);
+
+      messages.appendChild(div);
+
+      messages.scrollTop = messages.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
