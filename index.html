@@ -1,192 +1,170 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
-  <meta
-    name="theme-color"
-    content="#2563eb"
-  >
-
-  <title>Simple P2P Chat</title>
-
+  <title>Basic Chat</title>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
-
 
     html,
     body {
       margin: 0;
       padding: 0;
-
       width: 100%;
       height: 100%;
-
-      overflow: hidden;
-
       font-family: Arial, sans-serif;
-
-      background: #111827;
+      background: #121212;
       color: white;
     }
 
-
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-
-    /* =========================
-       CHAT CONTAINER
-       ========================= */
-
-    .chat {
-      width: 100%;
-      max-width: 600px;
-
-      height: 90vh;
-
-      background: #1f2937;
-
-      border-radius: 12px;
-
-      display: flex;
-      flex-direction: column;
-
       overflow: hidden;
     }
 
+    button,
+    input {
+      font: inherit;
+    }
 
     /* =========================
-       HEADER
+       LOGIN SCREEN
        ========================= */
 
-    header {
-      flex-shrink: 0;
-
-      min-height: 64px;
-
-      padding: 12px 14px;
-
-      background: #2563eb;
-
+    #loginScreen {
+      width: 100%;
+      height: 100%;
       display: flex;
-
       align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-      justify-content: space-between;
+    #loginBox {
+      width: 100%;
+      max-width: 420px;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
 
+    #loginBox h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #loginBox p {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 25px;
+    }
+
+    #loginBox input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2b2b2b;
+      color: white;
+      outline: none;
+    }
+
+    #loginBox input:focus {
+      box-shadow: 0 0 0 2px #4caf50;
+    }
+
+    #joinButton {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #joinButton:hover {
+      background: #43a047;
+    }
+
+    #joinButton:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #loginError {
+      color: #ff6b6b;
+      text-align: center;
+      margin-top: 15px;
+      min-height: 20px;
+    }
+
+    /* =========================
+       CHAT SCREEN
+       ========================= */
+
+    #chatScreen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    #chatHeader {
+      flex-shrink: 0;
+      min-height: 65px;
+      padding: 10px 15px;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
       gap: 10px;
     }
 
-
-    .header-left {
+    #chatInfo {
+      flex: 1;
       min-width: 0;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 8px;
     }
-
-
-    .chat-title {
-      min-width: 0;
-
-      font-size: 20px;
-
-      font-weight: bold;
-
-      overflow: hidden;
-    }
-
 
     #chatName {
-      display: inline-block;
-
-      max-width: 320px;
-
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-
+      font-size: 20px;
+      font-weight: bold;
       white-space: nowrap;
-
-      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
-
-    .header-right {
-      flex-shrink: 0;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 8px;
-    }
-
 
     #userCount {
       font-size: 13px;
-
-      font-weight: normal;
-
-      opacity: 0.9;
-
-      white-space: nowrap;
+      color: #aaa;
+      margin-top: 3px;
     }
-
-
-    /* =========================
-       HOME BUTTON
-       ========================= */
 
     #homeButton {
-      min-height: 38px;
-
-      padding: 8px 12px;
-
-      border: 1px solid rgba(255, 255, 255, 0.35);
-
-      border-radius: 7px;
-
-      background: rgba(255, 255, 255, 0.12);
-
+      flex-shrink: 0;
+      padding: 9px 13px;
+      border: none;
+      border-radius: 8px;
+      background: #333;
       color: white;
-
-      font-size: 13px;
-
       cursor: pointer;
-
-      white-space: nowrap;
     }
-
 
     #homeButton:hover {
-      background: rgba(255, 255, 255, 0.22);
+      background: #444;
     }
-
-
-    #homeButton:active {
-      transform: scale(0.97);
-    }
-
 
     /* =========================
        MESSAGES
@@ -194,382 +172,226 @@
 
     #messages {
       flex: 1;
-
-      min-height: 0;
-
-      padding: 20px;
-
       overflow-y: auto;
-
-      overflow-x: hidden;
-
-      -webkit-overflow-scrolling: touch;
-
-      scroll-behavior: smooth;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overscroll-behavior: contain;
     }
-
 
     .message {
-      margin-bottom: 12px;
-
-      padding: 10px 14px;
-
-      background: #374151;
-
-      border-radius: 8px;
-
+      max-width: 85%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      background: #252525;
+      word-wrap: break-word;
       overflow-wrap: anywhere;
-
-      word-break: break-word;
     }
 
-
-    .name {
-      margin-bottom: 4px;
-
+    .message .username {
       font-size: 12px;
+      font-weight: bold;
+      color: #81c784;
+      margin-bottom: 4px;
+    }
 
-      color: #93c5fd;
+    .message .messageText {
+      white-space: pre-wrap;
+    }
 
+    .systemMessage {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding: 3px 10px;
+    }
+
+    .drawingMessage {
+      max-width: 90%;
+    }
+
+    .drawingMessage .username {
+      font-size: 12px;
+      font-weight: bold;
+      color: #81c784;
+      margin-bottom: 6px;
+    }
+
+    .drawingMessage img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #444;
+    }
+
+    /* =========================
+       INPUT AREA
+       ========================= */
+
+    #inputArea {
+      flex-shrink: 0;
+      padding: 10px;
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      display: flex;
+      gap: 8px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+
+    #messageInput {
+      flex: 1;
+      min-width: 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2b2b2b;
+      color: white;
+      outline: none;
+    }
+
+    #messageInput:focus {
+      box-shadow: 0 0 0 2px #4caf50;
+    }
+
+    #sendButton,
+    #drawButton {
+      border: none;
+      border-radius: 10px;
+      padding: 0 15px;
+      cursor: pointer;
+      color: white;
       font-weight: bold;
     }
 
-
-    .system-message {
-      margin: 10px 0;
-
-      color: #9ca3af;
-
-      font-size: 13px;
-
-      text-align: center;
-
-      overflow-wrap: anywhere;
+    #sendButton {
+      background: #4caf50;
     }
 
-
-    /* =========================
-       DRAWING MESSAGE
-       ========================= */
-
-    .drawing-message {
-      margin-bottom: 12px;
-
-      padding: 10px;
-
-      background: #374151;
-
-      border-radius: 8px;
-
-      overflow: hidden;
+    #sendButton:hover {
+      background: #43a047;
     }
-
-
-    .drawing-image {
-      display: block;
-
-      width: 100%;
-
-      max-width: 400px;
-
-      height: auto;
-
-      background: white;
-
-      border-radius: 6px;
-    }
-
-
-    /* =========================
-       MESSAGE INPUT
-       ========================= */
-
-    .input-area {
-      flex-shrink: 0;
-
-      display: flex;
-
-      gap: 8px;
-
-      padding: 12px;
-
-      background: #111827;
-
-      padding-bottom:
-        max(12px, env(safe-area-inset-bottom));
-    }
-
-
-    #messageInput {
-      min-width: 0;
-
-      flex: 1;
-
-      padding: 12px;
-
-      border: none;
-
-      border-radius: 8px;
-
-      outline: none;
-
-      font-size: 16px;
-
-      background: white;
-
-      color: #111827;
-    }
-
-
-    #messageInput::placeholder {
-      color: #6b7280;
-    }
-
-
-    button {
-      flex-shrink: 0;
-
-      min-height: 46px;
-
-      padding: 12px 18px;
-
-      border: none;
-
-      border-radius: 8px;
-
-      background: #2563eb;
-
-      color: white;
-
-      cursor: pointer;
-
-      font-size: 15px;
-
-      -webkit-tap-highlight-color: transparent;
-    }
-
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-
-    button:disabled {
-      background: #4b5563;
-
-      cursor: not-allowed;
-
-      transform: none;
-    }
-
-
-    /* =========================
-       DRAW BUTTON
-       ========================= */
 
     #drawButton {
-      background: #374151;
+      background: #555;
     }
-
 
     #drawButton:hover {
-      background: #4b5563;
+      background: #666;
     }
-
-
-    /* =========================
-       LOGIN SCREEN
-       ========================= */
-
-    #login {
-      position: fixed;
-
-      z-index: 10;
-
-      width: calc(100% - 28px);
-
-      max-width: 360px;
-
-      padding: 28px;
-
-      background: #1f2937;
-
-      border-radius: 12px;
-
-      box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.4);
-    }
-
-
-    #login h2 {
-      margin: 0 0 20px;
-
-      font-size: 24px;
-
-      text-align: center;
-    }
-
-
-    #login input {
-      width: 100%;
-
-      height: 48px;
-
-      margin-bottom: 10px;
-
-      padding: 12px;
-
-      border: none;
-
-      border-radius: 8px;
-
-      outline: none;
-
-      font-size: 16px;
-    }
-
-
-    #login button {
-      width: 100%;
-
-      margin-top: 4px;
-
-      min-height: 48px;
-
-      font-size: 16px;
-    }
-
-
-    #connectionStatus {
-      min-height: 18px;
-
-      margin-top: 10px;
-
-      color: #d1d5db;
-
-      font-size: 12px;
-
-      line-height: 18px;
-
-      text-align: center;
-    }
-
 
     /* =========================
        DRAWING OVERLAY
        ========================= */
 
     #drawingOverlay {
-      position: fixed;
-
-      inset: 0;
-
-      z-index: 100;
-
       display: none;
-
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.85);
       align-items: center;
-
       justify-content: center;
-
-      padding: 16px;
-
-      background: rgba(0, 0, 0, 0.65);
+      padding: 15px;
     }
-
-
-    /* =========================
-       DRAWING BOX
-       ========================= */
 
     #drawingBox {
-      width: min(92vw, 500px);
-
-      background: #1f2937;
-
-      border-radius: 12px;
-
-      padding: 12px;
-
-      box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.5);
-
+      width: 100%;
+      max-width: 700px;
+      max-height: 95vh;
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 15px;
       display: flex;
-
       flex-direction: column;
-
-      gap: 10px;
+      gap: 12px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
     }
 
-
-    /* =========================
-       DRAWING HEADER
-       ========================= */
-
-    #drawingHeader {
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      font-size: 18px;
-
+    #drawingTitle {
+      text-align: center;
+      font-size: 20px;
       font-weight: bold;
     }
 
+    /* =========================
+       COLOR PICKER
+       ========================= */
 
-    #closeDrawingButton {
+    #colorSection {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #colorLabel {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    #colorPalette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .colorButton {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 50%;
+      border: 3px solid #555;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.1s;
+    }
+
+    .colorButton:hover {
+      transform: scale(1.08);
+    }
+
+    .colorButton.selected {
+      border-color: white;
+      box-shadow: 0 0 0 2px #4caf50;
+      transform: scale(1.08);
+    }
+
+    #customColor {
       width: 40px;
-
-      min-width: 40px;
-
       height: 40px;
-
-      min-height: 40px;
-
-      padding: 8px;
-
-      background: #374151;
-
-      font-size: 18px;
+      padding: 2px;
+      border: 3px solid #555;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
     }
 
-
-    #closeDrawingButton:hover {
-      background: #4b5563;
+    #customColor.selected {
+      border-color: white;
+      box-shadow: 0 0 0 2px #4caf50;
     }
-
 
     /* =========================
-       DRAWING CANVAS
+       CANVAS
        ========================= */
+
+    #canvasContainer {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 10px;
+      background: white;
+    }
 
     #drawingCanvas {
       display: block;
-
       width: 100%;
-
-      height: 300px;
-
+      height: min(55vh, 450px);
       background: white;
-
-      border-radius: 8px;
-
-      cursor: crosshair;
-
       touch-action: none;
-
-      user-select: none;
-
-      -webkit-user-select: none;
+      cursor: crosshair;
     }
-
 
     /* =========================
        DRAWING CONTROLS
@@ -577,443 +399,222 @@
 
     #drawingControls {
       display: flex;
-
       gap: 8px;
     }
 
-
     #drawingControls button {
       flex: 1;
-
       min-height: 44px;
-
-      padding: 10px;
-
-      font-size: 13px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
     }
-
 
     #clearDrawingButton {
-      background: #374151;
+      background: #555;
     }
-
-
-    #clearDrawingButton:hover {
-      background: #4b5563;
-    }
-
 
     #cancelDrawingButton {
-      background: #6b7280;
+      background: #8b2f2f;
     }
-
-
-    #cancelDrawingButton:hover {
-      background: #4b5563;
-    }
-
 
     #sendDrawingButton {
-      background: #2563eb;
+      background: #4caf50;
     }
 
-
-    /* =========================
-       TABLETS
-       ========================= */
-
-    @media (max-width: 700px) {
-
-      body {
-        align-items: stretch;
-      }
-
-
-      .chat {
-        width: 100%;
-
-        max-width: none;
-
-        height: 100dvh;
-
-        min-height: 100dvh;
-
-        border-radius: 0;
-      }
-
+    #clearDrawingButton:hover {
+      background: #666;
     }
 
+    #cancelDrawingButton:hover {
+      background: #a33a3a;
+    }
+
+    #sendDrawingButton:hover {
+      background: #43a047;
+    }
 
     /* =========================
-       PHONES
+       MOBILE
        ========================= */
 
-    @media (max-width: 480px) {
-
-      header {
-        min-height: 58px;
-
-        padding: 10px 12px;
-
-        gap: 6px;
+    @media (max-width: 600px) {
+      #loginBox {
+        padding: 22px;
       }
 
-
-      .chat-title {
-        font-size: 17px;
+      #chatHeader {
+        min-height: 60px;
+        padding: 8px 10px;
       }
-
 
       #chatName {
-        max-width: 150px;
+        font-size: 18px;
       }
-
-
-      #userCount {
-        font-size: 11px;
-      }
-
 
       #homeButton {
-        min-height: 36px;
-
-        padding: 7px 9px;
-
-        font-size: 12px;
-      }
-
-
-      .header-right {
-        gap: 5px;
-      }
-
-
-      #messages {
-        padding: 14px;
-      }
-
-
-      .message {
-        padding: 10px 12px;
-
-        margin-bottom: 10px;
-
-        font-size: 15px;
-
-        border-radius: 8px;
-      }
-
-
-      .name {
-        font-size: 11px;
-      }
-
-
-      .input-area {
-        gap: 6px;
-
-        padding: 8px;
-
-        padding-bottom:
-          max(8px, env(safe-area-inset-bottom));
-      }
-
-
-      #messageInput {
-        min-height: 46px;
-
-        padding: 11px;
-
-        font-size: 16px;
-      }
-
-
-      .input-area button {
-        min-width: 60px;
-
-        padding: 11px 9px;
-
+        padding: 8px 10px;
         font-size: 13px;
       }
 
+      #messages {
+        padding: 10px;
+      }
 
+      #inputArea {
+        gap: 6px;
+        padding: 8px;
+      }
+
+      #messageInput {
+        padding: 11px;
+      }
+
+      #sendButton,
       #drawButton {
-        min-width: 65px;
+        padding: 0 11px;
+        font-size: 13px;
       }
-
-
-      #login {
-        width: calc(100% - 28px);
-
-        padding: 24px 20px;
-      }
-
-
-      #login h2 {
-        font-size: 22px;
-
-        margin-bottom: 18px;
-      }
-
-
-      /* Drawing popup */
 
       #drawingOverlay {
-        padding: 10px;
+        padding: 8px;
       }
-
 
       #drawingBox {
-        width: 100%;
-
         padding: 10px;
-
-        border-radius: 10px;
+        border-radius: 12px;
       }
-
 
       #drawingCanvas {
-        height: 260px;
+        height: 50vh;
       }
 
-
-      #drawingControls {
-        gap: 6px;
+      .colorButton {
+        width: 32px;
+        height: 32px;
       }
-
 
       #drawingControls button {
-        padding: 9px 6px;
-
-        font-size: 12px;
+        min-height: 42px;
+        font-size: 13px;
       }
-
     }
 
-
-    /* =========================
-       VERY SMALL PHONES
-       ========================= */
-
-    @media (max-width: 360px) {
-
-      .chat-title {
-        font-size: 15px;
+    @media (max-width: 400px) {
+      #drawButton {
+        font-size: 0;
       }
 
-
-      #chatName {
-        max-width: 110px;
+      #drawButton::after {
+        content: "✏️";
+        font-size: 18px;
       }
 
-
-      #userCount {
-        display: none;
+      #sendButton {
+        font-size: 0;
       }
 
+      #sendButton::after {
+        content: "➤";
+        font-size: 18px;
+      }
 
       #homeButton {
-        padding: 7px 8px;
-
-        font-size: 11px;
+        font-size: 0;
       }
 
-
-      #messages {
-        padding: 10px;
+      #homeButton::after {
+        content: "⌂";
+        font-size: 20px;
       }
-
-
-      .message {
-        font-size: 14px;
-      }
-
-
-      .input-area button {
-        min-width: 55px;
-
-        padding-left: 7px;
-
-        padding-right: 7px;
-
-        font-size: 12px;
-      }
-
-
-      #drawButton {
-        min-width: 60px;
-      }
-
     }
-
-
-    /* =========================
-       LANDSCAPE PHONES
-       ========================= */
-
-    @media (
-      max-height: 500px
-    ) and (
-      orientation: landscape
-    ) {
-
-      .chat {
-        height: 100dvh;
-
-        min-height: 100dvh;
-      }
-
-
-      header {
-        min-height: 48px;
-
-        padding: 7px 12px;
-      }
-
-
-      #messages {
-        padding: 10px 14px;
-      }
-
-
-      .input-area {
-        padding: 6px;
-
-        padding-bottom:
-          max(6px, env(safe-area-inset-bottom));
-      }
-
-
-      #messageInput,
-      .input-area button {
-        min-height: 40px;
-      }
-
-
-      #login {
-        max-height: calc(100dvh - 20px);
-
-        overflow-y: auto;
-
-        padding: 18px;
-      }
-
-
-      #drawingCanvas {
-        height: 180px;
-      }
-
-    }
-
   </style>
-
 </head>
-
 
 <body>
 
-
   <!-- =========================
-       LOGIN / JOIN SCREEN
+       LOGIN SCREEN
        ========================= -->
 
-  <div id="login">
+  <div id="loginScreen">
 
-    <h2>Join Chat</h2>
+    <div id="loginBox">
 
+      <h1>Basic Chat</h1>
 
-    <input
-      id="username"
-      type="text"
-      placeholder="Your name"
-      maxlength="30"
-      autocomplete="name"
-      autocapitalize="words"
-    >
+      <p>
+        Enter your name and the name of the chat you want to join.
+      </p>
 
+      <input
+        id="usernameInput"
+        type="text"
+        placeholder="Your name"
+        maxlength="30"
+        autocomplete="off"
+      >
 
-    <input
-      id="chatNameInput"
-      type="text"
-      placeholder="Chat name"
-      maxlength="50"
-      autocomplete="off"
-      autocapitalize="words"
-    >
+      <input
+        id="chatNameInput"
+        type="text"
+        placeholder="Chat name"
+        maxlength="50"
+        autocomplete="off"
+      >
 
+      <button
+        id="joinButton"
+        type="button"
+        onclick="joinChat()"
+      >
+        Join Chat
+      </button>
 
-    <button
-      onclick="joinChat()"
-      type="button"
-    >
-      Join Chat
-    </button>
+      <div id="loginError"></div>
 
-
-    <div id="connectionStatus"></div>
+    </div>
 
   </div>
 
 
-
   <!-- =========================
-       CHAT
+       CHAT SCREEN
        ========================= -->
 
-  <div class="chat">
+  <div id="chatScreen">
 
+    <div id="chatHeader">
 
-    <header>
+      <div id="chatInfo">
 
-      <div class="header-left">
-
-        <div class="chat-title">
-
-          💬
-
-          <span id="chatName">
-            Chat
-          </span>
-
+        <div id="chatName">
+          Chat
         </div>
-
-      </div>
-
-
-      <div class="header-right">
 
         <div id="userCount">
-          0 / 5
+          0 / 5 users
         </div>
-
-
-        <button
-          id="homeButton"
-          onclick="goHome()"
-          type="button"
-        >
-          🏠 Home
-        </button>
 
       </div>
 
-    </header>
+      <button
+        id="homeButton"
+        type="button"
+        onclick="goHome()"
+      >
+        Home
+      </button>
 
+    </div>
 
-
-    <!-- =========================
-         MESSAGES
-         ========================= -->
 
     <div id="messages"></div>
 
 
-
-    <!-- =========================
-         MESSAGE INPUT
-         ========================= -->
-
-    <div class="input-area">
+    <div id="inputArea">
 
       <input
         id="messageInput"
@@ -1021,26 +622,20 @@
         placeholder="Type a message..."
         maxlength="1000"
         autocomplete="off"
-        enterkeyhint="send"
-        onkeydown="handleKey(event)"
       >
-
 
       <button
         id="drawButton"
-        onclick="openDrawing()"
         type="button"
-        disabled
+        onclick="openDrawing()"
       >
-        ✏️ Draw
+        Draw
       </button>
-
 
       <button
         id="sendButton"
-        onclick="sendMessage()"
         type="button"
-        disabled
+        onclick="sendMessage()"
       >
         Send
       </button>
@@ -1048,7 +643,6 @@
     </div>
 
   </div>
-
 
 
   <!-- =========================
@@ -1059,56 +653,162 @@
 
     <div id="drawingBox">
 
-
-      <div id="drawingHeader">
-
-        <span>
-          ✏️ Draw
-        </span>
+      <div id="drawingTitle">
+        Draw Something
+      </div>
 
 
-        <button
-          id="closeDrawingButton"
-          onclick="closeDrawing()"
-          type="button"
-        >
-          ✕
-        </button>
+      <div id="colorSection">
+
+        <div id="colorLabel">
+          Drawing color
+        </div>
+
+        <div id="colorPalette">
+
+          <button
+            class="colorButton selected"
+            type="button"
+            title="Black"
+            aria-label="Black"
+            data-color="#000000"
+            style="background:#000000;"
+            onclick="selectDrawingColor('#000000', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Red"
+            aria-label="Red"
+            data-color="#ff0000"
+            style="background:#ff0000;"
+            onclick="selectDrawingColor('#ff0000', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Blue"
+            aria-label="Blue"
+            data-color="#0066ff"
+            style="background:#0066ff;"
+            onclick="selectDrawingColor('#0066ff', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Green"
+            aria-label="Green"
+            data-color="#00a000"
+            style="background:#00a000;"
+            onclick="selectDrawingColor('#00a000', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Yellow"
+            aria-label="Yellow"
+            data-color="#ffd700"
+            style="background:#ffd700;"
+            onclick="selectDrawingColor('#ffd700', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Purple"
+            aria-label="Purple"
+            data-color="#8000ff"
+            style="background:#8000ff;"
+            onclick="selectDrawingColor('#8000ff', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Orange"
+            aria-label="Orange"
+            data-color="#ff8000"
+            style="background:#ff8000;"
+            onclick="selectDrawingColor('#ff8000', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Pink"
+            aria-label="Pink"
+            data-color="#ff1493"
+            style="background:#ff1493;"
+            onclick="selectDrawingColor('#ff1493', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Brown"
+            aria-label="Brown"
+            data-color="#8b4513"
+            style="background:#8b4513;"
+            onclick="selectDrawingColor('#8b4513', this)"
+          ></button>
+
+          <button
+            class="colorButton"
+            type="button"
+            title="Cyan"
+            aria-label="Cyan"
+            data-color="#00bcd4"
+            style="background:#00bcd4;"
+            onclick="selectDrawingColor('#00bcd4', this)"
+          ></button>
+
+          <input
+            id="customColor"
+            type="color"
+            value="#000000"
+            title="Choose a custom color"
+            aria-label="Choose a custom color"
+            onchange="selectCustomColor(this)"
+          >
+
+        </div>
 
       </div>
 
 
+      <div id="canvasContainer">
 
-      <canvas
-        id="drawingCanvas"
-      ></canvas>
+        <canvas id="drawingCanvas"></canvas>
 
+      </div>
 
 
       <div id="drawingControls">
 
         <button
           id="clearDrawingButton"
-          onclick="clearDrawing()"
           type="button"
+          onclick="clearDrawing()"
         >
           Clear
         </button>
 
-
         <button
           id="cancelDrawingButton"
-          onclick="closeDrawing()"
           type="button"
+          onclick="closeDrawing()"
         >
           Cancel
         </button>
 
-
         <button
           id="sendDrawingButton"
-          onclick="sendDrawing()"
           type="button"
+          onclick="sendDrawing()"
         >
           Send Drawing
         </button>
@@ -1120,23 +820,71 @@
   </div>
 
 
-
   <script>
 
     /* =========================
-       GLOBAL VARIABLES
+       WEBSOCKET
        ========================= */
 
-    let username = "";
+    const SERVER_URL =
+      "wss://basicchats.onrender.com";
 
     let socket = null;
 
+    let currentUsername = "";
+    let currentChatName = "";
+
+
+    /* =========================
+       DRAWING VARIABLES
+       ========================= */
+
     let drawingCanvas = null;
-
     let drawingContext = null;
-
     let drawing = false;
 
+    let drawingColor = "#000000";
+
+
+    /* =========================
+       ELEMENTS
+       ========================= */
+
+    const loginScreen =
+      document.getElementById("loginScreen");
+
+    const chatScreen =
+      document.getElementById("chatScreen");
+
+    const usernameInput =
+      document.getElementById("usernameInput");
+
+    const chatNameInput =
+      document.getElementById("chatNameInput");
+
+    const joinButton =
+      document.getElementById("joinButton");
+
+    const loginError =
+      document.getElementById("loginError");
+
+    const chatName =
+      document.getElementById("chatName");
+
+    const userCount =
+      document.getElementById("userCount");
+
+    const messages =
+      document.getElementById("messages");
+
+    const messageInput =
+      document.getElementById("messageInput");
+
+    const drawingOverlay =
+      document.getElementById("drawingOverlay");
+
+    const customColor =
+      document.getElementById("customColor");
 
 
     /* =========================
@@ -1145,288 +893,140 @@
 
     function joinChat() {
 
-      username =
-        document
-          .getElementById("username")
-          .value
-          .trim();
+      const username =
+        usernameInput.value.trim();
 
+      const chat =
+        chatNameInput.value.trim();
 
-      const chatName =
-        document
-          .getElementById("chatNameInput")
-          .value
-          .trim();
-
-
-      const status =
-        document
-          .getElementById(
-            "connectionStatus"
-          );
-
+      loginError.textContent = "";
 
       if (!username) {
-
-        status.textContent =
+        loginError.textContent =
           "Please enter your name.";
-
-        document
-          .getElementById("username")
-          .focus();
-
         return;
-
       }
 
-
-      if (!chatName) {
-
-        status.textContent =
+      if (!chat) {
+        loginError.textContent =
           "Please enter a chat name.";
-
-        document
-          .getElementById("chatNameInput")
-          .focus();
-
         return;
-
       }
 
+      joinButton.disabled = true;
 
-      status.textContent =
-        "Connecting...";
+      currentUsername = username;
+      currentChatName = chat;
 
+      socket = new WebSocket(SERVER_URL);
 
-      document
-        .getElementById("username")
-        .disabled = true;
-
-
-      document
-        .getElementById("chatNameInput")
-        .disabled = true;
-
-
-
-      /*
-       * Connect to your WebSocket server.
-       */
-
-      socket =
-        new WebSocket(
-          "wss://basicchats.onrender.com"
-        );
-
-
-
-      /* =========================
-         SOCKET OPEN
-         ========================= */
-
-      socket.onopen = () => {
+      socket.addEventListener("open", () => {
 
         socket.send(
           JSON.stringify({
-
             type: "join",
-
-            username:
-              username,
-
-            chatName:
-              chatName
-
+            username: username,
+            chatName: chat
           })
         );
 
-      };
+      });
 
 
-
-      /* =========================
-         SERVER MESSAGE
-         ========================= */
-
-      socket.onmessage = (event) => {
+      socket.addEventListener("message", (event) => {
 
         let data;
 
-
         try {
-
-          data =
-            JSON.parse(
-              event.data
-            );
-
+          data = JSON.parse(event.data);
         } catch (error) {
-
           console.error(
-            "Invalid server message:",
-            event.data
+            "Invalid server response."
           );
-
           return;
-
         }
 
+
+        /* =========================
+           JOINED
+           ========================= */
+
+        if (data.type === "joined") {
+
+          currentChatName =
+            data.chatName;
+
+          chatName.textContent =
+            data.chatName;
+
+          userCount.textContent =
+            `${data.userCount} / ${data.maxUsers} users`;
+
+          loginScreen.style.display =
+            "none";
+
+          chatScreen.style.display =
+            "flex";
+
+          messages.innerHTML = "";
+
+          messageInput.focus();
+
+          return;
+        }
 
 
         /* =========================
            JOIN ERROR
            ========================= */
 
-        if (
-          data.type ===
-          "joinError"
-        ) {
+        if (data.type === "joinError") {
 
-          status.textContent =
+          loginError.textContent =
             data.message;
 
+          joinButton.disabled = false;
 
-          document
-            .getElementById(
-              "username"
-            )
-            .disabled = false;
-
-
-          document
-            .getElementById(
-              "chatNameInput"
-            )
-            .disabled = false;
-
-
-          if (
-            socket &&
-            socket.readyState ===
-              WebSocket.OPEN
-          ) {
-
+          if (socket) {
             socket.close();
-
           }
 
-
           return;
-
         }
-
-
-
-        /* =========================
-           SUCCESSFULLY JOINED
-           ========================= */
-
-        if (
-          data.type ===
-          "joined"
-        ) {
-
-          document
-            .getElementById(
-              "login"
-            )
-            .style.display =
-              "none";
-
-
-          document
-            .getElementById(
-              "sendButton"
-            )
-            .disabled = false;
-
-
-          document
-            .getElementById(
-              "drawButton"
-            )
-            .disabled = false;
-
-
-          document
-            .getElementById(
-              "chatName"
-            )
-            .textContent =
-              data.chatName;
-
-
-          updateUserCount(
-            data.userCount,
-            data.maxUsers
-          );
-
-
-          addSystemMessage(
-            `You joined "${data.chatName}".`
-          );
-
-
-          document
-            .getElementById(
-              "messageInput"
-            )
-            .focus();
-
-
-          return;
-
-        }
-
 
 
         /* =========================
            USER COUNT
            ========================= */
 
-        if (
-          data.type ===
-          "userCount"
-        ) {
+        if (data.type === "userCount") {
 
-          updateUserCount(
-            data.userCount,
-            data.maxUsers
-          );
+          userCount.textContent =
+            `${data.userCount} / ${data.maxUsers} users`;
 
           return;
-
         }
-
 
 
         /* =========================
            SYSTEM MESSAGE
            ========================= */
 
-        if (
-          data.type ===
-          "system"
-        ) {
+        if (data.type === "system") {
 
           addSystemMessage(
             data.message
           );
 
           return;
-
         }
-
 
 
         /* =========================
            CHAT MESSAGE
            ========================= */
 
-        if (
-          data.type ===
-          "message"
-        ) {
+        if (data.type === "message") {
 
           addMessage(
             data.username,
@@ -1434,30 +1034,14 @@
           );
 
           return;
-
         }
-        if (data.type === "error") {
-
-  console.error(
-    "Server error:",
-    data.message
-  );
-
-  alert(data.message);
-
-  return;
-}
-
 
 
         /* =========================
-           DRAWING MESSAGE
+           DRAWING
            ========================= */
 
-        if (
-          data.type ===
-          "drawing"
-        ) {
+        if (data.type === "drawing") {
 
           addDrawing(
             data.username,
@@ -1465,474 +1049,478 @@
           );
 
           return;
-
         }
 
-      };
 
+        /* =========================
+           SERVER ERROR
+           ========================= */
 
+        if (data.type === "error") {
 
-      /* =========================
-         CONNECTION ERROR
-         ========================= */
-
-      socket.onerror = () => {
-
-        status.textContent =
-          "Unable to connect to the chat server.";
-
-
-        document
-          .getElementById(
-            "username"
-          )
-          .disabled = false;
-
-
-        document
-          .getElementById(
-            "chatNameInput"
-          )
-          .disabled = false;
-
-
-        document
-          .getElementById(
-            "sendButton"
-          )
-          .disabled = true;
-
-
-        document
-          .getElementById(
-            "drawButton"
-          )
-          .disabled = true;
-
-      };
-
-
-
-      /* =========================
-         DISCONNECTED
-         ========================= */
-
-      socket.onclose = () => {
-
-        document
-          .getElementById(
-            "sendButton"
-          )
-          .disabled = true;
-
-
-        document
-          .getElementById(
-            "drawButton"
-          )
-          .disabled = true;
-
-
-        if (
-          document
-            .getElementById(
-              "login"
-            )
-            .style
-            .display ===
-          "none"
-        ) {
-
-          addSystemMessage(
-            "Disconnected from server."
+          console.error(
+            "Server error:",
+            data.message
           );
 
+          alert(data.message);
+
+          return;
         }
 
-      };
+      });
+
+
+      socket.addEventListener("close", () => {
+
+        joinButton.disabled = false;
+
+      });
+
+
+      socket.addEventListener("error", () => {
+
+        loginError.textContent =
+          "Could not connect to the chat server.";
+
+        joinButton.disabled = false;
+
+      });
 
     }
 
 
-
     /* =========================
-       HOME BUTTON
-       ========================= */
-
-    function goHome() {
-
-      /*
-       * Prevent the old socket's
-       * onclose handler from adding
-       * a "Disconnected" message.
-       */
-
-      if (socket) {
-
-        socket.onclose = null;
-
-
-        if (
-          socket.readyState ===
-            WebSocket.OPEN ||
-          socket.readyState ===
-            WebSocket.CONNECTING
-        ) {
-
-          socket.close();
-
-        }
-
-      }
-
-
-      socket = null;
-
-      username = "";
-
-
-
-      /* Clear messages */
-
-      document
-        .getElementById(
-          "messages"
-        )
-        .innerHTML = "";
-
-
-
-      /* Reset chat name */
-
-      document
-        .getElementById(
-          "chatName"
-        )
-        .textContent =
-          "Chat";
-
-
-
-      /* Reset user count */
-
-      document
-        .getElementById(
-          "userCount"
-        )
-        .textContent =
-          "0 / 5";
-
-
-
-      /* Clear message */
-
-      document
-        .getElementById(
-          "messageInput"
-        )
-        .value = "";
-
-
-
-      /* Disable buttons */
-
-      document
-        .getElementById(
-          "sendButton"
-        )
-        .disabled = true;
-
-
-      document
-        .getElementById(
-          "drawButton"
-        )
-        .disabled = true;
-
-
-
-      /* Reset login fields */
-
-      document
-        .getElementById(
-          "username"
-        )
-        .disabled = false;
-
-
-      document
-        .getElementById(
-          "chatNameInput"
-        )
-        .disabled = false;
-
-
-      document
-        .getElementById(
-          "username"
-        )
-        .value = "";
-
-
-      document
-        .getElementById(
-          "chatNameInput"
-        )
-        .value = "";
-
-
-
-      /* Clear connection status */
-
-      document
-        .getElementById(
-          "connectionStatus"
-        )
-        .textContent = "";
-
-
-
-      /* Close drawing window */
-
-      closeDrawing();
-
-
-
-      /* Show login */
-
-      document
-        .getElementById(
-          "login"
-        )
-        .style.display =
-          "block";
-
-
-
-      /* Focus name */
-
-      document
-        .getElementById(
-          "username"
-        )
-        .focus();
-
-    }
-
-
-
-    /* =========================
-       SEND MESSAGE
+       SEND TEXT MESSAGE
        ========================= */
 
     function sendMessage() {
 
-      const input =
-        document
-          .getElementById(
-            "messageInput"
-          );
-
-
-      const text =
-        input.value.trim();
-
-
       if (
-        !text ||
         !socket ||
-        socket.readyState !==
-          WebSocket.OPEN
+        socket.readyState !== WebSocket.OPEN
       ) {
-
         return;
-
       }
 
+      const text =
+        messageInput.value.trim();
 
-
-      /*
-       * Send the message to the
-       * server.
-       *
-       * The server should broadcast
-       * it back to everyone in the
-       * same chat.
-       */
+      if (!text) {
+        return;
+      }
 
       socket.send(
         JSON.stringify({
-
-          type:
-            "message",
-
-          text:
-            text
-
+          type: "message",
+          text: text
         })
       );
 
+      messageInput.value = "";
 
-      input.value = "";
-
-      input.focus();
-
+      messageInput.focus();
     }
 
 
-
     /* =========================
-       ENTER TO SEND
-       ========================= */
-
-    function handleKey(event) {
-
-      if (
-        event.key ===
-        "Enter"
-      ) {
-
-        event.preventDefault();
-
-        sendMessage();
-
-      }
-
-    }
-
-
-
-    /* =========================
-       USER COUNT
-       ========================= */
-
-    function updateUserCount(
-      count,
-      max
-    ) {
-
-      document
-        .getElementById(
-          "userCount"
-        )
-        .textContent =
-          `${count} / ${max}`;
-
-    }
-
-
-
-    /* =========================
-       DISPLAY MESSAGE
+       ADD MESSAGE
        ========================= */
 
     function addMessage(
-      name,
+      username,
       text
     ) {
 
-      const messages =
-        document
-          .getElementById(
-            "messages"
-          );
+      const message =
+        document.createElement("div");
 
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
+      message.className =
         "message";
 
+      const name =
+        document.createElement("div");
 
-      const nameElement =
-        document.createElement(
-          "div"
-        );
+      name.className =
+        "username";
 
+      name.textContent =
+        username;
 
-      nameElement.className =
-        "name";
+      const messageText =
+        document.createElement("div");
 
+      messageText.className =
+        "messageText";
 
-      nameElement.textContent =
-        name;
-
-
-      const textElement =
-        document.createElement(
-          "div"
-        );
-
-
-      textElement.textContent =
+      messageText.textContent =
         text;
 
+      message.appendChild(name);
+      message.appendChild(messageText);
 
-      div.appendChild(
-        nameElement
-      );
+      messages.appendChild(message);
 
-
-      div.appendChild(
-        textElement
-      );
-
-
-      messages.appendChild(
-        div
-      );
-
-
-      messages.scrollTop =
-        messages.scrollHeight;
-
+      scrollMessagesToBottom();
     }
-
 
 
     /* =========================
        SYSTEM MESSAGE
        ========================= */
 
-    function addSystemMessage(
-      text
-    ) {
+    function addSystemMessage(text) {
 
-      const messages =
-        document
-          .getElementById(
-            "messages"
-          );
+      const message =
+        document.createElement("div");
 
+      message.className =
+        "systemMessage";
 
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "system-message";
-
-
-      div.textContent =
+      message.textContent =
         text;
 
+      messages.appendChild(message);
 
-      messages.appendChild(
-        div
-      );
+      scrollMessagesToBottom();
+    }
 
+
+    /* =========================
+       ADD DRAWING
+       ========================= */
+
+    function addDrawing(
+      username,
+      image
+    ) {
+
+      const message =
+        document.createElement("div");
+
+      message.className =
+        "drawingMessage";
+
+      const name =
+        document.createElement("div");
+
+      name.className =
+        "username";
+
+      name.textContent =
+        username;
+
+      const imageElement =
+        document.createElement("img");
+
+      imageElement.src =
+        image;
+
+      imageElement.alt =
+        `${username}'s drawing`;
+
+      message.appendChild(name);
+      message.appendChild(imageElement);
+
+      messages.appendChild(message);
+
+      imageElement.onload =
+        scrollMessagesToBottom;
+
+      scrollMessagesToBottom();
+    }
+
+
+    /* =========================
+       SCROLL
+       ========================= */
+
+    function scrollMessagesToBottom() {
 
       messages.scrollTop =
         messages.scrollHeight;
+    }
+
+
+    /* =========================
+       DRAWING SETUP
+       ========================= */
+
+    function setupDrawingCanvas() {
+
+      drawingCanvas =
+        document.getElementById(
+          "drawingCanvas"
+        );
+
+      drawingContext =
+        drawingCanvas.getContext("2d");
+
+      resizeDrawingCanvas();
+
+      drawingCanvas.addEventListener(
+        "pointerdown",
+        startDrawing
+      );
+
+      drawingCanvas.addEventListener(
+        "pointermove",
+        draw
+      );
+
+      drawingCanvas.addEventListener(
+        "pointerup",
+        stopDrawing
+      );
+
+      drawingCanvas.addEventListener(
+        "pointercancel",
+        stopDrawing
+      );
+
+      drawingCanvas.addEventListener(
+        "pointerleave",
+        stopDrawing
+      );
 
     }
 
+
+    /* =========================
+       RESIZE CANVAS
+       ========================= */
+
+    function resizeDrawingCanvas() {
+
+      if (!drawingCanvas) {
+        return;
+      }
+
+      const rect =
+        drawingCanvas.getBoundingClientRect();
+
+      const ratio =
+        window.devicePixelRatio || 1;
+
+      drawingCanvas.width =
+        rect.width * ratio;
+
+      drawingCanvas.height =
+        rect.height * ratio;
+
+      drawingContext.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+      );
+
+      drawingContext.fillStyle =
+        "#ffffff";
+
+      drawingContext.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+      setDrawingStyle();
+
+    }
+
+
+    /* =========================
+       DRAWING STYLE
+       ========================= */
+
+    function setDrawingStyle() {
+
+      if (!drawingContext) {
+        return;
+      }
+
+      drawingContext.strokeStyle =
+        drawingColor;
+
+      drawingContext.fillStyle =
+        drawingColor;
+
+      drawingContext.lineWidth =
+        3;
+
+      drawingContext.lineCap =
+        "round";
+
+      drawingContext.lineJoin =
+        "round";
+    }
+
+
+    /* =========================
+       GET DRAWING POSITION
+       ========================= */
+
+    function getDrawingPosition(event) {
+
+      const rect =
+        drawingCanvas.getBoundingClientRect();
+
+      return {
+        x:
+          event.clientX -
+          rect.left,
+
+        y:
+          event.clientY -
+          rect.top
+      };
+
+    }
+
+
+    /* =========================
+       START DRAWING
+       ========================= */
+
+    function startDrawing(event) {
+
+      if (!drawingCanvas) {
+        return;
+      }
+
+      drawing = true;
+
+      drawingCanvas.setPointerCapture(
+        event.pointerId
+      );
+
+      const position =
+        getDrawingPosition(event);
+
+      drawingContext.beginPath();
+
+      drawingContext.moveTo(
+        position.x,
+        position.y
+      );
+
+      drawingContext.lineTo(
+        position.x + 0.01,
+        position.y + 0.01
+      );
+
+      drawingContext.stroke();
+    }
+
+
+    /* =========================
+       DRAW
+       ========================= */
+
+    function draw(event) {
+
+      if (!drawing) {
+        return;
+      }
+
+      const position =
+        getDrawingPosition(event);
+
+      drawingContext.lineTo(
+        position.x,
+        position.y
+      );
+
+      drawingContext.stroke();
+    }
+
+
+    /* =========================
+       STOP DRAWING
+       ========================= */
+
+    function stopDrawing(event) {
+
+      if (!drawing) {
+        return;
+      }
+
+      drawing = false;
+
+      drawingContext.closePath();
+
+      if (
+        event &&
+        drawingCanvas.hasPointerCapture(
+          event.pointerId
+        )
+      ) {
+        drawingCanvas.releasePointerCapture(
+          event.pointerId
+        );
+      }
+    }
+
+
+    /* =========================
+       SELECT COLOR
+       ========================= */
+
+    function selectDrawingColor(
+      color,
+      button
+    ) {
+
+      drawingColor = color;
+
+      document
+        .querySelectorAll(".colorButton")
+        .forEach((element) => {
+          element.classList.remove(
+            "selected"
+          );
+        });
+
+      customColor.classList.remove(
+        "selected"
+      );
+
+      button.classList.add(
+        "selected"
+      );
+
+      setDrawingStyle();
+    }
+
+
+    /* =========================
+       CUSTOM COLOR
+       ========================= */
+
+    function selectCustomColor(
+      input
+    ) {
+
+      drawingColor =
+        input.value;
+
+      document
+        .querySelectorAll(".colorButton")
+        .forEach((element) => {
+          element.classList.remove(
+            "selected"
+          );
+        });
+
+      customColor.classList.add(
+        "selected"
+      );
+
+      setDrawingStyle();
+    }
 
 
     /* =========================
@@ -1941,40 +1529,16 @@
 
     function openDrawing() {
 
-      const overlay =
-        document
-          .getElementById(
-            "drawingOverlay"
-          );
-
-
-      drawingCanvas =
-        document
-          .getElementById(
-            "drawingCanvas"
-          );
-
-
-      overlay.style.display =
+      drawingOverlay.style.display =
         "flex";
 
-
-      /*
-       * Wait one frame so the
-       * canvas has its correct
-       * visible dimensions.
-       */
-
-      requestAnimationFrame(
-        () => {
-
-          setupDrawingCanvas();
-
-        }
-      );
+      if (!drawingCanvas) {
+        setupDrawingCanvas();
+      } else {
+        resizeDrawingCanvas();
+      }
 
     }
-
 
 
     /* =========================
@@ -1983,288 +1547,11 @@
 
     function closeDrawing() {
 
-      document
-        .getElementById(
-          "drawingOverlay"
-        )
-        .style.display =
-          "none";
-
-
       drawing = false;
 
+      drawingOverlay.style.display =
+        "none";
     }
-
-
-
-    /* =========================
-       SETUP CANVAS
-       ========================= */
-
-    function setupDrawingCanvas() {
-
-      if (!drawingCanvas) {
-
-        drawingCanvas =
-          document
-            .getElementById(
-              "drawingCanvas"
-            );
-
-      }
-
-
-      const rect =
-        drawingCanvas
-          .getBoundingClientRect();
-
-
-      const devicePixelRatio =
-        window.devicePixelRatio ||
-        1;
-
-
-      drawingCanvas.width =
-        Math.max(
-          1,
-          Math.floor(
-            rect.width *
-            devicePixelRatio
-          )
-        );
-
-
-      drawingCanvas.height =
-        Math.max(
-          1,
-          Math.floor(
-            rect.height *
-            devicePixelRatio
-          )
-        );
-
-
-      drawingContext =
-        drawingCanvas.getContext(
-          "2d"
-        );
-
-
-      drawingContext.setTransform(
-        devicePixelRatio,
-        0,
-        0,
-        devicePixelRatio,
-        0,
-        0
-      );
-
-
-      /*
-       * White background.
-       */
-
-      drawingContext.fillStyle =
-        "#ffffff";
-
-
-      drawingContext.fillRect(
-        0,
-        0,
-        rect.width,
-        rect.height
-      );
-
-
-      /*
-       * Black pen.
-       */
-
-      drawingContext.strokeStyle =
-        "#000000";
-
-
-      drawingContext.fillStyle =
-        "#000000";
-
-
-      drawingContext.lineWidth =
-        3;
-
-
-      drawingContext.lineCap =
-        "round";
-
-
-      drawingContext.lineJoin =
-        "round";
-
-    }
-
-
-
-    /* =========================
-       GET POINTER POSITION
-       ========================= */
-
-    function getDrawingPosition(
-      event
-    ) {
-
-      const rect =
-        drawingCanvas
-          .getBoundingClientRect();
-
-
-      return {
-
-        x:
-          event.clientX -
-          rect.left,
-
-        y:
-          event.clientY -
-          rect.top
-
-      };
-
-    }
-
-
-
-    /* =========================
-       START DRAWING
-       ========================= */
-
-    function startDrawing(
-      event
-    ) {
-
-      if (
-        document
-          .getElementById(
-            "drawingOverlay"
-          )
-          .style
-          .display !==
-        "flex"
-      ) {
-
-        return;
-
-      }
-
-
-      event.preventDefault();
-
-
-      drawing = true;
-
-
-      if (
-        drawingCanvas
-          .setPointerCapture
-      ) {
-
-        try {
-
-          drawingCanvas
-            .setPointerCapture(
-              event.pointerId
-            );
-
-        } catch (error) {
-
-          /*
-           * Some browsers may not
-           * support pointer capture.
-           */
-
-        }
-
-      }
-
-
-      const position =
-        getDrawingPosition(
-          event
-        );
-
-
-      drawingContext.beginPath();
-
-
-      drawingContext.moveTo(
-        position.x,
-        position.y
-      );
-
-    }
-
-
-
-    /* =========================
-       DRAW
-       ========================= */
-
-    function draw(
-      event
-    ) {
-
-      if (!drawing) {
-
-        return;
-
-      }
-
-
-      event.preventDefault();
-
-
-      const position =
-        getDrawingPosition(
-          event
-        );
-
-
-      drawingContext.lineTo(
-        position.x,
-        position.y
-      );
-
-
-      drawingContext.stroke();
-
-    }
-
-
-
-    /* =========================
-       STOP DRAWING
-       ========================= */
-
-    function stopDrawing(
-      event
-    ) {
-
-      if (event) {
-
-        event.preventDefault();
-
-      }
-
-
-      drawing = false;
-
-
-      if (drawingContext) {
-
-        drawingContext.closePath();
-
-      }
-
-    }
-
 
 
     /* =========================
@@ -2273,36 +1560,27 @@
 
     function clearDrawing() {
 
-      if (
-        !drawingCanvas ||
-        !drawingContext
-      ) {
-
+      if (!drawingCanvas) {
         return;
-
       }
 
-
       const rect =
-        drawingCanvas
-          .getBoundingClientRect();
+        drawingCanvas.getBoundingClientRect();
 
+      const ratio =
+        window.devicePixelRatio || 1;
 
       drawingContext.setTransform(
-        window.devicePixelRatio ||
-          1,
+        ratio,
         0,
         0,
-        window.devicePixelRatio ||
-          1,
+        ratio,
         0,
         0
       );
 
-
       drawingContext.fillStyle =
         "#ffffff";
-
 
       drawingContext.fillRect(
         0,
@@ -2311,228 +1589,152 @@
         rect.height
       );
 
-
-      drawingContext.strokeStyle =
-        "#000000";
-
-
-      drawingContext.fillStyle =
-        "#000000";
-
-
-      drawingContext.lineWidth =
-        3;
-
-
-      drawingContext.lineCap =
-        "round";
-
-
-      drawingContext.lineJoin =
-        "round";
-
+      setDrawingStyle();
     }
-
 
 
     /* =========================
        SEND DRAWING
        ========================= */
-function sendDrawing() {
 
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    alert("You are not connected to the chat.");
-    return;
-  }
+    function sendDrawing() {
 
-  if (!drawingCanvas) {
-    alert("Drawing canvas is not ready.");
-    return;
-  }
+      if (
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+      ) {
+        return;
+      }
 
-  const image = drawingCanvas.toDataURL("image/png");
+      if (!drawingCanvas) {
+        return;
+      }
 
-  console.log("Sending drawing...");
-  console.log("Drawing size:", image.length);
-
-  socket.send(
-    JSON.stringify({
-      type: "drawing",
-      image: image
-    })
-  );
-
-  closeDrawing();
-}
-
-
-
-    /* =========================
-       DISPLAY DRAWING
-       ========================= */
-
-    function addDrawing(
-      name,
-      image
-    ) {
-
-      const messages =
-        document
-          .getElementById(
-            "messages"
-          );
-
-
-      const div =
-        document.createElement(
-          "div"
+      const image =
+        drawingCanvas.toDataURL(
+          "image/png"
         );
 
-
-      div.className =
-        "drawing-message";
-
-
-      const nameElement =
-        document.createElement(
-          "div"
-        );
-
-
-      nameElement.className =
-        "name";
-
-
-      nameElement.textContent =
-        name;
-
-
-      const imageElement =
-        document.createElement(
-          "img"
-        );
-
-
-      imageElement.className =
-        "drawing-image";
-
-
-      imageElement.src =
-        image;
-
-
-      imageElement.alt =
-        `${name}'s drawing`;
-
-
-      div.appendChild(
-        nameElement
+      socket.send(
+        JSON.stringify({
+          type: "drawing",
+          image: image
+        })
       );
 
-
-      div.appendChild(
-        imageElement
-      );
-
-
-      messages.appendChild(
-        div
-      );
-
-
-      messages.scrollTop =
-        messages.scrollHeight;
-
+      closeDrawing();
     }
 
 
-
     /* =========================
-       CANVAS POINTER EVENTS
+       HOME BUTTON
        ========================= */
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      () => {
+    function goHome() {
 
-        drawingCanvas =
-          document
-            .getElementById(
-              "drawingCanvas"
-            );
+      if (socket) {
 
+        try {
+          socket.close();
+        } catch (error) {
+          console.error(error);
+        }
 
-        drawingCanvas.addEventListener(
-          "pointerdown",
-          startDrawing
-        );
-
-
-        drawingCanvas.addEventListener(
-          "pointermove",
-          draw
-        );
-
-
-        drawingCanvas.addEventListener(
-          "pointerup",
-          stopDrawing
-        );
-
-
-        drawingCanvas.addEventListener(
-          "pointercancel",
-          stopDrawing
-        );
-
-
-        drawingCanvas.addEventListener(
-          "pointerleave",
-          stopDrawing
-        );
-
+        socket = null;
       }
-    );
 
+      currentUsername = "";
+      currentChatName = "";
+
+      messages.innerHTML = "";
+
+      chatScreen.style.display =
+        "none";
+
+      loginScreen.style.display =
+        "flex";
+
+      loginError.textContent = "";
+
+      joinButton.disabled = false;
+
+      usernameInput.value = "";
+      chatNameInput.value = "";
+
+      messageInput.value = "";
+
+      closeDrawing();
+
+      usernameInput.focus();
+    }
 
 
     /* =========================
-       ESCAPE CLOSES DRAWING
+       ENTER KEY
        ========================= */
 
-    document.addEventListener(
+    usernameInput.addEventListener(
       "keydown",
-      (event) => {
+      function(event) {
 
-        if (
-          event.key ===
-          "Escape"
-        ) {
-
-          const overlay =
-            document
-              .getElementById(
-                "drawingOverlay"
-              );
-
-
-          if (
-            overlay.style.display ===
-            "flex"
-          ) {
-
-            closeDrawing();
-
-          }
-
+        if (event.key === "Enter") {
+          chatNameInput.focus();
         }
 
       }
     );
 
+
+    chatNameInput.addEventListener(
+      "keydown",
+      function(event) {
+
+        if (event.key === "Enter") {
+          joinChat();
+        }
+
+      }
+    );
+
+
+    messageInput.addEventListener(
+      "keydown",
+      function(event) {
+
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+
+      }
+    );
+
+
+    /* =========================
+       WINDOW RESIZE
+       ========================= */
+
+    window.addEventListener(
+      "resize",
+      function() {
+
+        if (
+          drawingOverlay.style.display ===
+          "flex"
+        ) {
+          resizeDrawingCanvas();
+        }
+
+      }
+    );
+
+
+    /* =========================
+       INITIAL FOCUS
+       ========================= */
+
+    usernameInput.focus();
+
   </script>
 
 </body>
-
 </html>
-```
