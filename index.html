@@ -20,10 +20,6 @@
 
   <style>
 
-    /* =========================
-       RESET
-       ========================= */
-
     * {
       box-sizing: border-box;
     }
@@ -33,6 +29,7 @@
     body {
       margin: 0;
       padding: 0;
+
       width: 100%;
       height: 100%;
 
@@ -45,16 +42,16 @@
     }
 
 
-    /* =========================
-       MAIN CHAT CONTAINER
-       ========================= */
-
     body {
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
+
+    /* =========================
+       CHAT CONTAINER
+       ========================= */
 
     .chat {
       width: 100%;
@@ -82,28 +79,28 @@
 
       min-height: 64px;
 
-      padding: 14px 18px;
+      padding: 12px 14px;
 
       background: #2563eb;
 
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
 
-      gap: 12px;
+      gap: 10px;
     }
 
 
-    #chatName {
-      display: inline-block;
+    .header-left {
+      min-width: 0;
 
-      max-width: 380px;
+      display: flex;
 
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      align-items: center;
 
-      vertical-align: middle;
+      gap: 8px;
     }
 
 
@@ -111,21 +108,82 @@
       min-width: 0;
 
       font-size: 20px;
+
       font-weight: bold;
 
       overflow: hidden;
     }
 
 
-    #userCount {
+    #chatName {
+      display: inline-block;
+
+      max-width: 320px;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+
+      vertical-align: middle;
+    }
+
+
+    .header-right {
       flex-shrink: 0;
 
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+    }
+
+
+    #userCount {
       font-size: 13px;
+
       font-weight: normal;
 
       opacity: 0.9;
 
       white-space: nowrap;
+    }
+
+
+    /* =========================
+       HOME BUTTON
+       ========================= */
+
+    #homeButton {
+      min-height: 38px;
+
+      padding: 8px 12px;
+
+      border: 1px solid rgba(255, 255, 255, 0.35);
+
+      border-radius: 7px;
+
+      background: rgba(255, 255, 255, 0.12);
+
+      color: white;
+
+      font-size: 13px;
+
+      cursor: pointer;
+
+      white-space: nowrap;
+    }
+
+
+    #homeButton:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+
+    #homeButton:active {
+      transform: scale(0.97);
     }
 
 
@@ -141,6 +199,7 @@
       padding: 20px;
 
       overflow-y: auto;
+
       overflow-x: hidden;
 
       -webkit-overflow-scrolling: touch;
@@ -203,8 +262,6 @@
 
       background: #111827;
 
-      /* Safe area for phones with
-         a bottom home indicator */
       padding-bottom:
         max(12px, env(safe-area-inset-bottom));
     }
@@ -287,7 +344,7 @@
 
       z-index: 10;
 
-      width: calc(100% - 32px);
+      width: calc(100% - 28px);
 
       max-width: 360px;
 
@@ -357,7 +414,7 @@
 
 
     /* =========================
-       TABLETS / SMALL LAPTOPS
+       TABLETS
        ========================= */
 
     @media (max-width: 700px) {
@@ -369,9 +426,11 @@
 
       .chat {
         width: 100%;
+
         max-width: none;
 
         height: 100dvh;
+
         min-height: 100dvh;
 
         border-radius: 0;
@@ -389,7 +448,9 @@
       header {
         min-height: 58px;
 
-        padding: 12px 14px;
+        padding: 10px 12px;
+
+        gap: 6px;
       }
 
 
@@ -399,12 +460,26 @@
 
 
       #chatName {
-        max-width: 190px;
+        max-width: 150px;
       }
 
 
       #userCount {
+        font-size: 11px;
+      }
+
+
+      #homeButton {
+        min-height: 36px;
+
+        padding: 7px 9px;
+
         font-size: 12px;
+      }
+
+
+      .header-right {
+        gap: 5px;
       }
 
 
@@ -480,16 +555,23 @@
     @media (max-width: 360px) {
 
       .chat-title {
-        font-size: 16px;
+        font-size: 15px;
       }
 
 
       #chatName {
-        max-width: 150px;
+        max-width: 110px;
       }
 
 
       #userCount {
+        display: none;
+      }
+
+
+      #homeButton {
+        padding: 7px 8px;
+
         font-size: 11px;
       }
 
@@ -508,6 +590,7 @@
         min-width: 60px;
 
         padding-left: 8px;
+
         padding-right: 8px;
       }
 
@@ -526,6 +609,7 @@
 
       .chat {
         height: 100dvh;
+
         min-height: 100dvh;
       }
 
@@ -533,7 +617,7 @@
       header {
         min-height: 48px;
 
-        padding: 8px 14px;
+        padding: 7px 12px;
       }
 
 
@@ -623,13 +707,30 @@
 
     <header>
 
-      <div class="chat-title">
-        💬 <span id="chatName">Chat</span>
+
+      <div class="header-left">
+
+        <div class="chat-title">
+          💬 <span id="chatName">Chat</span>
+        </div>
+
       </div>
 
 
-      <div id="userCount">
-        0 / 5 users
+      <div class="header-right">
+
+        <div id="userCount">
+          0 / 5
+        </div>
+
+
+        <button
+          id="homeButton"
+          onclick="goHome()"
+        >
+          🏠 Home
+        </button>
+
       </div>
 
     </header>
@@ -752,10 +853,6 @@
         "wss://basicchats.onrender.com"
       );
 
-
-      // =========================
-      // CONNECTION OPEN
-      // =========================
 
       socket.onopen = () => {
 
@@ -920,6 +1017,7 @@
         status.textContent =
           "Unable to connect to the chat server.";
 
+
         document
           .getElementById("username")
           .disabled = false;
@@ -961,6 +1059,98 @@
 
 
     // =========================
+    // HOME BUTTON
+    // =========================
+
+    function goHome() {
+
+      // Close the current WebSocket.
+
+      if (
+        socket &&
+        socket.readyState ===
+          WebSocket.OPEN
+      ) {
+
+        socket.close();
+
+      }
+
+
+      socket = null;
+
+
+      // Clear the messages.
+
+      document
+        .getElementById("messages")
+        .innerHTML = "";
+
+
+      // Reset chat name.
+
+      document
+        .getElementById("chatName")
+        .textContent = "Chat";
+
+
+      // Reset user count.
+
+      document
+        .getElementById("userCount")
+        .textContent = "0 / 5";
+
+
+      // Clear the message input.
+
+      document
+        .getElementById("messageInput")
+        .value = "";
+
+
+      // Disable Send.
+
+      document
+        .getElementById("sendButton")
+        .disabled = true;
+
+
+      // Re-enable login inputs.
+
+      document
+        .getElementById("username")
+        .disabled = false;
+
+
+      document
+        .getElementById("chatNameInput")
+        .disabled = false;
+
+
+      // Clear connection status.
+
+      document
+        .getElementById("connectionStatus")
+        .textContent = "";
+
+
+      // Show the login page.
+
+      document
+        .getElementById("login")
+        .style.display = "block";
+
+
+      // Put the cursor back in the name field.
+
+      document
+        .getElementById("username")
+        .focus();
+
+    }
+
+
+    // =========================
     // SEND MESSAGE
     // =========================
 
@@ -997,8 +1187,6 @@
         })
       );
 
-
-      // Display your own message immediately.
 
       addMessage(
         "You",
@@ -1042,13 +1230,13 @@
       document
         .getElementById("userCount")
         .textContent =
-          `${count} / ${max} users`;
+          `${count} / ${max}`;
 
     }
 
 
     // =========================
-    // DISPLAY CHAT MESSAGE
+    // DISPLAY MESSAGE
     // =========================
 
     function addMessage(
@@ -1089,6 +1277,7 @@
       div.appendChild(
         nameElement
       );
+
 
       div.appendChild(
         textElement
