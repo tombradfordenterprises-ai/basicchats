@@ -649,6 +649,265 @@
       }
 
     }
+    /* =========================
+   DRAWING BUTTON
+   ========================= */
+
+#drawButton {
+  background: #374151;
+}
+
+#drawButton:hover {
+  background: #4b5563;
+}
+
+
+/* =========================
+   DRAWING OVERLAY
+   ========================= */
+
+#drawingOverlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 100;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px;
+
+  background: rgba(0, 0, 0, 0.65);
+}
+
+
+/* =========================
+   DRAWING BOX
+   ========================= */
+
+#drawingBox {
+  width: min(92vw, 500px);
+
+  background: #1f2937;
+
+  border-radius: 12px;
+
+  padding: 12px;
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.5);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+/* =========================
+   DRAWING HEADER
+   ========================= */
+
+#drawingHeader {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  font-size: 18px;
+
+  font-weight: bold;
+}
+
+
+#closeDrawingButton {
+  min-width: 40px;
+
+  min-height: 40px;
+
+  padding: 8px;
+
+  background: #374151;
+
+  font-size: 18px;
+}
+
+
+#closeDrawingButton:hover {
+  background: #4b5563;
+}
+
+
+/* =========================
+   CANVAS
+   ========================= */
+
+#drawingCanvas {
+  display: block;
+
+  width: 100%;
+
+  height: 300px;
+
+  background: white;
+
+  border-radius: 8px;
+
+  cursor: crosshair;
+
+  touch-action: none;
+}
+
+
+/* =========================
+   DRAWING CONTROLS
+   ========================= */
+
+#drawingControls {
+  display: flex;
+
+  gap: 8px;
+}
+
+
+#drawingControls button {
+  flex: 1;
+
+  min-height: 44px;
+
+  padding: 10px;
+
+  font-size: 13px;
+}
+
+
+#drawingControls button:first-child {
+  background: #374151;
+}
+
+
+#drawingControls button:first-child:hover {
+  background: #4b5563;
+}
+
+
+#drawingControls button:nth-child(2) {
+  background: #6b7280;
+}
+
+
+#drawingControls button:nth-child(2):hover {
+  background: #4b5563;
+}
+
+
+#sendDrawingButton {
+  background: #2563eb;
+}
+
+
+/* =========================
+   DRAWING IN CHAT
+   ========================= */
+
+.drawing-message {
+  margin-bottom: 12px;
+
+  padding: 10px;
+
+  background: #374151;
+
+  border-radius: 8px;
+}
+
+
+.drawing-message .name {
+  margin-bottom: 8px;
+}
+
+
+.drawing-image {
+  display: block;
+
+  width: 100%;
+
+  max-width: 400px;
+
+  height: auto;
+
+  background: white;
+
+  border-radius: 6px;
+}
+
+
+/* =========================
+   SMALL PHONES
+   ========================= */
+
+@media (max-width: 480px) {
+
+  #drawingOverlay {
+    padding: 10px;
+  }
+
+
+  #drawingBox {
+    width: 100%;
+
+    padding: 10px;
+
+    border-radius: 10px;
+  }
+
+
+  #drawingCanvas {
+    height: 260px;
+  }
+
+
+  #drawingControls {
+    gap: 6px;
+  }
+
+
+  #drawingControls button {
+    padding: 9px 6px;
+
+    font-size: 12px;
+  }
+
+
+  #drawButton {
+    min-width: 65px;
+
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+}
+
+
+/* =========================
+   LANDSCAPE PHONES
+   ========================= */
+
+@media (
+  max-height: 500px
+) and (
+  orientation: landscape
+) {
+
+  #drawingCanvas {
+    height: 180px;
+  }
+
+}
 
   </style>
 
@@ -749,17 +1008,35 @@
          MESSAGE INPUT
          ========================= -->
 
-    <div class="input-area">
+  <div class="input-area">
 
-      <input
-        id="messageInput"
-        type="text"
-        placeholder="Type a message..."
-        maxlength="1000"
-        autocomplete="off"
-        enterkeyhint="send"
-        onkeydown="handleKey(event)"
-      >
+  <input
+    id="messageInput"
+    type="text"
+    placeholder="Type a message..."
+    maxlength="1000"
+    autocomplete="off"
+    enterkeyhint="send"
+    onkeydown="handleKey(event)"
+  >
+
+  <button
+    id="drawButton"
+    onclick="openDrawing()"
+    disabled
+  >
+    ✏️ Draw
+  </button>
+
+  <button
+    id="sendButton"
+    onclick="sendMessage()"
+    disabled
+  >
+    Send
+  </button>
+
+</div>
 
 
       <button
@@ -774,7 +1051,59 @@
 
   </div>
 
+<!-- =========================
+     DRAWING POPUP
+     ========================= -->
 
+<div id="drawingOverlay">
+
+  <div id="drawingBox">
+
+    <div id="drawingHeader">
+      <span>✏️ Draw</span>
+
+      <button
+        id="closeDrawingButton"
+        onclick="closeDrawing()"
+        type="button"
+      >
+        ✕
+      </button>
+    </div>
+
+
+    <canvas id="drawingCanvas"></canvas>
+
+
+    <div id="drawingControls">
+
+      <button
+        type="button"
+        onclick="clearDrawing()"
+      >
+        Clear
+      </button>
+
+      <button
+        type="button"
+        onclick="closeDrawing()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        id="sendDrawingButton"
+        onclick="sendDrawing()"
+      >
+        Send Drawing
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
   <script>
 
