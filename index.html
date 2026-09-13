@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -38,6 +39,15 @@
       background: #2563eb;
       font-size: 20px;
       font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #userCount {
+      font-size: 13px;
+      font-weight: normal;
+      opacity: 0.9;
     }
 
     #messages {
@@ -72,6 +82,7 @@
       border: none;
       border-radius: 8px;
       outline: none;
+      font-size: 15px;
     }
 
     button {
@@ -81,18 +92,31 @@
       background: #2563eb;
       color: white;
       cursor: pointer;
+      font-size: 15px;
     }
 
     button:hover {
       background: #1d4ed8;
     }
 
+    button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+
     #login {
       position: absolute;
+      z-index: 10;
       background: #1f2937;
       padding: 30px;
       border-radius: 12px;
       width: 300px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    #login h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
     }
 
     #login input {
@@ -103,123 +127,448 @@
     #login button {
       width: 100%;
     }
+
+    #connectionStatus {
+      font-size: 12px;
+      color: #d1d5db;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        align-items: stretch;
+      }
+
+      .chat {
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+      }
+
+      header {
+        padding: 15px;
+      }
+
+      #messages {
+        padding: 15px;
+      }
+
+      .input-area {
+        padding: 10px;
+      }
+    }
   </style>
+
 </head>
 
 <body>
 
+  <!-- LOGIN / JOIN SCREEN -->
+
   <div id="login">
-    <h2>Join Chat</h2>
 
-    <input
-      id="username"
-      placeholder="Enter your name"
-    />
+```
+<h2>Join Chat</h2>
 
-    <button onclick="joinChat()">
-      Join
-    </button>
+<input
+  id="username"
+  type="text"
+  placeholder="Enter your name"
+  maxlength="30"
+  autocomplete="off"
+/>
+
+<input
+  id="chatNameInput"
+  type="text"
+  placeholder="Chat name (optional)"
+  maxlength="50"
+  autocomplete="off"
+/>
+
+<button onclick="joinChat()">
+  Join
+</button>
+
+<div id="connectionStatus"></div>
+```
+
   </div>
 
+  <!-- CHAT -->
+
   <div class="chat">
-    <header>
-      💬 Simple P2P Chat
-    </header>
 
-    <div id="messages"></div>
+```
+<header>
 
-    <div class="input-area">
-      <input
-        id="messageInput"
-        placeholder="Type a message..."
-        onkeydown="handleKey(event)"
-      />
+  <div>
+    💬 <span id="chatName">Simple P2P Chat</span>
+  </div>
 
-      <button onclick="sendMessage()">
-        Send
-      </button>
-    </div>
+  <div id="userCount">
+    0 / 5 users
+  </div>
+
+</header>
+
+
+<!-- MESSAGES -->
+<div id="messages"></div>
+
+
+<!-- MESSAGE INPUT -->
+<div class="input-area">
+
+  <input
+    id="messageInput"
+    type="text"
+    placeholder="Type a message..."
+    maxlength="1000"
+    autocomplete="off"
+    onkeydown="handleKey(event)"
+  />
+
+  <button
+    id="sendButton"
+    onclick="sendMessage()"
+    disabled
+  >
+    Send
+  </button>
+
+</div>
+```
+
   </div>
 
   <script>
+
     let username = "";
-    let socket;
+    let socket = null;
+
+
+    // =========================
+    // JOIN CHAT
+    // =========================
 
     function joinChat() {
-      username = document.getElementById("username").value.trim();
+
+      username = document
+        .getElementById("username")
+        .value
+        .trim();
+
+      const requestedChatName = document
+        .getElementById("chatNameInput")
+        .value
+        .trim();
+
 
       if (!username) {
+
         alert("Please enter your name.");
+
         return;
       }
 
-      document.getElementById("login").style.display = "none";
+
+      const login = document.getElementById("login");
+      const connectionStatus =
+        document.getElementById("connectionStatus");
+
+
+      connectionStatus.textContent = "Connecting...";
+
 
       socket = new WebSocket(
-  "wss://basicchats.onrender.com"
-);
+        "wss://basicchats.onrender.com"
+      );
 
+
+      // =========================
+      // CONNECTION OPEN
+      // =========================
 
       socket.onopen = () => {
-        addMessage("System", "You joined the chat.");
+
+        connectionStatus.textContent = "";
+
+        login.style.display = "none";
+
+        document.getElementById("sendButton").disabled = false;
+
+        addMessage(
+          "System",
+          "You joined the chat."
+        );
+
+
+        // If the user entered a chat name,
+        // ask the server to set it.
+
+        if (requestedChatName) {
+
+          socket.send(
+            JSON.stringify({
+              type: "setChatName",
+              chatName: requestedChatName
+            })
+          );
+
+        }
+
       };
+
+
+      // =========================
+      // RECEIVE MESSAGE
+      // =========================
 
       socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
 
-        addMessage(message.username, message.text);
+        let data;
+
+        try {
+
+          data = JSON.parse(event.data);
+
+        } catch (error) {
+
+          console.error(
+            "Invalid server message:",
+            event.data
+          );
+
+          return;
+        }
+
+
+        // Chat is full
+
+        if (data.type === "full") {
+
+          alert(data.message);
+
+          login.style.display = "block";
+
+          connectionStatus.textContent =
+            "Chat is currently full.";
+
+          document.getElementById("sendButton").disabled = true;
+
+          socket = null;
+
+          return;
+        }
+
+
+        // Chat information
+
+        if (data.type === "chatInfo") {
+
+          document.getElementById(
+            "chatName"
+          ).textContent = data.chatName;
+
+
+          document.getElementById(
+            "userCount"
+          ).textContent =
+            `${data.userCount} / ${data.maxUsers} users`;
+
+          return;
+        }
+
+
+        // User count update
+
+        if (data.type === "userCount") {
+
+          document.getElementById(
+            "userCount"
+          ).textContent =
+            `${data.userCount} / ${data.maxUsers} users`;
+
+          return;
+        }
+
+
+        // Normal chat message
+
+        if (data.type === "message") {
+
+          addMessage(
+            data.username,
+            data.text
+          );
+
+          return;
+        }
+
       };
+
+
+      // =========================
+      // CONNECTION ERROR
+      // =========================
+
+      socket.onerror = () => {
+
+        connectionStatus.textContent =
+          "Unable to connect to the chat server.";
+
+        document.getElementById(
+          "sendButton"
+        ).disabled = true;
+
+      };
+
+
+      // =========================
+      // CONNECTION CLOSED
+      // =========================
 
       socket.onclose = () => {
-        addMessage("System", "Disconnected from server.");
+
+        document.getElementById(
+          "sendButton"
+        ).disabled = true;
+
+
+        // Only show this if the user
+        // had successfully joined.
+
+        if (login.style.display === "none") {
+
+          addMessage(
+            "System",
+            "Disconnected from server."
+          );
+
+        }
+
       };
+
     }
+
+
+    // =========================
+    // SEND MESSAGE
+    // =========================
 
     function sendMessage() {
-      const input = document.getElementById("messageInput");
-      const text = input.value.trim();
 
-      if (!text || !socket) return;
+      const input =
+        document.getElementById("messageInput");
+
+      const text =
+        input.value.trim();
+
+
+      if (
+        !text ||
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+      ) {
+
+        return;
+      }
+
 
       const message = {
+
+        type: "message",
+
         username: username,
+
         text: text
+
       };
 
-      socket.send(JSON.stringify(message));
 
-      addMessage("You", text);
+      socket.send(
+        JSON.stringify(message)
+      );
+
+
+      // The server does not send the message
+      // back to the sender, so display it locally.
+
+      addMessage(
+        "You",
+        text
+      );
+
 
       input.value = "";
+
       input.focus();
+
     }
+
+
+    // =========================
+    // ENTER TO SEND
+    // =========================
 
     function handleKey(event) {
+
       if (event.key === "Enter") {
+
+        event.preventDefault();
+
         sendMessage();
+
       }
+
     }
 
-    function addMessage(name, text) {
-      const messages = document.getElementById("messages");
 
-      const div = document.createElement("div");
+    // =========================
+    // DISPLAY MESSAGE
+    // =========================
+
+    function addMessage(name, text) {
+
+      const messages =
+        document.getElementById("messages");
+
+
+      const div =
+        document.createElement("div");
+
       div.className = "message";
 
-      const nameElement = document.createElement("div");
+
+      const nameElement =
+        document.createElement("div");
+
       nameElement.className = "name";
+
       nameElement.textContent = name;
 
-      const textElement = document.createElement("div");
+
+      const textElement =
+        document.createElement("div");
+
       textElement.textContent = text;
 
+
       div.appendChild(nameElement);
+
       div.appendChild(textElement);
+
 
       messages.appendChild(div);
 
-      messages.scrollTop = messages.scrollHeight;
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
     }
+
   </script>
 
 </body>
