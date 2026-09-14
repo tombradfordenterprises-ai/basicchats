@@ -985,22 +985,9 @@
     // WEBSOCKET URL
     // ========================================================
 
-   function getWebSocketURL() {
-  return "basicchats.onrender.com";
-} {
-
-      const protocol =
-        window.location.protocol === "https:"
-          ? "wss:"
-          : "ws:";
-
-      return (
-        protocol +
-        "//" +
-        window.location.host
-      );
-    }
-
+function getWebSocketURL() {
+  return "wss://basicchats.onrender.com";
+}
 
     // ========================================================
     // CONNECT
