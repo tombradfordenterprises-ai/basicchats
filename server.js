@@ -85,6 +85,22 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocket.Server({
   server
 });
+// Keep WebSocket connections alive
+const heartbeatInterval = setInterval(() => {
+  wss.clients.forEach(ws => {
+    if (ws.isAlive === false) {
+      console.log("Terminating inactive WebSocket connection.");
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+
+wss.on("close", () => {
+  clearInterval(heartbeatInterval);
+});
 
 
 // ============================================================
@@ -800,6 +816,19 @@ function applyCheckersMove(
 // ============================================================
 
 wss.on("connection", ws => {
+    ws.isAlive = true;
+
+  ws.on("pong", () => {
+    ws.isAlive = true;
+  });
+
+  ws.room = null;
+
+  ws.checkerColor = null;
+
+  console.log(
+    "New WebSocket connection."
+  );
 
   ws.room = null;
 
